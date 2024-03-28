@@ -2,6 +2,7 @@
   "name": "piggy-bank",
   "private": true,
   "version": "0.0.0",
+  "author": "Dhihan Ahmed 20005914 Luke Bianchi 20005985 Jesal Gandhi 20006223 Jacob Gurevich 20006224 Ajit Kandasamy 20006210",
   "type": "module",
   "scripts": {
     "dev": "vite",
