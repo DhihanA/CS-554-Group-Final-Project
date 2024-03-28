@@ -2,6 +2,7 @@
   "name": "piggy-bank",
   "private": true,
   "version": "0.0.0",
+  "author": "Dhihan Ahmed 20005914 Luke Bianchi 20005985 Jesal Gandhi 20006223 Jacob Gurevich 20006224 Ajit Kandasamy 20006210",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.9.9",
     "@nextui-org/react": "^2.2.10",
+    "graphql": "^16.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3"
