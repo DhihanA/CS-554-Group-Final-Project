@@ -4,11 +4,27 @@ import App from './App.jsx'
 import './index.css'
 import {BrowserRouter} from 'react-router-dom';
 import {NextUIProvider} from "@nextui-org/react";
+import {
+  ApolloClient,
+  HttpLink,
+  InMemoryCache,
+  ApolloProvider
+} from '@apollo/client';
+
+//! TODO: uncomment AppoloClient stuff after gql server is up and running
+// const client = new ApolloClient({
+//   cache: new InMemoryCache(),
+//   link: new HttpLink({
+//     uri: 'http://localhost:4000'
+//   })
+// });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <BrowserRouter>
-    <main className="dark text-foreground">
-      <App />
-    </main>
-    </BrowserRouter>
+    // <ApolloClient client={client}>
+      <BrowserRouter>
+      <main className="dark text-foreground">
+        <App />
+      </main>
+      </BrowserRouter>
+    // </ApolloClient>
 )
