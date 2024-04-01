@@ -214,4 +214,140 @@ const createUser = async (
     return await getUserById(insertInfo.insertedId.toString());
   };
 
-export {createUser};
+  const checkUser = async (emailAddress, password) => {
+    if ((!emailAddress) || (!password)) {
+      throw new Error ('All fields need to have valid values');
+    }
+    if (typeof emailAddress !== 'string' || typeof password !== 'string') {
+      throw new Error ('Both parameters must be of type string');
+    }
+
+    emailAddress = emailAddress.toLowerCase();
+    emailAddress = emailAddress.trim();
+  
+
+    //Check email
+    if (!emailAddress.includes('@')) {
+      throw new Error ('invalid email');
+    }
+    if (emailAddress.includes(' ')) {
+      throw new Error ('invalid email');
+    }
+    if ((!emailAddress.endsWith('.com')) && (!emailAddress.endsWith('.edu')) && (!emailAddress.endsWith('.org')) && (!emailAddress.endsWith('.net')) && (!emailAddress.endsWith('.int')) && (!emailAddress.endsWith('.gov')) && (!emailAddress.endsWith('.mil'))) {
+      throw new Error ('invalid email');
+    }
+    if (emailAddress[0] === '@') {
+      throw new Error ('invalid email');
+    } 
+    let index = emailAddress.indexOf('@');
+    if (emailAddress[index+1] === '.') {
+      throw new Error ('invalid email');
+    }
+    
+    //Check password
+    if ((typeof password !== 'string') || (!(password.replace(/\s/g, '').length)) || (password.length < 8)) {
+      throw new Error ('invalid password');
+    }
+    let upper = /[A-Z]/;
+    let nums = /\d/;
+    let specials = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+    if (!upper.test(password) || !nums.test(password) || !specials.test(password)) {
+      throw new Error ('invalid password');
+    }
+  
+    //End of error checking
+    
+    const userCollection = await users();
+    const userro = await userCollection.findOne({emailAddress: emailAddress});
+    if (userro === null) {
+      throw new Error ('Either the email address or password is invalid');
+    }
+    userro._id = userro._id.toString();
+    let compareToMatch = false;
+    try {
+      compareToMatch = await bcrypt.compare(password, userro.password);
+    } catch (e) {
+      //no op
+    }
+  
+    if (compareToMatch) {
+      return [userro.firstName, userro.lastName, userro.emailAddress, userro.password, userro.username, userro._id];
+    } else {
+      throw new Error ('Either the email address or password is invalid');
+    }
+    
+  };
+
+const getAllUsers = async () => {
+
+  const userData = await users();
+
+  let userList = await userData.find({}).toArray();
+
+  if (!userList) { throw new Error ('Unable to find all users'); }
+
+  userList = userList.map((item) =>  { 
+  item._id = item._id.toString(); 
+  return item; });
+  return userList;
+};
+
+const getUserById = async (id) => {
+
+  if (!id) { throw new Error('Missing ID parameter'); }
+
+  if (typeof id !== 'string' || id.trim().length === 0) {
+    throw new Error('ID parameter is invalid');
+  }
+
+  id = id.trim();
+
+  if (!ObjectId.isValid(id)) {
+    throw new Error('Invalid object ID');
+  }
+
+  const userData = await users();
+  let user = await userData.findOne({_id: new ObjectId(id)});
+
+  if (user === null) { throw new Error('User not found in database'); }
+  user._id = user._id.toString();
+
+  return user;
+
+}
+
+const removeUser = async (id) => {
+  if (!id) {
+    throw new Error ('needs an id parameter');
+  }
+  if (typeof id !== "string" || !(id.replace(/\s/g, '').length)) {
+    throw new Error ('id must be a nonempty string');
+  }
+  id = id.trim();
+  if (!ObjectId.isValid(id)) throw 'invalid object ID';
+  const userCollection = await users();
+  const deletionInfo = await userCollection.findOneAndDelete({
+    _id: new ObjectId(id)
+  });
+
+  if (deletionInfo.lastErrorObject.n === 0) {
+    throw `Could not delete user with id of ${id}`;
+  }
+  return `${deletionInfo.value.name} has been successfully deleted!`;
+};
+
+const getUserByUsername = async (username) => {
+
+  if (!username) { throw new Error('Missing ID parameter'); }
+
+  if (typeof username !== 'string' || username.trim().length === 0) {
+    throw new Error('ID parameter is invalid');
+  }
+  username = username.trim();
+  const userData = await users();
+  let user = await userData.findOne({username: username});
+  if (user === null) { throw new Error('User not found in database'); }
+  return user;
+}
+
+export {createUser, getUserByUsername, removeUser, getUserById, getAllUsers, checkUser};
