@@ -1,6 +1,15 @@
 import { transactions } from "../mongoCollections";
 
-
+function isValidDate(dateString) {
+    const regex = /^(0?[1-9]|1[012])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/;
+    if (!regex.test(dateString)) {
+      return false;
+    }
+  
+    const [month, day, year] = dateString.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  }
 
 
 export async function getTransactionById(id) {
@@ -12,16 +21,21 @@ export async function getTransactionById(id) {
     }
     }
 
-export async function sendTransaction(userId, recieverId, amount, date, description) {
+export async function makeTransaction(userId, recieverId, type, amount, date, description) {
     if (!userId) throw 'You must provide a userId';
     if (!recieverId) throw 'You must provide a recieverId';
+    if (!type) throw 'You must provide a type';
     if (!amount) throw 'You must provide an amount';
+    if (!amount > 0) throw 'You must provide a positive amount';
+    if (typeof amount !== 'number') throw 'Amount must be a number';
     if (!date) throw 'You must provide a date';
+    if (!isValidDate(date)) throw 'You must provide a valid date';
     if (!description) throw 'You must provide a description';
     const transactionsCollection = await transactions();
     const newTransaction = {
         userId: userId,
         recieverId: recieverId,
+        type: type,
         amount: amount,
         date: date,
         description: description
