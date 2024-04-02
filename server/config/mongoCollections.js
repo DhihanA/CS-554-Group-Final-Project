@@ -17,3 +17,4 @@ const getCollectionFn = (collection) => {
 
 //! List actual collections below
 // export const artists = getCollectionFn('artists');
+export const transactions = getCollectionFn('transactions');
