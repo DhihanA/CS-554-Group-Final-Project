@@ -1,21 +1,24 @@
-import {useState} from 'react'
-import {Route, Routes, BrowserRouter, useNavigate} from 'react-router-dom';
-import {NextUIProvider} from '@nextui-org/react';
-import './App.css'
-import Home from './components/Home';
+import { useState } from "react";
+import { Route, Routes, BrowserRouter, useNavigate } from "react-router-dom";
+import { NextUIProvider } from "@nextui-org/react";
+import "./App.css";
+
+// Import all pages here
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const navigate = useNavigate();
-  // const [count, setCount] = useState(0)
 
   return (
     <NextUIProvider navigate={navigate}>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      {/* More Routes below */}
-    </Routes>
+      {/* All route declarations go below */}
+
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+      </Routes>
+      {/* Footer Component (todo) here */}
     </NextUIProvider>
-  )
+  );
 }
 
-export default App
+export default App;

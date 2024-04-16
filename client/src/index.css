@@ -9,7 +9,8 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* background-color: #242424; */
+  background-color: black;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -17,7 +18,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+html,
+body,
+#app,
+#app > div {
+  height: 100%;
+}
+
+/* a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
@@ -69,4 +77,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
