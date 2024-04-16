@@ -4,11 +4,9 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  // Link,
+  Link,
   Button,
 } from "@nextui-org/react";
-
-import { Link } from "react-router-dom";
 
 import piggyBankLogo from "../assets/piggyBankIcon.png";
 
@@ -25,14 +23,14 @@ export default function NavbarComponent({ authenticated }) {
       {authenticated ? (
         <Navbar>
           <NavbarBrand>
-            <Link color="foreground" to="/">
+            <Link color="foreground" href="/">
               Dashboard
             </Link>
           </NavbarBrand>
           <NavbarContent className="" justify="center">
             {Object.keys(routes).map((key) => (
               <NavbarItem key={key}>
-                <Link color="foreground" to={routes[key]}>
+                <Link color="foreground" href={routes[key]}>
                   {key}
                 </Link>
               </NavbarItem>
@@ -40,17 +38,33 @@ export default function NavbarComponent({ authenticated }) {
           </NavbarContent>
           <NavbarContent justify="end">
             <NavbarItem className="hidden lg:flex">
-              <Link href="#">Login</Link>
+              <Link href="/login">Login</Link>
             </NavbarItem>
             <NavbarItem>
-              <Button as={Link} color="primary" href="#" variant="flat">
+              <Button as={Link} color="primary" href="/signup" variant="flat">
                 Sign Up
               </Button>
             </NavbarItem>
           </NavbarContent>
         </Navbar>
       ) : (
-        <></>
+        <Navbar>
+          <NavbarBrand>
+            <Link color="foreground" href="/">
+              Piggy Bank
+            </Link>
+          </NavbarBrand>
+          <NavbarContent justify="end">
+            <NavbarItem className="lg:flex">
+              <Link href="/login">Login</Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Button as={Link} color="primary" href="/signup" variant="flat">
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </NavbarContent>
+        </Navbar>
       )}
     </div>
   );

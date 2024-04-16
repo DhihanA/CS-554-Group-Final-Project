@@ -22,11 +22,9 @@ import {
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <ApolloClient client={client}>
   <BrowserRouter>
-    <NextUIProvider>
-      <main className="dark text-foreground bg-background ">
-        <App />
-      </main>
-    </NextUIProvider>
+    <main className="dark text-foreground bg-background ">
+      <App />
+    </main>
   </BrowserRouter>
   // </ApolloClient>
 );
