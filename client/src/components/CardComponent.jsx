@@ -12,7 +12,7 @@ import {
   Image,
 } from "@nextui-org/react";
 
-function Home() {
+function CardComponent() {
   return (
     <>
       {/* <p className="text-xl font-bold underline">Hello bro!</p> */}
@@ -50,4 +50,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default CardComponent;

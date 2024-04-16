@@ -2,24 +2,21 @@ import { useState } from "react";
 import { Route, Routes, BrowserRouter, useNavigate } from "react-router-dom";
 import { NextUIProvider } from "@nextui-org/react";
 import "./App.css";
-import Home from "./components/Home";
-import NavbarComponent from "./components/NavbarComponent";
+
+// Import all pages here
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const navigate = useNavigate();
 
   return (
     <NextUIProvider navigate={navigate}>
-      {/* !Fix this so that authenticated passes in whether user is actually logged in or not */}
-      <NavbarComponent authenticated={true}></NavbarComponent>
-      <NavbarComponent authenticated={false}></NavbarComponent>
+      {/* All route declarations go below */}
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        {/* More Routes below */}
+        <Route path="/" element={<Dashboard />} />
       </Routes>
-
-      {/* Footer Component here */}
+      {/* Footer Component (todo) here */}
     </NextUIProvider>
   );
 }
