@@ -1,57 +1,36 @@
 import React from "react";
-// import { Card, Avatar } from "@nextui-org/react";
 
 const Transactions = () => {
   return (
     <>
-      <button className="btn">Hello daisyUI</button>
-      {/* <Card className="max-w-[400px] mx-4">
-        <Card className="py-10">
-          <div className="p-center mb-5">
-            <p>Latest Transactions</p>
-            <button className="btn">Hello daisyUI</button>
+      <div className="card w-96 bg-base-100 shadow-xl mx-4">
+        <div className="card-body items-center text-center">
+          <h2 className="card-title">Latest Transactions</h2>
+          <div className="divider"></div>
+          {/* Transaction Item */}
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="avatar">
+              <div className="w-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
+              </div>
+            </div>
+            <p className="flex-grow font-semibold">Jose Perez</p>
+            <p className="text-success">4500 USD</p>
+            <p className="text-gray-500">9/20/2021</p>
           </div>
-
-          <div className="flex items-center justify-between gap-6 py-4">
-            <Avatar
-              size="md"
-              pointer
-              src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-              bordered
-              color="gradient"
-              stacked
-            />
-            <p size="$base" weight="semibold">
-              Jose Perez
-            </p>
-            <p className="p-green-600" size="$xs">
-              4500 USD
-            </p>
-            <p className="p-gray-600" size="$xs">
-              9/20/2021
-            </p>
+          {/* Repeated Transaction Item */}
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="avatar">
+              <div className="w-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" />
+              </div>
+            </div>
+            <p className="flex-grow font-semibold">Jose Perez</p>
+            <p className="text-success">4500 USD</p>
+            <p className="text-gray-500">9/20/2021</p>
           </div>
-          <div className="flex items-center justify-between gap-6 py-4">
-            <Avatar
-              size="md"
-              pointer
-              src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-              bordered
-              color="gradient"
-              stacked
-            />
-            <p size="$base" weight="semibold">
-              Jose Perez
-            </p>
-            <p className="p-green-600" size="$xs">
-              4500 USD
-            </p>
-            <p className="p-gray-600" size="$xs">
-              9/20/2021
-            </p>
-          </div>
-        </Card>
-      </Card> */}
+        </div>
+      </div>
     </>
   );
 };
