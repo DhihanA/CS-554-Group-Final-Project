@@ -1,12 +1,12 @@
 import React from "react";
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  Link,
-  Button,
-} from "@nextui-org/react";
+// import {
+//   Navbar,
+//   NavbarBrand,
+//   NavbarContent,
+//   NavbarItem,
+//   Link,
+//   Button,
+// } from "@nextui-org/react";
 
 import piggyBankLogo from "../assets/piggyBankIcon.png";
 
@@ -20,7 +20,7 @@ export default function NavbarComponent({ authenticated }) {
   };
   return (
     <div>
-      {authenticated ? (
+      {/* {authenticated ? (
         <Navbar>
           <NavbarBrand>
             <Link color="foreground" href="/">
@@ -65,7 +65,7 @@ export default function NavbarComponent({ authenticated }) {
             </NavbarItem>
           </NavbarContent>
         </Navbar>
-      )}
+      )} */}
     </div>
   );
 }
