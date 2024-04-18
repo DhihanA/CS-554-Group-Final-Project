@@ -2,22 +2,22 @@ import React from "react";
 // import "../App.css";
 // import '../output.css'
 import NavbarComponent from "./NavbarComponent";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Divider,
-  Link,
-  Image,
-} from "@nextui-org/react";
+// import {
+//   Card,
+//   CardHeader,
+//   CardBody,
+//   CardFooter,
+//   Divider,
+//   Link,
+//   Image,
+// } from "@nextui-org/react";
 
 function CardComponent() {
   return (
     <>
       {/* <p className="text-xl font-bold underline">Hello bro!</p> */}
 
-      <Card className="max-w-[400px]">
+      {/* <Card className="max-w-[400px]">
         <CardHeader className="flex gap-3">
           <Image
             alt="nextui logo"
@@ -45,7 +45,7 @@ function CardComponent() {
             Visit source code on GitHub.
           </Link>
         </CardFooter>
-      </Card>
+      </Card> */}
     </>
   );
 }
