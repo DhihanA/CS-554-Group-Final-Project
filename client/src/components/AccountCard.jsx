@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AddBudgetedTransactionModal from "./AddBudgetedTransactionModal";
 
 const AccountCard = ({
   accountType,
@@ -20,10 +21,14 @@ const AccountCard = ({
     currency: "USD",
   }).format(withdrawals);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLearnMoreModalOpen, setIsLearnMoreModalOpen] = useState(false);
+  const [isBTModalOpen, setIsBTModalOpen] = useState(false);
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
+  const toggleLearnMoreModal = () => {
+    setIsLearnMoreModalOpen(!isLearnMoreModalOpen);
+  };
+  const toggleBTModal = () => {
+    setIsBTModalOpen(!isBTModalOpen);
   };
 
   return (
@@ -69,16 +74,16 @@ const AccountCard = ({
         <div className="card-actions flex-col items-center">
           <button className="btn btn-primary mb-2">Transfer money</button>
           {accountType.toUpperCase() === "CHECKING ACCOUNT" && (
-            <button className="btn btn-secondary mb-2">
+            <button className="btn btn-secondary mb-2" onClick={toggleBTModal}>
               Create budgeted transaction
             </button>
           )}
-          <button className="btn btn-ghost" onClick={toggleModal}>
+          <button className="btn btn-ghost" onClick={toggleLearnMoreModal}>
             Learn More
           </button>
         </div>
       </div>
-      {isModalOpen && (
+      {isLearnMoreModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box">
             <h3 className="font-bold text-lg">{accountType.toUpperCase()}</h3>
@@ -97,12 +102,18 @@ const AccountCard = ({
               </p>
             )}
             <div className="modal-action">
-              <button className="btn btn-primary" onClick={toggleModal}>
+              <button
+                className="btn btn-primary"
+                onClick={toggleLearnMoreModal}
+              >
                 Close
               </button>
             </div>
           </div>
         </div>
+      )}
+      {isBTModalOpen && (
+        <AddBudgetedTransactionModal toggleModal={toggleBTModal} />
       )}
     </div>
   );
