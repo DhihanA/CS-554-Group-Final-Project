@@ -27,14 +27,14 @@ const AccountCard = ({
   };
 
   return (
-    <div className="card card-side bg-base-300 shadow-xl">
+    <div className="card card-side bg-base-300 shadow-xl m-4">
       <div className="card-body flex-col justify-center">
         <h2 className="card-title justify-center text-center">
           {accountType.toUpperCase()} ({accountNumber})
         </h2>
         <p className="text-3xl font-bold text-center">{formattedBalance}</p>
-        <p className="text-base-content text-opacity-40 text-center">
-          {/* {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
+        {/* <p className="text-base-content text-opacity-40 text-center"> */}
+        {/* {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
             <div>
               This is a short-term account is for budgeting upcoming purchases
               and transferring money to others
@@ -45,7 +45,7 @@ const AccountCard = ({
               purchases in the future
             </div>
           )} */}
-        </p>
+        {/* </p> */}
       </div>
       <div className="divider divider-horizontal"></div>{" "}
       {/* This is to create a vertical divider */}
@@ -68,6 +68,11 @@ const AccountCard = ({
         </div>
         <div className="card-actions flex-col items-center">
           <button className="btn btn-primary mb-2">Transfer money</button>
+          {accountType.toUpperCase() === "CHECKING ACCOUNT" && (
+            <button className="btn btn-secondary mb-2">
+              Create budgeted transaction
+            </button>
+          )}
           <button className="btn btn-ghost" onClick={toggleModal}>
             Learn More
           </button>
