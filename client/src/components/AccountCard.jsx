@@ -34,7 +34,7 @@ const AccountCard = ({
         </h2>
         <p className="text-3xl font-bold text-center">{formattedBalance}</p>
         <p className="text-base-content text-opacity-40 text-center">
-          {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
+          {/* {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
             <div>
               This is a short-term account is for budgeting upcoming purchases
               and transferring money to others
@@ -44,7 +44,7 @@ const AccountCard = ({
               This is a long-term account for saving your money for larger
               purchases in the future
             </div>
-          )}
+          )} */}
         </p>
       </div>
       <div className="divider divider-horizontal"></div>{" "}
@@ -68,7 +68,6 @@ const AccountCard = ({
         </div>
         <div className="card-actions flex-col items-center">
           <button className="btn btn-primary mb-2">Transfer money</button>
-          <button className="btn btn-ghost">More</button>
           <button className="btn btn-ghost" onClick={toggleModal}>
             Learn More
           </button>
@@ -77,18 +76,19 @@ const AccountCard = ({
       {isModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg">
-              {accountType.toUpperCase()} Account
-            </h3>
+            <h3 className="font-bold text-lg">{accountType.toUpperCase()}</h3>
             {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
               <p>
                 This is a short-term account for budgeting upcoming purchases
-                and transferring money to others.
+                and transferring money to others. Budgeting money is reversible,
+                but transferring money to others is not, so be careful!
               </p>
             ) : (
               <p>
                 This is a long-term account for saving your money for larger
-                purchases in the future.
+                purchases in the future. It is better to keep money in this
+                account because our high interest rate means you can earn money
+                in the background!
               </p>
             )}
             <div className="modal-action">

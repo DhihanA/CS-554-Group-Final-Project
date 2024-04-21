@@ -11,7 +11,7 @@ const Dashboard = () => {
         {/* <Card />
         <Card />
         <Card /> */}
-        <Transactions></Transactions>
+        {/* <Transactions></Transactions> */}
         <div className="p-6 min-h-screen">
           <h1 className="text-2xl font-bold">Bank accounts</h1>
           <AccountCard
