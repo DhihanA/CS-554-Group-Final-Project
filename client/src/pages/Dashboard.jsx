@@ -15,7 +15,7 @@ const Dashboard = () => {
         <div className="p-6 min-h-screen">
           <h1 className="text-2xl font-bold">Bank accounts</h1>
           <AccountCard
-            accountType="checkings account"
+            accountType="checking account"
             accountNumber="...3137"
             balance={1053.0}
             deposits={5005.09}

@@ -46,7 +46,7 @@ export default function NavbarComponent({ authenticated }) {
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal p-0">
+        <ul className="menu menu-horizontal px-1">
           {authenticated &&
             Object.keys(routes).map((key) => (
               <li key={key}>
@@ -57,13 +57,15 @@ export default function NavbarComponent({ authenticated }) {
       </div>
       <div className="navbar-end">
         {!authenticated && (
-          <Link to="/login" className="btn">
-            Login
-          </Link>
+          <div>
+            <Link to="/login" className="btn">
+              Login
+            </Link>
+            <Link to="/signup" className="btn btn-primary">
+              Sign Up
+            </Link>
+          </div>
         )}
-        <Link to="/signup" className="btn btn-primary">
-          Sign Up
-        </Link>
       </div>
     </div>
   );

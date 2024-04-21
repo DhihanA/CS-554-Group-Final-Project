@@ -8,7 +8,7 @@ const BasePage = ({ children }) => {
     <>
       {/* !TODO Fix this so that authenticated passes in whether user is actually logged in or not */}
       <NavbarComponent authenticated={true}></NavbarComponent>
-      <NavbarComponent authenticated={false}></NavbarComponent>
+      {/* <NavbarComponent authenticated={false}></NavbarComponent> */}
       <div className="flex flex-col min-h-screen overflow-x-hidden">
         {children}
       </div>

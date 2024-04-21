@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const AccountCard = ({
   accountType,
@@ -20,6 +20,12 @@ const AccountCard = ({
     currency: "USD",
   }).format(withdrawals);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   return (
     <div className="card card-side bg-base-300 shadow-xl">
       <div className="card-body flex-col justify-center">
@@ -28,7 +34,7 @@ const AccountCard = ({
         </h2>
         <p className="text-3xl font-bold text-center">{formattedBalance}</p>
         <p className="text-base-content text-opacity-40 text-center">
-          {accountType.toUpperCase() === "CHECKINGS ACCOUNT" ? (
+          {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
             <div>
               This is a short-term account is for budgeting upcoming purchases
               and transferring money to others
@@ -63,8 +69,36 @@ const AccountCard = ({
         <div className="card-actions flex-col items-center">
           <button className="btn btn-primary mb-2">Transfer money</button>
           <button className="btn btn-ghost">More</button>
+          <button className="btn btn-ghost" onClick={toggleModal}>
+            Learn More
+          </button>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">
+              {accountType.toUpperCase()} Account
+            </h3>
+            {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
+              <p>
+                This is a short-term account for budgeting upcoming purchases
+                and transferring money to others.
+              </p>
+            ) : (
+              <p>
+                This is a long-term account for saving your money for larger
+                purchases in the future.
+              </p>
+            )}
+            <div className="modal-action">
+              <button className="btn btn-primary" onClick={toggleModal}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
