@@ -5,6 +5,7 @@ import "./App.css";
 
 // Import all pages here
 import Dashboard from "./pages/Dashboard";
+import TransactionsPage from "./pages/TransactionsPage";
 
 function App() {
   const navigate = useNavigate();
@@ -15,7 +16,8 @@ function App() {
       {/* All route declarations go below */}
 
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard user={{}} />} />
+        <Route path="/transactions" element={<TransactionsPage />} />
       </Routes>
       {/* Footer Component (todo) here */}
     </>

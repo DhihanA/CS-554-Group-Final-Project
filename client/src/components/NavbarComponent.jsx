@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import piggyBankLogo from "../assets/piggyBankIcon.png";
 
-export default function NavbarComponent({ authenticated }) {
+export default function NavbarComponent({ user }) {
   const routes = {
-    Transactions: "/transactions",
+    "My Transactions": "/transactions",
     Settings: "/settings",
-    Learn: "/learn",
+    "Learn n' Earn": "/learn",
   };
 
   return (
@@ -46,8 +46,8 @@ export default function NavbarComponent({ authenticated }) {
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal p-0">
-          {authenticated &&
+        <ul className="menu menu-horizontal px-1">
+          {user &&
             Object.keys(routes).map((key) => (
               <li key={key}>
                 <Link to={routes[key]}>{key}</Link>
@@ -56,14 +56,16 @@ export default function NavbarComponent({ authenticated }) {
         </ul>
       </div>
       <div className="navbar-end">
-        {!authenticated && (
-          <Link to="/login" className="btn">
-            Login
-          </Link>
+        {!user && (
+          <div>
+            <Link to="/login" className="btn">
+              Login
+            </Link>
+            <Link to="/signup" className="btn btn-primary">
+              Sign Up
+            </Link>
+          </div>
         )}
-        <Link to="/signup" className="btn btn-primary">
-          Sign Up
-        </Link>
       </div>
     </div>
   );
