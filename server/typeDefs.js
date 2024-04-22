@@ -28,15 +28,15 @@ export const typeDefs = `#graphql
 
   type CheckingAccount {
     _id: String!
-    balance: Int!
+    balance: Float!
     Transactions: [Transaction]
   }
 
   type SavingsAccount {
     _id: String!
-    currentBalance: Int!
-    previousBalance: Int!
-    Interest_rate: Int!
+    currentBalance: Float!
+    previousBalance: Float!
+    Interest_rate: Float!
     lastDateUpdated: Date!
     Transactions: [Transaction]
   }
@@ -45,7 +45,7 @@ export const typeDefs = `#graphql
     _id: String!
     sender: AccountType
     receiver: AccountType
-    amount: Int!
+    amount: Float!
     date: Date!
     description: String
     type: Type
