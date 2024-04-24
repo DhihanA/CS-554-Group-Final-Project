@@ -4,8 +4,10 @@ import { Route, Routes, BrowserRouter, useNavigate } from "react-router-dom";
 import "./App.css";
 
 // Import all pages here
-import Dashboard from "./pages/Dashboard";
+import DashboardPage from "./pages/DashboardPage";
 import TransactionsPage from "./pages/TransactionsPage";
+import SettingsPage from "./pages/SettingsPage";
+import LearnPage from "./pages/LearnPage";
 
 function App() {
   const navigate = useNavigate();
@@ -16,8 +18,10 @@ function App() {
       {/* All route declarations go below */}
 
       <Routes>
-        <Route path="/" element={<Dashboard user={{}} />} />
+        <Route path="/" element={<DashboardPage user={{}} />} />
         <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/learn" element={<LearnPage />} />
       </Routes>
       {/* Footer Component (todo) here */}
     </>
