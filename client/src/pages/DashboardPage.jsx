@@ -4,7 +4,7 @@ import Card from "../components/CardComponent";
 import Transactions from "../components/Transactions";
 import AccountCard from "../components/AccountCard";
 
-const Dashboard = ({ user }) => {
+const DashboardPage = ({ user }) => {
   return (
     <BasePage>
       <div>
@@ -54,4 +54,4 @@ const Dashboard = ({ user }) => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;
