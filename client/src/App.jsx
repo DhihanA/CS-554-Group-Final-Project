@@ -6,6 +6,7 @@ import "./App.css";
 // Import all pages here
 import Dashboard from "./pages/Dashboard";
 import TransactionsPage from "./pages/TransactionsPage";
+import Quiz from './pages/Quiz'
 
 function App() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard user={{}} />} />
         <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/learn" element={<Quiz />} /> {/* learn n' earn quiz */}
       </Routes>
       {/* Footer Component (todo) here */}
     </>

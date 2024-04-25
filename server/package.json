@@ -5,7 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node ./tasks/seed.js",
+    "start": "node server.js"
   },
   "author": "Dhihan Ahmed 20005914 Luke Bianchi 20005985 Jesal Gandhi 20006223 Jacob Gurevich 20006224 Ajit Kandasamy 20006210",
   "license": "ISC",
