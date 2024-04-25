@@ -7,8 +7,10 @@ import {SignedIn, SignedOut} from '@clerk/clerk-react';
 import "./App.css";
 
 // Import all pages here
-import Dashboard from "./pages/Dashboard";
+import DashboardPage from "./pages/DashboardPage";
 import TransactionsPage from "./pages/TransactionsPage";
+import SettingsPage from "./pages/SettingsPage";
+import LearnPage from "./pages/LearnPage";
 
 
 function App() {
@@ -18,7 +20,6 @@ function App() {
     // <NextUIProvider navigate={navigate}>
     <>
       {/* All route declarations go below */}
-
       
         <SignedIn>
           <Routes>
@@ -34,7 +35,6 @@ function App() {
             <Route path="/signup" element={<SignUpClerk />}/>
           </Routes>
         </SignedOut>
-
 
       {/* Footer Component (todo) here */}
     </>
