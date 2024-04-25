@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Route, Routes, BrowserRouter, useNavigate } from "react-router-dom";
+import SignUpClerk from "./pages/SignUpPage";
+import LoginClerk from "./pages/LoginPage";
+import {SignedIn, SignedOut} from '@clerk/clerk-react';
 // import { NextUIProvider } from "@nextui-org/react";
 import "./App.css";
 
@@ -9,6 +12,7 @@ import TransactionsPage from "./pages/TransactionsPage";
 import SettingsPage from "./pages/SettingsPage";
 import LearnPage from "./pages/LearnPage";
 
+
 function App() {
   const navigate = useNavigate();
 
@@ -16,13 +20,22 @@ function App() {
     // <NextUIProvider navigate={navigate}>
     <>
       {/* All route declarations go below */}
+      
+        <SignedIn>
+          <Routes>
+            <Route path="/" element={<Dashboard user={{}} />} />
+            <Route path="/transactions" element={<TransactionsPage />} />
+          </Routes>
+        </SignedIn>
 
-      <Routes>
-        <Route path="/" element={<DashboardPage user={{}} />} />
-        <Route path="/transactions" element={<TransactionsPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/learn" element={<LearnPage />} />
-      </Routes>
+        <SignedOut>
+          <Routes>
+            <Route path="/" element={<Dashboard user={{}} />} />
+            <Route path="/login" element={<LoginClerk />}/>
+            <Route path="/signup" element={<SignUpClerk />}/>
+          </Routes>
+        </SignedOut>
+
       {/* Footer Component (todo) here */}
     </>
     // </NextUIProvider>

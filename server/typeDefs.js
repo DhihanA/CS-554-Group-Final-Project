@@ -1,5 +1,3 @@
-//! TODO
-
 export const typeDefs = `#graphql
   type Query {
     savingsAccounts: [SavingsAccount]
@@ -10,6 +8,7 @@ export const typeDefs = `#graphql
     getCheckingAccountById(_id: String!): CheckingAccount
     getUserById(_id: String!): User
     getTransactionById(_id: String!): Transaction
+    getTransactionByUserId(userId: String!) # for downloading a users' transactions
   }
 
   type User {
@@ -19,7 +18,6 @@ export const typeDefs = `#graphql
     emailAddress: Email!
     username: String! 
     dob: Date!
-    hashed_password: String!
     phoneNumber: PhoneNumber!
     city: String!
     state: String!
@@ -43,26 +41,36 @@ export const typeDefs = `#graphql
 
   type Transaction {
     _id: String!
-    sender: AccountType
-    receiver: AccountType
+    sender: AccountType!
+    receiver: AccountType!
     amount: Float!
     date: Date!
     description: String
     type: Type
   }
 
-  union AccountType = SavingsAccount | CheckingAccount
+  union AccountType = SavingsAccount | CheckingAccount | ParentAccount
 
   scalar Date
-  scalar PhoneNumber
   scalar Email
 
   enum Type {
     Transfer
     Budgeted
+    Parent
+  }
+
+  enum Role {
+    Child
+    Parent
   }
 
   type Mutation {
-
+    addCheckingAccount(userId: String!): CheckingAccount
+    addSavingsAccount(userId: String!): SavingsAccount
+    createUser(_id: String!, firstName: String!, lastName: String!, username: String!, dob: Date!, Email: Email!, city: String!, state: String!, role: Role!): User
+    editUser(_id: String, firstName: String, lastName: String, username: String, dob: Date, Email: Email, city: String, state: String, role: Role): User
+    sendMoney(sender: AccountType!, reciever: AccountType!, amount: Float!): 
+    updateSavingsBalanceForLogin(currentBalance: Float!, lastDateUpdated: Date!, currentDate: Date!)
   }
 `;
