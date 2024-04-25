@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import piggyBankLogo from "../assets/piggyBankIcon.png";
+import { UserButton } from "@clerk/clerk-react";
 
 export default function NavbarComponent({ user }) {
   const routes = {
@@ -67,6 +68,16 @@ export default function NavbarComponent({ user }) {
           </div>
         )}
       </div>
+      <div>
+            <UserButton
+              afterSignOutUrl="/"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                localStorage.clear();
+              }}
+            />
+      </div>
+      
     </div>
   );
 }
