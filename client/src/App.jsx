@@ -1,6 +1,12 @@
-import { useState } from "react";
-import { Route, Routes, BrowserRouter, useNavigate } from "react-router-dom";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import react from "react";
+import {
+  Route,
+  Routes,
+  BrowserRouter as Router,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import "./App.css";
 
 // Import all pages here
@@ -13,31 +19,49 @@ import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
 
 function App() {
-  const navigate = useNavigate();
+  const { isSignedIn, isLoaded } = useUser();
+
+  if (!isLoaded)
+    return <span className="loading loading-infinity loading-lg"></span>;
 
   return (
-    <>
-      {/* All route declarations go below */}
+    <Routes>
+      {/* Authenticated user routes go below */}
+      <Route
+        path="/dashboard"
+        element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
+      />
+      <Route
+        path="/transactions"
+        element={isSignedIn ? <TransactionsPage /> : <Navigate to="/" />}
+      />
+      <Route
+        path="/settings"
+        element={isSignedIn ? <SettingsPage /> : <Navigate to="/" />}
+      />
+      <Route
+        path="/learn"
+        element={isSignedIn ? <LearnPage /> : <Navigate to="/" />}
+      />
 
-      <SignedIn>
-        <Routes>
-          <Route path="/dashboard" element={<DashboardPage user={{}} />} />
-          <Route path="/transactions" element={<TransactionsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/learn" element={<LearnPage />} />
-        </Routes>
-      </SignedIn>
+      {/* Unauthenticated user routes go below */}
+      {!isSignedIn && <Route path="/" element={<HeroPage />} />}
 
-      <SignedOut>
-        <Routes>
-          <Route path="/" element={<HeroPage />} />
-          <Route path="/login" element={<LoginClerk />} />
-          <Route path="/signup" element={<SignUpClerk />} />
-        </Routes>
-      </SignedOut>
+      <Route
+        path="/login"
+        element={!isSignedIn ? <LoginClerk /> : <Navigate to="/dashboard" />}
+      />
+      <Route
+        path="/signup"
+        element={!isSignedIn ? <SignUpClerk /> : <Navigate to="/dashboard" />}
+      />
 
-      {/* Footer Component (todo) here */}
-    </>
+      {/* Redirect any unknown paths */}
+      <Route
+        path="*"
+        element={<Navigate replace to={isSignedIn ? "/dashboard" : "/"} />}
+      />
+    </Routes>
   );
 }
 
