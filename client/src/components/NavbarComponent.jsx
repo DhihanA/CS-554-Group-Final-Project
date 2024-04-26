@@ -41,10 +41,26 @@ export default function NavbarComponent({ user }) {
             ))}
           </ul>
         </div>
-        <Link to="/" className="btn btn-ghost normal-case text-xl">
-          <img src={piggyBankLogo} className="h-8 mr-2" alt="Piggy Bank Logo" />
-          Piggy Bank
-        </Link>
+        {user && (
+          <Link to="/dashboard" className="btn btn-ghost normal-case text-xl">
+            <img
+              src={piggyBankLogo}
+              className="h-8 mr-2"
+              alt="Piggy Bank Logo"
+            />
+            Piggy Bank
+          </Link>
+        )}
+        {!user && (
+          <Link to="/" className="btn btn-ghost normal-case text-xl">
+            <img
+              src={piggyBankLogo}
+              className="h-8 mr-2"
+              alt="Piggy Bank Logo"
+            />
+            Piggy Bank
+          </Link>
+        )}
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
@@ -69,15 +85,14 @@ export default function NavbarComponent({ user }) {
         )}
       </div>
       <div>
-            <UserButton
-              afterSignOutUrl="/"
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                localStorage.clear();
-              }}
-            />
+        <UserButton
+          afterSignOutUrl="/"
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            localStorage.clear();
+          }}
+        />
       </div>
-      
     </div>
   );
 }
