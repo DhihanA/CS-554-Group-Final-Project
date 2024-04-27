@@ -87,8 +87,8 @@ export const typeDefs = `#graphql
   }
 
   type User {
-    _id: ID!
-    parentId: ID
+    _id: String!
+    parentId: String!
     verificationCode: String
     firstName: String!
     lastName: String!
@@ -102,20 +102,18 @@ export const typeDefs = `#graphql
   }
 
   type CheckingAccount {
-    _id: ID!
-    ownerId: ID!
+    _id: String!
+    ownerId: String!
     balance: Float!
-    transactions: [Transaction]
   }
 
   type SavingsAccount {
-    _id: ID!
-    ownerId: ID!
+    _id: String!
+    ownerId: String!
     currentBalance: Float!
     previousBalance: Float!
     interestRate: Float!
     lastDateUpdated: Date!
-    transactions: [Transaction] # Depending on requirement
   }
 
   type Transaction {
