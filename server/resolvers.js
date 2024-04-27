@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import {ObjectId} from 'mongodb';
 import redis from 'redis';
 import {
   transactions as transactionsCollection,
@@ -17,34 +18,81 @@ await client.flushAll();
 
 export const resolvers = {
   Query: {
-    getAllTransactions: async () => {
-
-      let exists = await client.exists('allTransactions');
+    getAllTransactions: async (_, args) => {
+      let cacheKey = `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`
+      let exists = await client.exists(cacheKey);
       if (exists) {
         // console.log('getting from cache');
-        let list = await client.lRange('allTransactions', 0, -1);
+        let list = await client.lRange(`allTransactions:${args.userId.trim()}:${args.accountType.trim()}`, 0, -1);
         return list.map(str => JSON.parse(str));
       } else {
         const transactions = await transactionsCollection();
-        const allTransactions = await transactions.find({}).toArray();
-        if (!allTransactions) {
-          //Could not get list
-          throw new GraphQLError(`Internal Server Error`, {
-            extensions: {code: 'INTERNAL_SERVER_ERROR'}
-          });
+        const savingsAccounts = await savingsAccountCollection();
+        const checkingAccounts = await checkingAccountCollection();
+        if (args.accountType.trim() === "savings") {
+          const foundAccount = await savingsAccounts.findOne(
+            {ownerId: new ObjectId(args.userId.trim())},
+            {projection: {_id:1}}
+          );
+          if (!foundAccount) {
+            throw new GraphQLError('Account Not Found', {
+              extensions: {code: 'BAD_USER_INPUT'}
+            });
+          }
+          console.log(foundAccount);
+          const foundTransactions = await transactions.find({
+            $or: [
+              { senderId: foundAccount._id },
+              { receiverId: foundAccount._id }
+            ]
+          }).toArray();
+          if (!foundTransactions) {
+            throw new GraphQLError('User has no transactions', {
+              extensions: {code: 'BAD_USER_INPUT'}
+            });
+          }
+
+          //push transactions to the redis object
+          foundTransactions.forEach(transaction => {
+            client.rPush(`allTransactions:${args.userId.trim()}:${args.accountType.trim()}`, JSON.stringify(transaction));
+          })
+          //set expiration
+          await client.expire(`allTransactions:${args.userId.trim()}:${args.accountType.trim()}`, 3600);
+
+          return foundTransactions;
         }
+        if (args.accountType.trim() === "checking") {
+          const foundAccount = await checkingAccounts.findOne(
+            {ownerId: new ObjectId(args.userId.trim())},
+            {projection: {_id:1}}
+          );
+          if (!foundAccount) {
+            throw new GraphQLError('Account Not Found', {
+              extensions: {code: 'BAD_USER_INPUT'}
+            });
+          }
+          console.log(foundAccount);
+          const foundTransactions = await transactions.find({
+            $or: [
+              { senderId: foundAccount._id },
+              { receiverId: foundAccount._id }
+            ]
+          }).toArray();
+          if (!foundTransactions) {
+            throw new GraphQLError('User has no transactions', {
+              extensions: {code: 'BAD_USER_INPUT'}
+            });
+          }
 
-        let allTransactionss = [];
-        allTransactions.forEach(transaction => {
-          allTransactionss = allTransactionss.concat(transaction);
-          client.rPush('allTransactions', JSON.stringify(transaction));
-        })
-      
+          //push transactions to the redis object
+          foundTransactions.forEach(transaction => {
+            client.rPush(`allTransactions:${args.userId.trim()}:${args.accountType.trim()}`, JSON.stringify(transaction));
+          })
+          //set expiration
+          await client.expire(`allTransactions:${args.userId.trim()}:${args.accountType.trim()}`, 3600);
 
-        //set expiration
-        await client.expire('allTransactions', 3600);
-
-        return allTransactions;
+          return foundTransactions;
+        }
       }
     },
     getUserInfo: async (_, { userId }) => {

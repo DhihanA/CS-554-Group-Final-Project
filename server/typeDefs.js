@@ -80,10 +80,10 @@ export const typeDefs = `#graphql
   scalar Date
 
   type Query {
-    getAllTransactions: [Transaction]
-    getUserInfo(userId: ID!): User
-    getCheckingAccountInfo(userId: ID!): CheckingAccount
-    getSavingsAccountInfo(userId: ID!): SavingsAccount
+    getAllTransactions(userId: String!, accountType: String!): [Transaction]
+    getUserInfo(userId: String!): User
+    getCheckingAccountInfo(userId: String!): CheckingAccount
+    getSavingsAccountInfo(userId: String!): SavingsAccount
   }
 
   type User {
@@ -119,19 +119,13 @@ export const typeDefs = `#graphql
   }
 
   type Transaction {
-    _id: ID!
-    senderId: ID!
-    receiverId: ID!
+    _id: String!
+    senderId: String!
+    receiverId: String!
     amount: Float!
     date: Date!
     description: String
-    type: TransactionType
-  }
-
-  enum TransactionType {
-    USER_TRANSFER
-    ACCOUNT_TRANSFER
-    BUDGETED_TRANSFER
+    type: String
   }
 
   type Mutation {
