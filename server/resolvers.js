@@ -1,137 +1,257 @@
 import {GraphQLError} from 'graphql';
-
-//! Import actual collections below
-// import {
-//   artists as artistsCollection,
-//   albums as albumsCollection,
-//   recordCompanies as recordCompaniesCollection,
-//   songs as songsCollection,
-//   songs
-// } from './config/mongoCollections.js';
-
 import helpers from './helpers.js';
-import {ObjectId} from 'mongodb';
 import redis from 'redis';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  transactions as transactionsCollection,
+  users as usersCollection,
+  savingsAccount as savingsAccountCollection,
+  checkingAccount as checkingAccountCollection
+} from './config/mongoCollections.js';
+
 
 const client = redis.createClient();
 client.connect().then(() => {});
 
-/* parentValue - References the type def that called it
-    so for example when we execute numOfEmployees we can reference
-    the parent's properties with the parentValue Paramater
-*/
 
-/* args - Used for passing any arguments in from the client
-    for example, when we call 
-    addEmployee(firstName: String!, lastName: String!, employerId: Int!): Employee
-		
-*/
 
 //! TODO
 export const resolvers = {
   Query: {
-    // artists: async () => {
-    //   const cacheCheck = await client.get('artists');
-    //   if (cacheCheck) return JSON.parse(cacheCheck);
-    //   const artists = await artistsCollection();
-    //   const allArtists = await artists.find({}).toArray();
-    //   if (!allArtists) {
-    //     throw new GraphQLError(`Internal Server Error`, {
-    //       extensions: {code: 'INTERNAL_SERVER_ERROR'}
-    //     });
-    //   }
-    //   await client.set('artists', JSON.stringify(allArtists));
-    //   await client.expire('artists', 3600);
-    //   return allArtists;
-    // },
+    savingsAccounts: async () => {
+      try {
+        const cacheKey = 'savingsAccounts';
+        const keyType = await client.type(cacheKey);
+        if (keyType !== 'list') {
+          await client.del(cacheKey);
+        }
+        let savingsAccountStrings = await client.lRange(cacheKey, 0, -1);
+        let savingsAccounts;
+        if (savingsAccountStrings.length === 0) {
+          savingsAccounts = await SavingsAccountCollection.find({}).toArray();
+          for (const account of savingsAccounts) {
+            await client.rPush(cacheKey, JSON.stringify(account));
+          }
+          await client.expire(cacheKey, 3600); // Set cache expiration to 1 hour
+        } else {
+          savingsAccounts = savingsAccountStrings.map(str => JSON.parse(str));
+        }
+        return savingsAccounts;
+      } catch (error) {
+        console.error('Error fetching savings accounts:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    checkingAccounts: async () => {
+      try {
+        const cacheKey = 'checkingAccounts';
+        const keyType = await client.type(cacheKey);
+        if (keyType !== 'list') {
+          await client.del(cacheKey);
+        }
+        let checkingAccountStrings = await client.lRange(cacheKey, 0, -1);
+        let checkingAccounts;
+        if (checkingAccountStrings.length === 0) {
+          checkingAccounts = await checkingAccountCollection.find({}).toArray();
+          for (const account of checkingAccounts) {
+            await client.rPush(cacheKey, JSON.stringify(account));
+          }
+          await client.expire(cacheKey, 3600); // Set cache expiration to 1 hour
+        } else {
+          checkingAccounts = checkingAccountStrings.map(str => JSON.parse(str));
+        }
+        return checkingAccounts;
+      } catch (error) {
+        console.error('Error fetching checking accounts:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    users: async () => {
+      try {
+        const cacheKey = 'users';
+        const keyType = await client.type(cacheKey);
+        if (keyType !== 'list') {
+          await client.del(cacheKey);
+        }
+        let userStrings = await client.lRange(cacheKey, 0, -1);
+        let users;
+        if (userStrings.length === 0) {
+          users = await usersCollection.find({}).toArray();
+          for (const user of users) {
+            await client.rPush(cacheKey, JSON.stringify(user));
+          }
+          await client.expire(cacheKey, 3600); // Set cache expiration to 1 hour
+        } else {
+          users = userStrings.map(str => JSON.parse(str));
+        }
+        return users;
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    transactions: async () => {
+      try {
+        const cacheKey = 'transactions';
+        const keyType = await client.type(cacheKey);
+        if (keyType !== 'list') {
+          await client.del(cacheKey);
+        }
+        let transactionStrings = await client.lRange(cacheKey, 0, -1);
+        let transactions;
+        if (transactionStrings.length === 0) {
+          transactions = await transactionsCollection.find({}).toArray();
+          for (const transaction of transactions) {
+            await client.rPush(cacheKey, JSON.stringify(transaction));
+          }
+          await client.expire(cacheKey, 3600); // Set cache expiration to 1 hour
+        } else {
+          transactions = transactionStrings.map(str => JSON.parse(str));
+        }
+        return transactions;
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    getSavingsAccountById: async (_, { _id }) => {
+      try {
+        _id = _id.trim();
+        const cacheKey = `savingsAccount:${_id}`;
+        let savingsAccount = await client.get(cacheKey);
+        if (!savingsAccount) {
+          savingsAccount = await SavingsAccountCollection.findOne({ _id });
+          if (!savingsAccount) throw new GraphQLError('Savings Account Not Found', { extensions: { code: 'NOT_FOUND' } });
+          await client.set(cacheKey, JSON.stringify(savingsAccount), 'EX', 3600); // Cache for 1 hour
+        } else {
+          savingsAccount = JSON.parse(savingsAccount);
+        }
+        return savingsAccount;
+      } catch (error) {
+        console.error('Error fetching savings account:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    getCheckingAccountById: async (_, { _id }) => {
+      try {
+        _id = _id.trim();
+        const cacheKey = `checkingAccount:${_id}`;
+        let checkingAccount = await client.get(cacheKey);
+        if (!checkingAccount) {
+          checkingAccount = await checkingAccountCollection.findOne({ _id });
+          if (!checkingAccount) throw new GraphQLError('Checking Account Not Found', { extensions: { code: 'NOT_FOUND' } });
+          await client.set(cacheKey, JSON.stringify(checkingAccount), 'EX', 3600); // Cache for 1 hour
+        } else {
+          checkingAccount = JSON.parse(checkingAccount);
+        }
+        return checkingAccount;
+      } catch (error) {
+        console.error('Error fetching checking account:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    getUserById: async (_, { _id }) => {
+      try {
+        _id = _id.trim();
+        const cacheKey = `user:${_id}`;
+        let user = await client.get(cacheKey);
+        if (!user) {
+          user = await usersCollection.findOne({ _id });
+          if (!user) throw new GraphQLError('User Not Found', { extensions: { code: 'NOT_FOUND' } });
+          await client.set(cacheKey, JSON.stringify(user), 'EX', 3600); // Cache for 1 hour
+        } else {
+          user = JSON.parse(user);
+        }
+        return user;
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
+    getTransactionById: async (_, { _id }) => {
+      try {
+        _id = _id.trim();
+        const cacheKey = `transaction:${_id}`;
+        let transaction = await client.get(cacheKey);
+        if (!transaction) {
+          transaction = await transactionsCollection.findOne({ _id });
+          if (!transaction) throw new GraphQLError('Transaction Not Found', { extensions: { code: 'NOT_FOUND' } });
+          await client.set(cacheKey, JSON.stringify(transaction), 'EX', 3600); // Cache for 1 hour
+        } else {
+          transaction = JSON.parse(transaction);
+        }
+        return transaction;
+      } catch (error) {
+        console.error('Error fetching transaction:', error);
+        throw new GraphQLError('Internal Server Error', {
+          extensions: { code: 'INTERNAL_SERVER_ERROR', exception: error.message }
+        });
+      }
+    },
   },
-  Users: {
-    // artist: async (parentValue) => {
-    //   const artists = await artistsCollection();
-    //   const artist = await artists.findOne({_id: new ObjectId(parentValue.artistId)});
-    //   return artist;
-    // },
+  // Additional type resolvers and mutations...
+  // Add resolvers for User, CheckingAccount, etc., as needed...
+  User: {
+    checkingAccounts: async (parentValue) => {
+      // Assuming there's a reference to checking accounts IDs in the User document
+      return await checkingAccountCollection.find({_id: { $in: parentValue.checkingAccountIds }}).toArray();
+    },
+    savingsAccounts: async (parentValue) => {
+      // Assuming there's a reference to savings accounts IDs in the User document
+      return await savingsAccountCollection.find({_id: { $in: parentValue.savingsAccountIds }}).toArray();
+    },
+    transactions: async (parentValue) => {
+      // Fetch all transactions for a user across all their accounts
+      return await transactionsCollection.find({userId: parentValue._id}).toArray();
+    }
   },
   CheckingAccount: {
-    // albums: async (parentValue) => {
-    //   const albums = await albumsCollection();
-    //   const artistAlbums = await albums.find({artistId: new ObjectId(parentValue._id)}).toArray();
-    //   return artistAlbums;
-    // },
+    transactions: async (parentValue) => {
+      // Transactions associated with a specific checking account
+      return await transactionsCollection.find({accountId: parentValue._id}).toArray();
+    },
+    user: async (parentValue) => {
+      // Fetch the owner of the checking account
+      return await usersCollection.findOne({_id: parentValue.userId});
+    }
   },
   SavingsAccount: {
-    // albums: async (parentValue) => {
-    //   const albums = await albumsCollection();
-    //   const companyAlbums = await albums.find({recordCompanyId: new ObjectId(parentValue._id)}).toArray();
-    //   return companyAlbums;
-    // },
+    transactions: async (parentValue) => {
+      // Transactions associated with a specific savings account
+      return await transactionsCollection.find({accountId: parentValue._id}).toArray();
+    },
+    user: async (parentValue) => {
+      // Fetch the owner of the savings account
+      return await usersCollection.findOne({_id: parentValue.userId});
+    }
   },
-  Transactions: {
-    // albumId: async (parentValue) => {
-    //   const albums = await albumsCollection();
-    //   const album = await albums.findOne({_id: new ObjectId(parentValue.albumId)});
-    //   return album;
-    // }
+  Transaction: {
+    senderAccount: async (parentValue) => {
+      // Resolves the account from which money was sent
+      const accountCollection = parentValue.senderType === 'Checking' ? checkingAccountCollection : savingsAccountCollection;
+      return await accountCollection.findOne({_id: parentValue.senderId});
+    },
+    receiverAccount: async (parentValue) => {
+      // Resolves the account to which money was received
+      const accountCollection = parentValue.receiverType === 'Checking' ? checkingAccountCollection : savingsAccountCollection;
+      return await accountCollection.findOne({_id: parentValue.receiverId});
+    }
   },
   Mutation: {
-    // addArtist: async (_, args) => {
-    //   /* Error check name, date, members */
-    //   try {
-    //     args.name = helpers.checkArg(args.name, 'Name');
-    //   } catch (e) {
-    //     throw new GraphQLError(e,
-    //       {
-    //         extensions: {code: 'BAD_USER_INPUT'}
-    //       }
-    //     );
-    //   }
-    //   try {
-    //     args.date_formed = helpers.checkDate(args.date_formed);
-    //   } catch (e) {
-    //     throw new GraphQLError(e,
-    //       {
-    //         extensions: {code: 'BAD_USER_INPUT'}
-    //       }
-    //     );
-    //   }
-    //   if (args.members.length === 0) {
-    //     throw new GraphQLError(
-    //       `Members should be a non-empty array`,
-    //       {
-    //         extensions: {code: 'BAD_USER_INPUT'}
-    //       }
-    //     );
-    //   }
-    //   for (let i = 0; i < args.members.length; i++) {
-    //     try {
-    //       args.members[i] = helpers.checkArg(args.members[i], 'Member');
-    //       helpers.checkForOnlyLetters(args.members[i], 'Member');
-    //     } catch (e) {
-    //       throw new GraphQLError(e,
-    //         {
-    //           extensions: {code: 'BAD_USER_INPUT'}
-    //         }
-    //       );
-    //     }
-    //   }
-      
-    //   /* Add artist to db + cache + return */
-    //   const artists = await artistsCollection();
-    //   const newArtist = {
-    //     _id: new ObjectId(),
-    //     name: args.name,
-    //     dateFormed: args.date_formed,
-    //     members: args.members,
-    //     albums: []
-    //   }
-    //   let insertedArtist = await artists.insertOne(newArtist);
-    //   if (!insertedArtist.acknowledged || !insertedArtist.insertedId) {
-    //     throw new GraphQLError(`Could not Add Artist`, {
-    //       extensions: {code: 'INTERNAL_SERVER_ERROR'}
-    //     });
-    //   }
-    //   await client.json.set(`artist_${newArtist._id.toString()}`, '$', newArtist);
-    //   return newArtist;
-    // },
+    
   }
 };

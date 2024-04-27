@@ -18,3 +18,7 @@ const getCollectionFn = (collection) => {
 //! List actual collections below
 // export const artists = getCollectionFn('artists');
 export const transactions = getCollectionFn('transactions');
+export const users = getCollectionFn('users');
+export const savingsAccount = getCollectionFn('savingsAccount');
+export const checkingAccount = getCollectionFn('checkingAccount');
+
