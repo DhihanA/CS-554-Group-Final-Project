@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { ObjectId } from 'mongodb';
 import redis from 'redis';
 import {
   transactions as transactionsCollection,
@@ -18,7 +19,6 @@ await client.flushAll();
 export const resolvers = {
   Query: {
     getAllTransactions: async () => {
-
       let exists = await client.exists('allTransactions');
       if (exists) {
         // console.log('getting from cache');
@@ -33,50 +33,97 @@ export const resolvers = {
             extensions: {code: 'INTERNAL_SERVER_ERROR'}
           });
         }
-
         let allTransactionss = [];
         allTransactions.forEach(transaction => {
           allTransactionss = allTransactionss.concat(transaction);
           client.rPush('allTransactions', JSON.stringify(transaction));
         })
-      
-
+  
         //set expiration
         await client.expire('allTransactions', 3600);
 
         return allTransactions;
       }
     },
-    getUserInfo: async (_, { userId }) => {
-      try {
-        const user = await usersCollection.findOne({ _id: userId });
-        if (!user) throw new GraphQLError('User Not Found');
-        return user;
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-        throw new GraphQLError('Internal Server Error');
+    // getUserInfo: async (_, { userId }) => {
+    //   try {
+    //     const user = await usersCollection.findOne({ _id: userId });
+    //     if (!user) throw new GraphQLError('User Not Found');
+    //     return user;
+    //   } catch (error) {
+    //     console.error('Error fetching user info:', error);
+    //     throw new GraphQLError('Internal Server Error');
+    //   }
+    // },
+    
+
+getCheckingAccountInfo: async (_, { userId }) => {
+  try {
+    const cacheKey = `checkingAccount:${userId}`;  
+    let accountString = await client.get(cacheKey);
+
+    if (accountString) {
+      console.log("Account info found in cache.");
+      return JSON.parse(accountString);
+    } else {
+      console.log("Account info not found in cache, querying database."); 
+      const accountCollection = await checkingAccountCollection();
+      const objectId = new ObjectId(userId); 
+      const account = await accountCollection.findOne({ ownerId: objectId }); 
+
+      if (!account) {
+        console.log("Account not found in database."); 
+        throw new GraphQLError('Checking Account Not Found', {
+          extensions: { code: 'NOT_FOUND' }
+        });
       }
-    },
-    getCheckingAccountInfo: async (_, { userId }) => {
-      try {
-        const account = await checkingAccountCollection.findOne({ ownerId: userId });
-        if (!account) throw new GraphQLError('Checking Account Not Found');
-        return account;
-      } catch (error) {
-        console.error('Error fetching checking account info:', error);
-        throw new GraphQLError('Internal Server Error');
+
+      console.log("Account found, caching and returning."); 
+      await client.set(cacheKey, JSON.stringify(account), 'EX', 3600); 
+
+      return account;
+    }
+  } catch (error) {
+    console.error('Error fetching checking account info:', error);
+    if (error instanceof TypeError && error.message.includes('ObjectId')) {
+      console.error('Invalid ObjectId format:', userId);
+      throw new GraphQLError('Invalid ObjectId Format', {
+        extensions: { code: 'INVALID_ID' }
+      });
+    }
+    throw new GraphQLError('Internal Server Error', {
+      extensions: { code: 'INTERNAL_SERVER_ERROR' }
+    });
+  }
+}
+,
+getSavingsAccountInfo: async (_, { userId }) => {
+  try {
+    const cacheKey = `savingsAccount:${userId}`;
+    let accountString = await client.get(cacheKey);
+
+    if (accountString) {
+      return JSON.parse(accountString);
+    } else {
+      const accountCollection = await savingsAccountCollection();
+      const objectId = new ObjectId(userId);
+      const account = await accountCollection.findOne({ ownerId: objectId });
+
+      if (!account) {
+        throw new GraphQLError('Savings Account Not Found', {
+          extensions: { code: 'NOT_FOUND' }
+        });
       }
-    },
-    getSavingsAccountInfo: async (_, { userId }) => {
-      try {
-        const account = await savingsAccountCollection.findOne({ ownerId: userId });
-        if (!account) throw new GraphQLError('Savings Account Not Found');
-        return account;
-      } catch (error) {
-        console.error('Error fetching savings account info:', error);
-        throw new GraphQLError('Internal Server Error');
-      }
-    },
+
+      await client.set(cacheKey, JSON.stringify(account), 'EX', 3600);
+      return account;
+    }
+  } catch (error) {
+    throw new GraphQLError('Internal Server Error', {
+      extensions: { code: 'INTERNAL_SERVER_ERROR' }
+    });
+  }
+},
   },
   Mutation: {
     createUser: async (_, { firstName, lastName, emailAddress, username, dob, parentId, verificationCode }) => {

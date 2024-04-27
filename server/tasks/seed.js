@@ -41,9 +41,8 @@ const main = async () => {
       ownerId: usersIds[1],
       currentBalance: 200,
       previousBalance: 0,
-      Interest_rate: 4.3,
+      interestRate: 4.3,
       lastDateUpdated: new Date(),
-      Transactions: transactionIds[0]
     }
   ]);
 
@@ -52,7 +51,6 @@ const main = async () => {
       _id: checkingIds[0],
       ownerId: usersIds[1],
       balance: 500,
-      Transactions: []
     }
   ]);
 
