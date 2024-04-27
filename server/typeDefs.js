@@ -1,82 +1,76 @@
-//! TODO
-
 export const typeDefs = `#graphql
   type Query {
-    # artists: [Artist]
-    # albums: [Album]
-    # recordCompanies: [RecordCompany]
-    # getArtistById(_id: String!): Artist
-    # getAlbumById(_id: String!): Album
-    # getCompanyById(_id: String!): RecordCompany
-    # getSongsByArtistId(artistId: String!): [Song] # changed this to [Song] for extra credit
-    # albumsByGenre(genre: MusicGenre!): [Album]
-    # companyByFoundedYear(min: Int!, max: Int!) : [RecordCompany]
-    # searchArtistByArtistName(searchTerm: String!): [Artist]
-    # getSongById(_id: String!): Song
-    # getSongsByAlbumId(_id: String!): [Song]
-    # searchSongByTitle (searchTitleTerm: String!): [Song]
+    savingsAccounts: [SavingsAccount]
+    checkingAccounts: [CheckingAccount]
+    users: [User]
+    transactions: [Transaction]
+    getSavingsAccountById(_id: String!): SavingsAccount
+    getCheckingAccountById(_id: String!): CheckingAccount
+    getUserById(_id: String!): User
+    getTransactionById(_id: String!): Transaction
+    getTransactionByUserId(userId: String!) # for downloading a users' transactions
   }
 
-  type Users {
+  type User {
     _id: String!
-    # title: String!
-    # releaseDate: Date!
-    # genre: MusicGenre!
-    # artist: Artist!
-    # recordCompany: RecordCompany!
-    # songs: [Song!]!
+    firstName: String!
+    lastName: String! 
+    emailAddress: Email!
+    username: String! 
+    dob: Date!
+    phoneNumber: PhoneNumber!
+    city: String!
+    state: String!
+    completedQuestionIds: [Int]
   }
 
   type CheckingAccount {
-    # _id: String!
-    # name: String!
-    # dateFormed: Date!
-    # members: [String!]!
-    # albums: [Album!]!
-    # numOfAlbums: Int
+    _id: String!
+    balance: Float!
+    Transactions: [Transaction]
   }
 
   type SavingsAccount {
-    # _id: String!
-    # name: String!
-    # foundedYear: Int!
-    # country: String
-    # albums: [Album!]!
-    # numOfAlbums: Int
+    _id: String!
+    currentBalance: Float!
+    previousBalance: Float!
+    Interest_rate: Float!
+    lastDateUpdated: Date!
+    Transactions: [Transaction]
   }
 
-  type Transactions {
-    # _id: String! 
-    # title: String! 
-    # duration: String! 
-    # albumId: Album!
+  type Transaction {
+    _id: String!
+    sender: AccountType!
+    receiver: AccountType!
+    amount: Float!
+    date: Date!
+    description: String
+    type: Type
   }
 
-# Not sure if we are doing enums/scalars but I'll leave this here
-  # enum MusicGenre {
-  #   POP
-  #   ROCK
-  #   HIP_HOP
-  #   COUNTRY
-  #   JAZZ
-  #   CLASSICAL
-  #   ELECTRONIC
-  #   R_AND_B
-  #   INDIE
-  #   ALTERNATIVE
-  # }
+  union AccountType = SavingsAccount | CheckingAccount | ParentAccount
 
-  # scalar Date
+  scalar Date
+  scalar Email
+
+  enum Type {
+    Transfer
+    Budgeted
+    Parent
+  }
+
+  enum Role {
+    Child
+    Parent
+  }
 
   type Mutation {
-    # addArtist(
-    #   name: String!
-    #   date_formed: Date!
-    #   members: [String!]!): Artist
-    # editArtist(
-    #   _id: String!
-    #   name: String
-    #   date_formed: Date
-    #   members: [String!]): Artist
+    addCheckingAccount(userId: String!): CheckingAccount
+    addSavingsAccount(userId: String!): SavingsAccount
+    createUser(_id: String!, firstName: String!, lastName: String!, username: String!, dob: Date!, Email: Email!, city: String!, state: String!, role: Role!): User
+    editUser(_id: String, firstName: String, lastName: String, username: String, dob: Date, Email: Email, city: String, state: String, role: Role): User
+    sendMoney(sender: AccountType!, reciever: AccountType!, amount: Float!): 
+    updateSavingsBalanceForLogin(currentBalance: Float!, lastDateUpdated: Date!, currentDate: Date!)
   }
 `;
