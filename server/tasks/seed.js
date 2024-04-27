@@ -1,4 +1,5 @@
-import {dbConnection, closeConnection} from '../config/mongoConnection.js';
+import { dbConnection, closeConnection } from '../config/mongoConnection.js';
+import { v4 as uuidv4 } from 'uuid';
 
 //! Import collections like done below
 import {users, transactions, savingsAccount, checkingAccount} from '../config/mongoCollections.js';
@@ -6,8 +7,8 @@ import {users, transactions, savingsAccount, checkingAccount} from '../config/mo
 import {ObjectId} from 'mongodb';
 
 const main = async () => {
-  const db = await dbConnection();
-  await db.dropDatabase();
+    const db = await dbConnection();
+    await db.dropDatabase();
 
   //! TODO: create seed data
 
@@ -40,9 +41,8 @@ const main = async () => {
       ownerId: usersIds[1],
       currentBalance: 200,
       previousBalance: 0,
-      Interest_rate: 4.3,
+      interestRate: 4.3,
       lastDateUpdated: new Date(),
-      Transactions: transactionIds[0]
     }
   ]);
 
@@ -51,12 +51,11 @@ const main = async () => {
       _id: checkingIds[0],
       ownerId: usersIds[1],
       balance: 500,
-      Transactions: []
     }
   ]);
 
-  console.log('Done seeding database');
-  await closeConnection();
+    console.log('Done seeding database');
+    await closeConnection();
 };
 
-main().catch(console.log);
+main().catch(console.error);
