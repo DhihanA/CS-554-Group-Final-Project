@@ -1,77 +1,62 @@
 import { dbConnection, closeConnection } from '../config/mongoConnection.js';
 import { transactions, users, savingsAccount, checkingAccount } from '../config/mongoCollections.js';
 import { v4 as uuidv4 } from 'uuid';
+import {dbConnection, closeConnection} from '../config/mongoConnection.js';
+
+//! Import collections like done below
+import {users, transactions, savingsAccount, checkingAccount} from '../config/mongoCollections.js';
+
+import {ObjectId} from 'mongodb';
 
 const main = async () => {
     const db = await dbConnection();
     await db.dropDatabase();
 
-    // Collections
-    const transactionsCol = await transactions();
-    const usersCol = await users();
-    const savingsAccountCol = await savingsAccount();
-    const checkingAccountCol = await checkingAccount();
+  //! TODO: create seed data
 
-    // Create mock users
-    const user1 = {
-        _id: uuidv4(),
-        firstName: "John",
-        lastName: "Doe",
-        emailAddress: "john.doe@example.com",
-        username: "johndoe",
-        dob: new Date('1990-04-01'),
-        phoneNumber: "123-456-7890",
-        city: "SomeCity",
-        state: "SomeState",
-        completedQuestionIds: [1, 2, 3]
-    };
+  /* Create collections here: */
+  const transactionsCollection = await transactions();
+  const savingsCollection = await savingsAccount();
+  const checkingCollection = await checkingAccount();
 
-    const user2 = {
-        _id: uuidv4(),
-        firstName: "Jane",
-        lastName: "Smith",
-        emailAddress: "jane.smith@example.com",
-        username: "janesmith",
-        dob: new Date('1985-08-15'),
-        phoneNumber: "987-654-3210",
-        city: "OtherCity",
-        state: "OtherState",
-        completedQuestionIds: [1, 2, 4]
-    };
+  const usersIds = [new ObjectId(), new ObjectId(), new ObjectId()]
+  const transactionIds = [new ObjectId()]
+  const savingsIds = [new ObjectId()]
+  const checkingIds = [new ObjectId()]
 
-    await usersCol.insertMany([user1, user2]);
+  /* Call queries below */
+  await transactionsCollection.insertMany([
+    {
+      _id: transactionIds[0],
+      senderId: checkingIds[0],
+      receiverId: savingsIds[0], //id of account money has been sent to
+      amount: 200,
+      date: new Date(),
+      description: "Payment for school supplies",
+      type: "Parent"
+    }
+  ]);
 
-    // Create mock accounts
-    const savings1 = {
-        _id: uuidv4(),
-        userId: user1._id,
-        currentBalance: 5000.00,
-        previousBalance: 4500.00,
-        Interest_rate: 1.2,
-        lastDateUpdated: new Date()
-    };
+  await savingsCollection.insertMany([
+    {
+      _id: savingsIds[0],
+      ownerId: usersIds[1],
+      currentBalance: 200,
+      previousBalance: 0,
+      Interest_rate: 4.3,
+      lastDateUpdated: new Date(),
+      Transactions: transactionIds[0]
+    }
+  ]);
 
-    const checking1 = {
-        _id: uuidv4(),
-        userId: user1._id,
-        balance: 1500.00
-    };
-
-    await savingsAccountCol.insertOne(savings1);
-    await checkingAccountCol.insertOne(checking1);
-
-    // Create mock transactions
-    const transaction1 = {
-        _id: uuidv4(),
-        sender: { accountId: checking1._id, accountType: 'Checking' },
-        receiver: { accountId: savings1._id, accountType: 'Savings' },
-        amount: 200.00,
-        date: new Date(),
-        description: "Transfer from checking to savings",
-        type: 'Transfer'
-    };
-
-    await transactionsCol.insertOne(transaction1);
+  await checkingCollection.insertMany([
+    {
+      _id: checkingIds[0],
+      ownerId: usersIds[1],
+      balance: 500,
+      Transactions: []
+    }
+  ]);
 
     console.log('Done seeding database');
     await closeConnection();
