@@ -22,7 +22,6 @@ export const resolvers = {
       let cacheKey = `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`
       let exists = await client.exists(cacheKey);
       if (exists) {
-        // console.log('getting from cache');
         let list = await client.lRange(`allTransactions:${args.userId.trim()}:${args.accountType.trim()}`, 0, -1);
         return list.map(str => JSON.parse(str));
       } else {
@@ -39,7 +38,6 @@ export const resolvers = {
               extensions: {code: 'BAD_USER_INPUT'}
             });
           }
-          console.log(foundAccount);
           const foundTransactions = await transactions.find({
             $or: [
               { senderId: foundAccount._id },
@@ -71,7 +69,6 @@ export const resolvers = {
               extensions: {code: 'BAD_USER_INPUT'}
             });
           }
-          console.log(foundAccount);
           const foundTransactions = await transactions.find({
             $or: [
               { senderId: foundAccount._id },
