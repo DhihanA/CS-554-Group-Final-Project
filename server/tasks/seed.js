@@ -1,52 +1,80 @@
-import {dbConnection, closeConnection} from '../config/mongoConnection.js';
-
-//! Import collections like done below
-// import {artists, albums, recordCompanies, songs} from '../config/mongoCollections.js';
-
-import {ObjectId} from 'mongodb';
+import { dbConnection, closeConnection } from '../config/mongoConnection.js';
+import { transactions, users, savingsAccount, checkingAccount } from '../config/mongoCollections.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const main = async () => {
-  const db = await dbConnection();
-  await db.dropDatabase();
+    const db = await dbConnection();
+    await db.dropDatabase();
 
-  //! TODO: create seed data
+    // Collections
+    const transactionsCol = await transactions();
+    const usersCol = await users();
+    const savingsAccountCol = await savingsAccount();
+    const checkingAccountCol = await checkingAccount();
 
-  /* Create collections here: */
-  // const artistsCollection = await artists();
+    // Create mock users
+    const user1 = {
+        _id: uuidv4(),
+        firstName: "John",
+        lastName: "Doe",
+        emailAddress: "john.doe@example.com",
+        username: "johndoe",
+        dob: new Date('1990-04-01'),
+        phoneNumber: "123-456-7890",
+        city: "SomeCity",
+        state: "SomeState",
+        completedQuestionIds: [1, 2, 3]
+    };
 
-  /* Create IDs of users/other entities here */
-  // const artist1Id = new ObjectId();
-  // const artist2Id = new ObjectId();
-  // const artist3Id = new ObjectId();
+    const user2 = {
+        _id: uuidv4(),
+        firstName: "Jane",
+        lastName: "Smith",
+        emailAddress: "jane.smith@example.com",
+        username: "janesmith",
+        dob: new Date('1985-08-15'),
+        phoneNumber: "987-654-3210",
+        city: "OtherCity",
+        state: "OtherState",
+        completedQuestionIds: [1, 2, 4]
+    };
 
-  /* Call queries below */
-  // await artistsCollection.insertMany([
-  //   {
-  //     _id: artist1Id,
-  //     name: 'Patrick',
-  //     dateFormed: '02/01/2024',
-  //     members: ['Freddie Gibbs', 'Ye'],
-  //     albums: [album1Id, album2Id]
-  //   },
-  //   {
-  //     _id: artist2Id,
-  //     name: 'Natasha',
-  //     dateFormed: '10/07/2015',
-  //     members: ['Lil Baby', 'Gunna'],
-  //     albums: [album3Id]
-  //   },
-  //   {
-  //     _id: artist3Id,
-  //     name: 'Jesal',
-  //     dateFormed: '05/20/2020',
-  //     members: ['Dhihan', 'Ajit'],
-  //     albums: [album4Id, album5Id]
-  //   }
-  // ]);
+    await usersCol.insertMany([user1, user2]);
 
+    // Create mock accounts
+    const savings1 = {
+        _id: uuidv4(),
+        userId: user1._id,
+        currentBalance: 5000.00,
+        previousBalance: 4500.00,
+        Interest_rate: 1.2,
+        lastDateUpdated: new Date()
+    };
 
-  console.log('Done seeding database');
-  await closeConnection();
+    const checking1 = {
+        _id: uuidv4(),
+        userId: user1._id,
+        balance: 1500.00
+    };
+
+    await savingsAccountCol.insertOne(savings1);
+    await checkingAccountCol.insertOne(checking1);
+
+    // Create mock transactions
+    const transaction1 = {
+        _id: uuidv4(),
+        sender: { accountId: checking1._id, accountType: 'Checking' },
+        receiver: { accountId: savings1._id, accountType: 'Savings' },
+        amount: 200.00,
+        date: new Date(),
+        description: "Transfer from checking to savings",
+        type: 'Transfer'
+    };
+
+    await transactionsCol.insertOne(transaction1);
+
+    console.log('Done seeding database');
+    await closeConnection();
 };
 
-main().catch(console.log);
+main().catch(console.error);
