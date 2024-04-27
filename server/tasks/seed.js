@@ -25,7 +25,7 @@ const main = async () => {
   await transactionsCollection.insertMany([
     {
       _id: transactionIds[0],
-      senderId: usersIds[0],
+      senderId: checkingIds[0],
       receiverId: savingsIds[0], //id of account money has been sent to
       amount: 200,
       date: new Date(),
