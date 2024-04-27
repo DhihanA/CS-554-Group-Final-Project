@@ -10,7 +10,7 @@ import {
   ApolloProvider,
 } from "@apollo/client";
 
-import { ClerkProvider } from '@clerk/clerk-react'
+import { ClerkProvider } from "@clerk/clerk-react";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -24,12 +24,12 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <ApolloClient client={client}>
-  // <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-  <BrowserRouter>
-    <main className="dark text-foreground bg-background ">
-      <App />
-    </main>
-  </BrowserRouter>
-  // </ClerkProvider>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <BrowserRouter>
+      <main className="dark text-foreground bg-background ">
+        <App />
+      </main>
+    </BrowserRouter>
+  </ClerkProvider>
   // </ApolloClient>
 );

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import piggyBankLogo from "../assets/piggyBankIcon.png";
+import { UserButton } from "@clerk/clerk-react";
 
 export default function NavbarComponent({ user }) {
   const routes = {
@@ -40,10 +41,26 @@ export default function NavbarComponent({ user }) {
             ))}
           </ul>
         </div>
-        <Link to="/" className="btn btn-ghost normal-case text-xl">
-          <img src={piggyBankLogo} className="h-8 mr-2" alt="Piggy Bank Logo" />
-          Piggy Bank
-        </Link>
+        {user && (
+          <Link to="/dashboard" className="btn btn-ghost normal-case text-xl">
+            <img
+              src={piggyBankLogo}
+              className="h-8 mr-2"
+              alt="Piggy Bank Logo"
+            />
+            Piggy Bank
+          </Link>
+        )}
+        {!user && (
+          <Link to="/" className="btn btn-ghost normal-case text-xl">
+            <img
+              src={piggyBankLogo}
+              className="h-8 mr-2"
+              alt="Piggy Bank Logo"
+            />
+            Piggy Bank
+          </Link>
+        )}
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
@@ -66,6 +83,15 @@ export default function NavbarComponent({ user }) {
             </Link>
           </div>
         )}
+      </div>
+      <div>
+        <UserButton
+          afterSignOutUrl="/"
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            localStorage.clear();
+          }}
+        />
       </div>
     </div>
   );
