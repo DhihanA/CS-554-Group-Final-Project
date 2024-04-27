@@ -13,7 +13,6 @@ import "./App.css";
 import HeroPage from "./pages/HeroPage";
 import DashboardPage from "./pages/DashboardPage";
 import TransactionsPage from "./pages/TransactionsPage";
-import Quiz from './pages/Quiz'
 import SettingsPage from "./pages/SettingsPage";
 import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
