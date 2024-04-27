@@ -1,7 +1,5 @@
 import { dbConnection, closeConnection } from '../config/mongoConnection.js';
-import { transactions, users, savingsAccount, checkingAccount } from '../config/mongoCollections.js';
 import { v4 as uuidv4 } from 'uuid';
-import {dbConnection, closeConnection} from '../config/mongoConnection.js';
 
 //! Import collections like done below
 import {users, transactions, savingsAccount, checkingAccount} from '../config/mongoCollections.js';

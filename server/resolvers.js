@@ -1,7 +1,6 @@
 import {GraphQLError} from 'graphql';
 import helpers from './helpers.js';
 import redis from 'redis';
-import { v4 as uuidv4 } from 'uuid';
 import {
   transactions as transactionsCollection,
   users as usersCollection,
@@ -28,7 +27,7 @@ export const resolvers = {
         let savingsAccountStrings = await client.lRange(cacheKey, 0, -1);
         let savingsAccounts;
         if (savingsAccountStrings.length === 0) {
-          savingsAccounts = await SavingsAccountCollection.find({}).toArray();
+          savingsAccounts = await savingsAccountCollection.find({}).toArray();
           for (const account of savingsAccounts) {
             await client.rPush(cacheKey, JSON.stringify(account));
           }
@@ -128,7 +127,7 @@ export const resolvers = {
         const cacheKey = `savingsAccount:${_id}`;
         let savingsAccount = await client.get(cacheKey);
         if (!savingsAccount) {
-          savingsAccount = await SavingsAccountCollection.findOne({ _id });
+          savingsAccount = await savingsAccountCollection.findOne({ _id });
           if (!savingsAccount) throw new GraphQLError('Savings Account Not Found', { extensions: { code: 'NOT_FOUND' } });
           await client.set(cacheKey, JSON.stringify(savingsAccount), 'EX', 3600); // Cache for 1 hour
         } else {
@@ -251,7 +250,7 @@ export const resolvers = {
       return await accountCollection.findOne({_id: parentValue.receiverId});
     }
   },
-  Mutation: {
+  // Mutation: {
     
-  }
+  // }
 };

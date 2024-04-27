@@ -70,7 +70,7 @@ export const typeDefs = `#graphql
     addSavingsAccount(userId: String!): SavingsAccount
     createUser(_id: String!, firstName: String!, lastName: String!, username: String!, dob: Date!, Email: Email!, city: String!, state: String!, role: Role!): User
     editUser(_id: String, firstName: String, lastName: String, username: String, dob: Date, Email: Email, city: String, state: String, role: Role): User
-    sendMoney(sender: AccountType!, reciever: AccountType!, amount: Float!): 
-    updateSavingsBalanceForLogin(currentBalance: Float!, lastDateUpdated: Date!, currentDate: Date!)
+    sendMoney(sender: AccountType!, reciever: AccountType!, amount: Float!): Transaction
+    updateSavingsBalanceForLogin(currentBalance: Float!, lastDateUpdated: Date!, currentDate: Date!): SavingsAccount
   }
 `;
