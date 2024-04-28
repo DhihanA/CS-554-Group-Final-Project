@@ -7,32 +7,29 @@ import AccountCard from "../components/AccountCard";
 const DashboardPage = ({ user }) => {
   return (
     <BasePage>
-      <div>
-        {/* <Card />
-        <Card />
-        <Card /> */}
-        {/* <Transactions></Transactions> */}
-        <div className="p-6 min-h-screen">
+      <div className="flex justify-center">
+        {" "}
+        {/* Added to center content */}
+        <div className="p-6 min-h-screen max-w-4xl w-full">
+          {" "}
+          {/* Set maximum width and full width */}
           {new Date().getHours() < 12 && (
-            <h1 className="text-2xl font-bold m-4">Good morning, user! </h1>
+            <h1 className="text-2xl font-bold m-4">Good morning, user!</h1>
             //   <h1 className="text-2xl font-bold m-4">
             //   Good morning, {user.firstName}!
             // </h1>
           )}
-          {
-            new Date().getHours() < 18 ? (
-              <h1 className="text-2xl font-bold m-4">Good afternoon, user! </h1>
-            ) : (
-              //   <h1 className="text-2xl font-bold m-4">
-              //   Good afternoon, {user.firstName}!
-              // </h1>
-              <h1 className="text-2xl font-bold m-4">Good evening, user! </h1>
-            )
+          {new Date().getHours() < 18 ? (
+            <h1 className="text-2xl font-bold m-4">Good afternoon, user!</h1>
+          ) : (
+            //   <h1 className="text-2xl font-bold m-4">
+            //   Good afternoon, {user.firstName}!
+            // </h1>
+            <h1 className="text-2xl font-bold m-4">Good evening, user!</h1>
             //   <h1 className="text-2xl font-bold m-4">
             //   Good evening, {user.firstName}!
             // </h1>
-          }
-
+          )}
           <h1 className="text-2xl font-bold m-4">Bank accounts</h1>
           <AccountCard
             accountType="checking account"

@@ -6,7 +6,7 @@ import { UserButton } from "@clerk/clerk-react";
 export default function NavbarComponent({ user }) {
   const routes = {
     "My Transactions": "/transactions",
-    Settings: "/settings",
+    // Settings: "/settings",
     "Learn n' Earn": "/learn",
   };
 

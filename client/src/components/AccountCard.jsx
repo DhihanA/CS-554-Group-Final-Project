@@ -60,7 +60,7 @@ const AccountCard = ({
             +{formattedDeposits}
           </p>
           <p className="text-xs text-base-content text-opacity-40 text-center">
-            Deposits this month
+            All deposits
           </p>
         </div>
         <div className="mb-4">
@@ -68,7 +68,7 @@ const AccountCard = ({
             -{formattedWithdrawals}
           </p>
           <p className="text-xs text-base-content text-opacity-40 text-center">
-            Withdrawals this month
+            All withdrawals
           </p>
         </div>
         <div className="card-actions flex-col items-center">
