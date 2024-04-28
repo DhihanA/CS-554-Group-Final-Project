@@ -123,16 +123,24 @@ export const typeDefs = `#graphql
     amount: Float!
     date: Date!
     description: String
-    type: String
+    type: TransferType
+  }
+
+  enum TransferType {
+    Transfer
+    Budgeted
+    InnerTransfer
   }
 
   type Mutation {
     createUser(firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!, parentId: ID, verificationCode: String): User
-    editUser(_id: ID!, firstName: String, lastName: String, emailAddress: String, phoneNumber: String, username: String): User
+    editUser(_id: String!, firstName: String, lastName: String, emailAddress: String, phoneNumber: String, username: String): User
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
-    addBudgetedTransaction(ownerId: ID!, transactionName: String!, amount: Float!, description: String!): Transaction
-    editBudgetedTransaction(transactionId: ID!, newName: String, newAmount: Float, newDescription: String): Transaction
-    sendMoney(senderUserId: ID!, receiverUserId: ID!, amount: Float!): Boolean
-    downloadTransactions(userId: ID!): String
+    addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType!): Transaction
+    addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!, type: TransferType): Transaction
+    addInnerTransferTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType): Transaction
+    editBudgetedTransaction(transactionId: String!, newName: String, newAmount: Float, newDescription: String): Transaction
+    sendMoney(senderUserId: String!, receiverUserId: String!, amount: Float!): Boolean
+    downloadTransactions(userId: String!): String
   }
 `;
