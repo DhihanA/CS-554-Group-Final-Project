@@ -219,8 +219,6 @@ getSavingsAccountInfo: async (_, { userId }) => {
       }
     },
     updateSavingsBalanceForLogin: async (_, { accountId }) => {
-      // args: accountId, currentBalance, lastDateUpdated
-      // let {accountId} = args;
       try {
         const savingsAccounts = await savingsAccountCollection();
         let theAccount = await savingsAccounts.findOne({ _id: new ObjectId(accountId.trim())});
@@ -232,7 +230,7 @@ getSavingsAccountInfo: async (_, { userId }) => {
         return await savingsAccounts.findOneAndUpdate({ _id: new ObjectId(accountId.trim())}, {
           $set: { previousBalance: theAccount.currentBalance, currentBalance: newBalance, lastDateUpdated: new Date() }
         });
-        
+
       } catch (error) {
         console.error('Error updating savings balance:', error);
         throw new GraphQLError('Internal Server Error');
@@ -240,4 +238,3 @@ getSavingsAccountInfo: async (_, { userId }) => {
     },
   }
 }
-    // Define other mutations as necessary...
