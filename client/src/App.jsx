@@ -13,7 +13,7 @@ import "./App.css";
 import HeroPage from "./pages/HeroPage";
 import DashboardPage from "./pages/DashboardPage";
 import TransactionsPage from "./pages/TransactionsPage";
-import SettingsPage from "./pages/SettingsPage";
+// import SettingsPage from "./pages/SettingsPage";
 import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
@@ -35,10 +35,10 @@ function App() {
         path="/transactions"
         element={isSignedIn ? <TransactionsPage /> : <Navigate to="/" />}
       />
-      <Route
+      {/* <Route
         path="/settings"
         element={isSignedIn ? <SettingsPage /> : <Navigate to="/" />}
-      />
+      /> */}
       <Route
         path="/learn"
         element={isSignedIn ? <LearnPage /> : <Navigate to="/" />}
