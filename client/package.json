@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/client": "^3.9.9",
     "@clerk/clerk-react": "^5.0.1",
+    "axios": "^1.6.8",
     "graphql": "^16.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
