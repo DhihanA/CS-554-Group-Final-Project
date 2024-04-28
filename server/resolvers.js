@@ -305,19 +305,19 @@ addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
         throw new GraphQLError('Internal Server Error');
       }
     },
-    updateSavingsBalanceForLogin: async (_, { currentBalance, lastDateUpdated, currentDate }) => {
+    updateSavingsBalanceForLogin: async (_, { accountId }) => {
       try {
-        // Example of how you might calculate this
-        const interestRate = 0.01; // Assuming a static interest rate for demonstration
-        const days = (new Date(currentDate) - new Date(lastDateUpdated)) / (1000 * 60 * 60 * 24);
-        const interest = currentBalance * interestRate * days / 365; // Simple daily compound
-        const newBalance = currentBalance + interest;
+        const savingsAccounts = await savingsAccountCollection();
+        let theAccount = await savingsAccounts.findOne({ _id: new ObjectId(accountId.trim())});
+        const interestRate = theAccount.interestRate;
+        const days = (new Date() - new Date(theAccount.lastDateUpdated)) / (1000 * 60 * 60 * 24);
+        const interest = theAccount.currentBalance * interestRate * days / 365; // Simple daily compound
+        const newBalance = theAccount.currentBalance + interest;
 
-        await savingsAccountCollection.updateOne({ lastDateUpdated }, {
-          $set: { currentBalance: newBalance, lastDateUpdated: new Date(currentDate) }
+        return await savingsAccounts.findOneAndUpdate({ _id: new ObjectId(accountId.trim())}, {
+          $set: { previousBalance: theAccount.currentBalance, currentBalance: newBalance, lastDateUpdated: new Date() }
         });
 
-        return savingsAccountCollection.findOne({ lastDateUpdated });
       } catch (error) {
         console.error('Error updating savings balance:', error);
         throw new GraphQLError('Internal Server Error');
@@ -325,4 +325,3 @@ addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
     },
   }
 }
-    // Define other mutations as necessary...
