@@ -29,10 +29,19 @@ const main = async () => {
       senderId: checkingIds[0],
       receiverId: savingsIds[0], //id of account money has been sent to
       amount: 200,
-      date: new Date(),
       description: "Payment for school supplies",
-      type: "Parent"
+      type: "Transfer"
+    },
+    {
+    _id: transactionIds[1],
+    senderId: checkingIds[0],
+    receiverId: savingsIds[0], //id of account money has been sent to
+    amount: 100,
+    description: "Payment for school supplies",
+    type: "Transfer"
     }
+
+
   ]);
 
   await savingsCollection.insertMany([
@@ -43,6 +52,14 @@ const main = async () => {
       previousBalance: 0,
       interestRate: 4.3,
       lastDateUpdated: new Date(),
+    },
+    {
+      _id: savingsIds[1],
+      ownerId: usersIds[2],
+      currentBalance: 0,
+      previousBalance: 0,
+      interestRate: 5.3,
+      lastDateUpdated: new Date(),
     }
   ]);
 
@@ -51,8 +68,16 @@ const main = async () => {
       _id: checkingIds[0],
       ownerId: usersIds[1],
       balance: 500,
+    },
+    {
+      _id: checkingIds[1],
+      ownerId: usersIds[2],
+      balance: 1000,
     }
   ]);
+
+
+
 
     console.log('Done seeding database');
     await closeConnection();
