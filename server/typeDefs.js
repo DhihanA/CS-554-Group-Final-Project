@@ -129,7 +129,7 @@ export const typeDefs = `#graphql
   type Mutation {
     createUser(firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!, parentId: ID, verificationCode: String): User
     editUser(_id: ID!, firstName: String, lastName: String, emailAddress: String, phoneNumber: String, username: String): User
-    updateSavingsBalanceForLogin(currentBalance: Float!, lastDateUpdated: Date!, currentDate: Date!): SavingsAccount
+    updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
     addBudgetedTransaction(ownerId: ID!, transactionName: String!, amount: Float!, description: String!): Transaction
     editBudgetedTransaction(transactionId: ID!, newName: String, newAmount: Float, newDescription: String): Transaction
     sendMoney(senderUserId: ID!, receiverUserId: ID!, amount: Float!): Boolean
