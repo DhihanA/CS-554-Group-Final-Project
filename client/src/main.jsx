@@ -15,21 +15,21 @@ import { ClerkProvider } from "@clerk/clerk-react";
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 //! TODO: uncomment AppoloClient stuff after gql server is up and running
-// const client = new ApolloClient({
-//   cache: new InMemoryCache(),
-//   link: new HttpLink({
-//     uri: 'http://localhost:4000'
-//   })
-// });
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link: new HttpLink({
+    uri: "http://localhost:4000",
+  }),
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  // <ApolloClient client={client}>
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-    <BrowserRouter>
-      <main className="dark text-foreground bg-background ">
-        <App />
-      </main>
-    </BrowserRouter>
-  </ClerkProvider>
-  // </ApolloClient>
+  <ApolloProvider client={client}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <BrowserRouter>
+        <main className="dark text-foreground bg-background ">
+          <App />
+        </main>
+      </BrowserRouter>
+    </ClerkProvider>
+  </ApolloProvider>
 );
