@@ -1,6 +1,8 @@
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import redis from "redis";
+import { createClerkClient } from "@clerk/clerk-sdk-node";
+import { configDotenv } from "dotenv";
 import {
   transactions as transactionsCollection,
   users as usersCollection,
@@ -8,13 +10,20 @@ import {
   checkingAccount as checkingAccountCollection,
 } from "./config/mongoCollections.js";
 
+configDotenv();
+
 const client = redis.createClient();
 client.connect().then(() => {});
 client.on("error", function (err) {
   console.log("Something went wrong ", err);
 });
-
 await client.flushAll();
+
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY,
+});
+const response = await clerkClient.users.getUserList();
+console.log(response);
 
 export const resolvers = {
   Query: {
