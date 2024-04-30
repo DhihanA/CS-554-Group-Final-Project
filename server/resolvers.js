@@ -7,14 +7,6 @@ import {
   savingsAccount as savingsAccountCollection,
   checkingAccount as checkingAccountCollection,
 } from "./config/mongoCollections.js";
-// import { createClerkClient } from "@clerk/clerk-sdk-node";
-// const CLERK_SECRET_KEY = await import("./.env").then(
-//   (env) => env.CLERK_SECRET_KEY
-// );
-// console.log(CLERK_SECRET_KEY);
-// const clerkClient = createClerkClient({ secretKey: CLERK_SECRET_KEY });
-// const clientList = await clerkClient.clients.getClientList();
-// console.log(clientList);
 
 const client = redis.createClient();
 client.connect().then(() => {});
@@ -153,10 +145,8 @@ export const resolvers = {
               extensions: { code: "NOT_FOUND" },
             });
           }
-
           console.log("Account found, caching and returning.");
           await client.set(cacheKey, JSON.stringify(account), "EX", 3600);
-
           return account;
         }
       } catch (error) {
@@ -176,34 +166,6 @@ export const resolvers = {
       try {
         const cacheKey = `savingsAccount:${userId}`;
         let accountString = await client.get(cacheKey);
-      if (!account) {
-        console.log("Account not found in database."); 
-        throw new GraphQLError('Checking Account Not Found', {
-          extensions: { code: 'NOT_FOUND' }
-        });
-      }
-      console.log("Account found, caching and returning."); 
-      await client.set(cacheKey, JSON.stringify(account), 'EX', 3600); 
-      return account;
-    }
-  } catch (error) {
-    console.error('Error fetching checking account info:', error);
-    if (error instanceof TypeError && error.message.includes('ObjectId')) {
-      console.error('Invalid ObjectId format:', userId);
-      throw new GraphQLError('Invalid ObjectId Format', {
-        extensions: { code: 'INVALID_ID' }
-      });
-    }
-    throw new GraphQLError('Internal Server Error', {
-      extensions: { code: 'INTERNAL_SERVER_ERROR' }
-    });
-  }
-}
-,
-getSavingsAccountInfo: async (_, { userId }) => {
-  try {
-    const cacheKey = `savingsAccount:${userId}`;
-    let accountString = await client.get(cacheKey);
 
         if (accountString) {
           return JSON.parse(accountString);
@@ -266,138 +228,105 @@ getSavingsAccountInfo: async (_, { userId }) => {
     //     throw new GraphQLError('Internal Server Error');
     //   }
     // },
-    addTransferTransaction: async (_, { senderId, receiverId, amount, description }) => {
-  try {
-    if (senderId === receiverId) {
-      throw new GraphQLError('Sender and Receiver cannot be the same for transfer transactions');
-    }
-    if (amount <= 0) {
-      throw new GraphQLError('Amount must be greater than 0');
-    }
-    const caCollection = await checkingAccountCollection();
-    const senderAccount = await caCollection.findOne({ _id: new ObjectId(senderId) });
-    const receiverAccount = await caCollection.findOne({ _id: new ObjectId(receiverId) });
-    
-    if (!senderAccount) {
-      throw new GraphQLError('Sender checking account not found');
-    }
-    if (!receiverAccount) {
-      throw new GraphQLError('Receiver checking account not found');
-    }
-    if (senderAccount.balance < amount) {
-      throw new GraphQLError('Sender does not have sufficient balance');
-    }
-
-    const transaction = {
-      _id: new ObjectId(),
-      senderId: senderId,  
-      receiverId: receiverId,  
-      amount: amount,
-      description: description.trim(),
-      type: 'Transfer'
-    };
-    
-    const transactionsCol = await transactionsCollection();
-    await transactionsCol.insertOne(transaction);
-
-    await caCollection.updateOne(
-      { _id: new ObjectId(senderId) },
-      { $inc: { balance: -amount } }
-    );
-    await caCollection.updateOne(
-      { _id: new ObjectId(receiverId) },
-      { $inc: { balance: amount } }
-    );
-
-    return transaction;
-  } catch (error) {
-    console.error('Error creating transfer transaction:', error);
-    throw new GraphQLError('Internal Server Error');
-  }
-},
-
-addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
-  try {
-    // Validate the amount
-    if (amount <= 0) {
-      throw new GraphQLError('Amount must be greater than 0');
-    }
-    const caCollection = await checkingAccountCollection();
-    const account = await caCollection.findOne({ ownerId: new ObjectId(ownerId) });
-    if (!account) {
-      throw new GraphQLError('Checking account not found');
-    }
-
-    if (account.balance < amount) {
-      throw new GraphQLError('Account does not have sufficient balance');
-    }
-
-    await caCollection.updateOne(
-      { _id: account._id },
-      { $inc: { balance: -amount } }
-    );
-
-    const transaction = {
-      _id: new ObjectId(),
-      senderId: ownerId,  
-      receiverId: ownerId,
-      amount,
-      description: description.trim(),
-      type: 'Budgeted'  
-    };
-
-    const transactionsCol = await transactionsCollection();
-    await transactionsCol.insertOne(transaction);
-    return transaction;
-  } catch (error) {
-    console.error('Error creating budgeted transaction:', error);
-    throw new GraphQLError('Internal Server Error');
-  }
-}
-,
-    createUser: async (
+    addTransferTransaction: async (
       _,
-      {
-        firstName,
-        lastName,
-        emailAddress,
-        username,
-        dob,
-        parentId,
-        verificationCode,
-      }
+      { senderId, receiverId, amount, description }
     ) => {
       try {
-        const userId = uuidv4();
-        await usersCollection.insertOne({
-          _id: userId,
-          parentId,
-          verificationCode,
-          firstName,
-          lastName,
-          emailAddress,
-          username,
-          dob,
-          completedQuestionIds: [],
+        if (senderId === receiverId) {
+          throw new GraphQLError(
+            "Sender and Receiver cannot be the same for transfer transactions"
+          );
+        }
+        if (amount <= 0) {
+          throw new GraphQLError("Amount must be greater than 0");
+        }
+        const caCollection = await checkingAccountCollection();
+        const senderAccount = await caCollection.findOne({
+          _id: new ObjectId(senderId),
         });
-        await checkingAccountCollection.insertOne({
-          _id: uuidv4(),
-          ownerId: userId,
-          balance: 100, // Initialize balance
-          transactions: [],
+        const receiverAccount = await caCollection.findOne({
+          _id: new ObjectId(receiverId),
         });
-        await savingsAccountCollection.insertOne({
-          _id: uuidv4(),
-          ownerId: userId,
-          currentBalance: 100,
-          previousBalance: 100,
-          interestRate: 0.01, // Example interest rate
-          lastDateUpdated: new Date(),
-          transactions: [],
-        });
-        return usersCollection.findOne({ _id: userId });
+
+        if (!senderAccount) {
+          throw new GraphQLError("Sender checking account not found");
+        }
+        if (!receiverAccount) {
+          throw new GraphQLError("Receiver checking account not found");
+        }
+        if (senderAccount.balance < amount) {
+          throw new GraphQLError("Sender does not have sufficient balance");
+        }
+
+        const transaction = {
+          _id: new ObjectId(),
+          senderId: senderId,
+          receiverId: receiverId,
+          amount: amount,
+          description: description.trim(),
+          type: "Transfer",
+        };
+
+        const transactionsCol = await transactionsCollection();
+        await transactionsCol.insertOne(transaction);
+
+        await caCollection.updateOne(
+          { _id: new ObjectId(senderId) },
+          { $inc: { balance: -amount } }
+        );
+        await caCollection.updateOne(
+          { _id: new ObjectId(receiverId) },
+          { $inc: { balance: amount } }
+        );
+
+        return transaction;
       } catch (error) {
-        console.error("Error creating user:", error);
+        console.error("Error creating transfer transaction:", error);
+        throw new GraphQLError("Internal Server Error");
+      }
+    },
+
+    addBudgetedTransaction: async (
+      _,
+      { ownerId, amount, description, type }
+    ) => {
+      try {
+        // Validate the amount
+        if (amount <= 0) {
+          throw new GraphQLError("Amount must be greater than 0");
+        }
+        const caCollection = await checkingAccountCollection();
+        const account = await caCollection.findOne({
+          ownerId: new ObjectId(ownerId),
+        });
+        if (!account) {
+          throw new GraphQLError("Checking account not found");
+        }
+
+        if (account.balance < amount) {
+          throw new GraphQLError("Account does not have sufficient balance");
+        }
+
+        await caCollection.updateOne(
+          { _id: account._id },
+          { $inc: { balance: -amount } }
+        );
+
+        const transaction = {
+          _id: new ObjectId(),
+          senderId: ownerId,
+          receiverId: ownerId,
+          amount,
+          description: description.trim(),
+          type: "Budgeted",
+        };
+
+        const transactionsCol = await transactionsCollection();
+        await transactionsCol.insertOne(transaction);
+        return transaction;
+      } catch (error) {
+        console.error("Error creating budgeted transaction:", error);
         throw new GraphQLError("Internal Server Error");
       }
     },
@@ -416,45 +345,33 @@ addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
       }
     },
     updateSavingsBalanceForLogin: async (_, { accountId }) => {
-    updateSavingsBalanceForLogin: async (
-      _,
-      { currentBalance, lastDateUpdated, currentDate }
-    ) => {
       try {
         const savingsAccounts = await savingsAccountCollection();
-        let theAccount = await savingsAccounts.findOne({ _id: new ObjectId(accountId.trim())});
-        const interestRate = theAccount.interestRate;
-        const days = (new Date() - new Date(theAccount.lastDateUpdated)) / (1000 * 60 * 60 * 24);
-        const interest = theAccount.currentBalance * interestRate * days / 365; // Simple daily compound
-        const newBalance = theAccount.currentBalance + interest;
-        // Example of how you might calculate this
-        const interestRate = 0.01; // Assuming a static interest rate for demonstration
-        const days =
-          (new Date(currentDate) - new Date(lastDateUpdated)) /
-          (1000 * 60 * 60 * 24);
-        const interest = (currentBalance * interestRate * days) / 365; // Simple daily compound
-        const newBalance = currentBalance + interest;
-
-        return await savingsAccounts.findOneAndUpdate({ _id: new ObjectId(accountId.trim())}, {
-          $set: { previousBalance: theAccount.currentBalance, currentBalance: newBalance, lastDateUpdated: new Date() }
+        let theAccount = await savingsAccounts.findOne({
+          _id: new ObjectId(accountId.trim()),
         });
-        await savingsAccountCollection.updateOne(
-          { lastDateUpdated },
+        const interestRate = theAccount.interestRate;
+        const days =
+          (new Date() - new Date(theAccount.lastDateUpdated)) /
+          (1000 * 60 * 60 * 24);
+        const interest =
+          (theAccount.currentBalance * interestRate * days) / 365; // Simple daily compound
+        const newBalance = theAccount.currentBalance + interest;
+
+        return await savingsAccounts.findOneAndUpdate(
+          { _id: new ObjectId(accountId.trim()) },
           {
             $set: {
+              previousBalance: theAccount.currentBalance,
               currentBalance: newBalance,
-              lastDateUpdated: new Date(currentDate),
+              lastDateUpdated: new Date(),
             },
           }
         );
-
       } catch (error) {
         console.error("Error updating savings balance:", error);
         throw new GraphQLError("Internal Server Error");
       }
     },
-  }
-}
   },
 };
-// Define other mutations as necessary...
