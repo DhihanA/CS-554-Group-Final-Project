@@ -22,8 +22,26 @@ await client.flushAll();
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
 });
-const response = await clerkClient.users.getUserList();
-console.log(response);
+
+// const response = await clerkClient.users.getUserList();
+// console.log(response);
+
+async function updateUserAddParent(userId) {
+  try {
+    const updatedUser = await clerkClient.users.updateUser(userId, {
+      public_metadata: {
+        parent: true,
+      },
+    });
+
+    console.log("Updated user:", updatedUser);
+  } catch (error) {
+    console.error("Error updating user: ", error);
+  }
+}
+// const lastUser = response.data[response.data.length - 1];
+// console.log(lastUser.id);
+// await updateUserAddParent(lastUser.id);
 
 export const resolvers = {
   Query: {
