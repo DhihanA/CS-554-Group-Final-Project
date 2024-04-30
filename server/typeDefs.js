@@ -87,17 +87,15 @@ export const typeDefs = `#graphql
 
   type User {
     _id: String!
-    parentId: String!
-    verificationCode: String
+    clerkId: String!
+    parentId: String # undefined for Parent
+    verificationCode: String # undefined for children
     firstName: String!
     lastName: String!
     emailAddress: String!
     username: String!
     dob: Date!
     completedQuestionIds: [Int] # undefined for Parent
-    checkingAccounts: [CheckingAccount]
-    savingsAccounts: [SavingsAccount]
-    transactions: [Transaction]
   }
 
   type CheckingAccount {
@@ -133,6 +131,8 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
+    createUserInLocalDB(clerkUserId: String!, firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!): User
+    verifyChild(userId: String!, verificationCode: String!): User
     createUser(firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!, parentId: ID, verificationCode: String): User
     editUser(_id: String!, firstName: String, lastName: String, emailAddress: String, phoneNumber: String, username: String): User
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount

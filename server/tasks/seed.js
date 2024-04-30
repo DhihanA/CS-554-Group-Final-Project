@@ -1,14 +1,19 @@
-import { dbConnection, closeConnection } from '../config/mongoConnection.js';
-import { v4 as uuidv4 } from 'uuid';
+import { dbConnection, closeConnection } from "../config/mongoConnection.js";
+import { v4 as uuidv4 } from "uuid";
 
 //! Import collections like done below
-import {users, transactions, savingsAccount, checkingAccount} from '../config/mongoCollections.js';
+import {
+  users,
+  transactions,
+  savingsAccount,
+  checkingAccount,
+} from "../config/mongoCollections.js";
 
-import {ObjectId} from 'mongodb';
+import { ObjectId } from "mongodb";
 
 const main = async () => {
-    const db = await dbConnection();
-    await db.dropDatabase();
+  const db = await dbConnection();
+  await db.dropDatabase();
 
   //! TODO: create seed data
 
@@ -17,10 +22,10 @@ const main = async () => {
   const savingsCollection = await savingsAccount();
   const checkingCollection = await checkingAccount();
 
-  const usersIds = [new ObjectId(), new ObjectId(), new ObjectId()]
-  const transactionIds = [new ObjectId()]
-  const savingsIds = [new ObjectId()]
-  const checkingIds = [new ObjectId()]
+  const usersIds = [new ObjectId(), new ObjectId(), new ObjectId()];
+  const transactionIds = [new ObjectId()];
+  const savingsIds = [new ObjectId()];
+  const checkingIds = [new ObjectId()];
 
   /* Call queries below */
   await transactionsCollection.insertMany([
@@ -30,18 +35,16 @@ const main = async () => {
       receiverId: savingsIds[0], //id of account money has been sent to
       amount: 200,
       description: "Payment for school supplies",
-      type: "Transfer"
+      type: "Transfer",
     },
     {
-    _id: transactionIds[1],
-    senderId: checkingIds[0],
-    receiverId: savingsIds[0], //id of account money has been sent to
-    amount: 100,
-    description: "Payment for school supplies",
-    type: "Transfer"
-    }
-
-
+      _id: transactionIds[1],
+      senderId: checkingIds[0],
+      receiverId: savingsIds[0], //id of account money has been sent to
+      amount: 100,
+      description: "Payment for school supplies",
+      type: "Transfer",
+    },
   ]);
 
   await savingsCollection.insertMany([
@@ -60,7 +63,7 @@ const main = async () => {
       previousBalance: 0,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
-    }
+    },
   ]);
 
   await checkingCollection.insertMany([
@@ -73,14 +76,11 @@ const main = async () => {
       _id: checkingIds[1],
       ownerId: usersIds[2],
       balance: 1000,
-    }
+    },
   ]);
 
-
-
-
-    console.log('Done seeding database');
-    await closeConnection();
+  console.log("Done seeding database");
+  await closeConnection();
 };
 
 main().catch(console.error);
