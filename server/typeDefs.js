@@ -14,9 +14,9 @@
 //   type User {
 //     _id: String!
 //     firstName: String!
-//     lastName: String! 
+//     lastName: String!
 //     emailAddress: Email!
-//     username: String! 
+//     username: String!
 //     dob: Date!
 //     phoneNumber: PhoneNumber!
 //     city: String!
@@ -75,7 +75,6 @@
 //   }
 // `;
 
-
 export const typeDefs = `#graphql
   scalar Date
 
@@ -127,6 +126,7 @@ export const typeDefs = `#graphql
   }
 
   enum TransferType {
+    Parent
     Transfer
     Budgeted
     InnerTransfer

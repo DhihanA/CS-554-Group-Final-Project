@@ -39,9 +39,9 @@ async function updateUserAddParent(userId) {
     console.error("Error updating user: ", error);
   }
 }
-// const lastUser = response.data[response.data.length - 1];
-// console.log(lastUser.id);
-// await updateUserAddParent(lastUser.id);
+
+// adding parent field to user jesal to test
+await updateUserAddParent("user_2fk8aRObMHQDixP9M5hdA7mu0xY");
 
 export const resolvers = {
   Query: {
