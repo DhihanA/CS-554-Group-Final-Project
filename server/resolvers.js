@@ -258,7 +258,6 @@ getSavingsAccountInfo: async (_, { userId }) => {
 
 addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
   try {
-    // Validate the amount
     if (amount <= 0) {
       throw new GraphQLError('Amount must be greater than 0');
     }
@@ -267,16 +266,13 @@ addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
     if (!account) {
       throw new GraphQLError('Checking account not found');
     }
-
     if (account.balance < amount) {
       throw new GraphQLError('Account does not have sufficient balance');
     }
-
     await caCollection.updateOne(
       { _id: account._id },
       { $inc: { balance: -amount } }
     );
-
     const transaction = {
       _id: new ObjectId(),
       senderId: ownerId,  
@@ -285,7 +281,6 @@ addBudgetedTransaction: async (_, { ownerId, amount, description, type }) => {
       description: description.trim(),
       type: 'Budgeted'  
     };
-
     const transactionsCol = await transactionsCollection();
     await transactionsCol.insertOne(transaction);
     return transaction;
