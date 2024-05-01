@@ -78,13 +78,6 @@
 export const typeDefs = `#graphql
   scalar Date
 
-  type Query {
-    getAllTransactions(userId: String!, accountType: String!): [Transaction]
-    getUserInfo(userId: String!): User
-    getCheckingAccountInfo(userId: String!): CheckingAccount
-    getSavingsAccountInfo(userId: String!): SavingsAccount
-  }
-
   type User {
     _id: String!
     clerkId: String!
@@ -130,12 +123,30 @@ export const typeDefs = `#graphql
     InnerTransfer
   }
 
+
+  type Query {
+    # User Queries
+    getUserInfo(userId: String!): User
+    getChildren(parentUserId: String!): [User] #new
+
+    # Account Queries
+    getCheckingAccountInfo(userId: String!): CheckingAccount
+    getSavingsAccountInfo(userId: String!): SavingsAccount
+
+    # Transaction Queries
+    getAllTransactions(userId: String!, accountType: String!): [Transaction]
+  }
+
   type Mutation {
-    createUserInLocalDB(clerkUserId: String!, firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!): User
+    # User Mutations
+    createUserInLocalDB(clerkUserId: String!): User
+    updateUserInLocalDB(clerkUserId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
-    createUser(firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!, parentId: ID, verificationCode: String): User
-    editUser(_id: String!, firstName: String, lastName: String, emailAddress: String, phoneNumber: String, username: String): User
+
+    # Account Mutations
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
+
+    # Transaction Mutations
     addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType!): Transaction
     addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!, type: TransferType): Transaction
     addInnerTransferTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType): Transaction

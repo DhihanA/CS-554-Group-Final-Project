@@ -26,10 +26,7 @@ export const userResolvers = {
     // this mutation should be called directly AFTER the user has been created in clerk
     // (WE ARE ASSUMING parentId IS GIVEN DURING SIGNUP, NOT AFTER)
     // parentId should be added to publicMetadata of clerk user (if they are child) before calling this shit
-    createUserInLocalDB: async (
-      _,
-      { clerkUserId, firstName, lastName, emailAddress, username, dob }
-    ) => {
+    createUserInLocalDB: async (_, { clerkUserId }) => {
       try {
         const clerkUser = await clerkClient.users.getUser(clerkUserId);
 
@@ -57,11 +54,11 @@ export const userResolvers = {
           parentId,
           verificationCode: verificationCode,
           verified: verified,
-          firstName,
-          lastName,
-          emailAddress,
-          username,
-          dob,
+          firstName: clerkUser.firstName,
+          lastName: clerkUser.lastName,
+          emailAddress: clerkUser.emailAddresses,
+          username: clerkUser.username,
+          dob: clerkUser.publicMetadata.dob,
           completedQuestionIds: completedQuestionIds, // empty for new children, undef for parents
         });
 
@@ -81,8 +78,12 @@ export const userResolvers = {
         });
       }
     },
+
+    // TODO: Jesal
+    updateUserInLocalDB: async (_, { clerkUserId }) => {},
+
     // this mutation should ONLY be called on children, NOT parents
-    //!NOT WORKING/TESTED YET
+    //!NOT WORKING/TESTED YET: Jesal
     verifyChild: async (_, { userId, verificationCode }) => {
       const usersCol = await usersCollection();
 
@@ -131,22 +132,6 @@ export const userResolvers = {
         }
       }
       return verifiedUser;
-    },
-
-    //jacob; doesnt implement clerk yet
-    editUser: async (_, { _id, ...updates }) => {
-      try {
-        const result = await usersCollection.updateOne(
-          { _id },
-          { $set: updates }
-        );
-        if (result.modifiedCount === 0)
-          throw new GraphQLError("User Not Found or No Changes Made");
-        return usersCollection.findOne({ _id });
-      } catch (error) {
-        console.error("Error editing user:", error);
-        throw new GraphQLError("Internal Server Error");
-      }
     },
   },
 };
