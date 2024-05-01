@@ -1,27 +1,13 @@
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
-import redis from "redis";
-import { createClerkClient } from "@clerk/clerk-sdk-node";
-import { configDotenv } from "dotenv";
 import {
   transactions as transactionsCollection,
   users as usersCollection,
   savingsAccount as savingsAccountCollection,
   checkingAccount as checkingAccountCollection,
 } from "./config/mongoCollections.js";
-
-configDotenv();
-
-const client = redis.createClient();
-client.connect().then(() => {});
-client.on("error", function (err) {
-  console.log("Something went wrong ", err);
-});
-await client.flushAll();
-
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
+import clerkClient from "./clients/clerkClient.js";
+import redisClient from "./clients/redisClient.js";
 
 // const response = await clerkClient.users.getUserList();
 // console.log(response);
@@ -47,9 +33,9 @@ export const resolvers = {
   Query: {
     getAllTransactions: async (_, args) => {
       let cacheKey = `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`;
-      let exists = await client.exists(cacheKey);
+      let exists = await redisClient.exists(cacheKey);
       if (exists) {
-        let list = await client.lRange(
+        let list = await redisClient.lRange(
           `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
           0,
           -1
@@ -85,13 +71,13 @@ export const resolvers = {
 
           //push transactions to the redis object
           foundTransactions.forEach((transaction) => {
-            client.rPush(
+            redisClient.rPush(
               `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
               JSON.stringify(transaction)
             );
           });
           //set expiration
-          await client.expire(
+          await redisClient.expire(
             `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
             3600
           );
@@ -124,13 +110,13 @@ export const resolvers = {
 
           //push transactions to the redis object
           foundTransactions.forEach((transaction) => {
-            client.rPush(
+            redisClient.rPush(
               `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
               JSON.stringify(transaction)
             );
           });
           //set expiration
-          await client.expire(
+          await redisClient.expire(
             `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
             3600
           );
@@ -153,7 +139,7 @@ export const resolvers = {
     getCheckingAccountInfo: async (_, { userId }) => {
       try {
         const cacheKey = `checkingAccount:${userId}`;
-        let accountString = await client.get(cacheKey);
+        let accountString = await redisClient.get(cacheKey);
 
         if (accountString) {
           console.log("Account info found in cache.");
@@ -173,7 +159,7 @@ export const resolvers = {
             });
           }
           console.log("Account found, caching and returning.");
-          await client.set(cacheKey, JSON.stringify(account), "EX", 3600);
+          await redisClient.set(cacheKey, JSON.stringify(account), "EX", 3600);
           return account;
         }
       } catch (error) {
@@ -192,7 +178,7 @@ export const resolvers = {
     getSavingsAccountInfo: async (_, { userId }) => {
       try {
         const cacheKey = `savingsAccount:${userId}`;
-        let accountString = await client.get(cacheKey);
+        let accountString = await redisClient.get(cacheKey);
 
         if (accountString) {
           return JSON.parse(accountString);
@@ -209,7 +195,7 @@ export const resolvers = {
             });
           }
 
-          await client.set(cacheKey, JSON.stringify(account), "EX", 3600);
+          await redisClient.set(cacheKey, JSON.stringify(account), "EX", 3600);
           return account;
         }
       } catch (error) {
