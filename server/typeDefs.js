@@ -111,7 +111,6 @@ export const typeDefs = `#graphql
     senderId: String!
     receiverId: String!
     amount: Float!
-    date: Date!
     description: String
     type: TransferType
   }

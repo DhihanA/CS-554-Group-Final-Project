@@ -9,14 +9,6 @@ export const accountResolvers = {
   Query: {
     getCheckingAccountInfo: async (_, { userId }) => {
       try {
-        const cacheKey = `checkingAccount:${userId}`;
-        let accountString = await redisClient.get(cacheKey);
-
-        if (accountString) {
-          console.log("Account info found in cache.");
-          return JSON.parse(accountString);
-        } else {
-          console.log("Account info not found in cache, querying database.");
           const accountCollection = await checkingAccountCollection();
           const objectId = new ObjectId(userId);
           const account = await accountCollection.findOne({
@@ -27,12 +19,9 @@ export const accountResolvers = {
             console.log("Account not found in database.");
             throw new GraphQLError("Checking Account Not Found", {
               extensions: { code: "NOT_FOUND" },
-            });
-          }
+          });}
           console.log("Account found, caching and returning.");
-          await redisClient.set(cacheKey, JSON.stringify(account), "EX", 3600);
           return account;
-        }
       } catch (error) {
         console.error("Error fetching checking account info:", error);
         if (error instanceof TypeError && error.message.includes("ObjectId")) {
@@ -48,12 +37,6 @@ export const accountResolvers = {
     },
     getSavingsAccountInfo: async (_, { userId }) => {
       try {
-        const cacheKey = `savingsAccount:${userId}`;
-        let accountString = await redisClient.get(cacheKey);
-
-        if (accountString) {
-          return JSON.parse(accountString);
-        } else {
           const accountCollection = await savingsAccountCollection();
           const objectId = new ObjectId(userId);
           const account = await accountCollection.findOne({
@@ -63,13 +46,11 @@ export const accountResolvers = {
           if (!account) {
             throw new GraphQLError("Savings Account Not Found", {
               extensions: { code: "NOT_FOUND" },
-            });
-          }
+            });}
 
-          await redisClient.set(cacheKey, JSON.stringify(account), "EX", 3600);
           return account;
         }
-      } catch (error) {
+      catch (error) {
         throw new GraphQLError("Internal Server Error", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
