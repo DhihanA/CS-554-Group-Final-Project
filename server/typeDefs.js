@@ -14,9 +14,9 @@
 //   type User {
 //     _id: String!
 //     firstName: String!
-//     lastName: String! 
+//     lastName: String!
 //     emailAddress: Email!
-//     username: String! 
+//     username: String!
 //     dob: Date!
 //     phoneNumber: PhoneNumber!
 //     city: String!
@@ -75,30 +75,20 @@
 //   }
 // `;
 
-
 export const typeDefs = `#graphql
   scalar Date
 
-  type Query {
-    getAllTransactions(userId: String!, accountType: String!): [Transaction]
-    getUserInfo(userId: String!): User
-    getCheckingAccountInfo(userId: String!): CheckingAccount
-    getSavingsAccountInfo(userId: String!): SavingsAccount
-  }
-
   type User {
     _id: String!
-    parentId: String!
-    verificationCode: String
+    clerkId: String!
+    parentId: String # undefined for Parent
+    verificationCode: String # undefined for children
     firstName: String!
     lastName: String!
     emailAddress: String!
     username: String!
     dob: Date!
     completedQuestionIds: [Int] # undefined for Parent
-    checkingAccounts: [CheckingAccount]
-    savingsAccounts: [SavingsAccount]
-    transactions: [Transaction]
   }
 
   type CheckingAccount {
@@ -127,15 +117,36 @@ export const typeDefs = `#graphql
   }
 
   enum TransferType {
+    Parent
     Transfer
     Budgeted
     InnerTransfer
   }
 
+
+  type Query {
+    # User Queries
+    getUserInfo(userId: String!): User
+    getChildren(parentUserId: String!): [User] #new
+
+    # Account Queries
+    getCheckingAccountInfo(userId: String!): CheckingAccount
+    getSavingsAccountInfo(userId: String!): SavingsAccount
+
+    # Transaction Queries
+    getAllTransactions(userId: String!, accountType: String!): [Transaction]
+  }
+
   type Mutation {
-    createUser(firstName: String!, lastName: String!, emailAddress: String!, username: String!, dob: Date!, parentId: ID, verificationCode: String): User
-    editUser(_id: String!, firstName: String, lastName: String, emailAddress: String, phoneNumber: String, username: String): User
+    # User Mutations
+    createUserInLocalDB(clerkUserId: String!): User
+    updateUserInLocalDB(clerkUserId: String!): User
+    verifyChild(userId: String!, verificationCode: String!): User
+
+    # Account Mutations
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
+
+    # Transaction Mutations
     addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType!): Transaction
     addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!, type: TransferType): Transaction
     addInnerTransferTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType): Transaction

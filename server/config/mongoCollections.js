@@ -1,7 +1,5 @@
-import {dbConnection} from './mongoConnection.js';
+import { dbConnection } from "./mongoConnection.js";
 
-/* This will allow you to have one reference to each collection per app */
-/* Feel free to copy and paste this this */
 const getCollectionFn = (collection) => {
   let _col = undefined;
 
@@ -15,10 +13,7 @@ const getCollectionFn = (collection) => {
   };
 };
 
-//! List actual collections below
-// export const artists = getCollectionFn('artists');
-export const transactions = getCollectionFn('transactions');
-export const users = getCollectionFn('users');
-export const savingsAccount = getCollectionFn('savingsAccount');
-export const checkingAccount = getCollectionFn('checkingAccount');
-
+export const transactions = getCollectionFn("transactions");
+export const users = getCollectionFn("users");
+export const savingsAccount = getCollectionFn("savingsAccount");
+export const checkingAccount = getCollectionFn("checkingAccount");
