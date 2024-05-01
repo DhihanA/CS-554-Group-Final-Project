@@ -19,21 +19,28 @@ import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
 
 function App() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
 
   if (!isLoaded)
     return <span className="loading loading-infinity loading-lg"></span>;
 
+  let isParent;
+  if (isSignedIn && user) isParent = user.publicMetadata.parent;
+
   return (
     <Routes>
       {/* Authenticated user routes go below */}
+
+      {/* This is the only path both adults+children can access: */}
       <Route
         path="/dashboard"
         element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
       />
       <Route
         path="/transactions"
-        element={isSignedIn ? <TransactionsPage /> : <Navigate to="/" />}
+        element={
+          isSignedIn && !isParent ? <TransactionsPage /> : <Navigate to="/" />
+        }
       />
       {/* <Route
         path="/settings"
@@ -41,7 +48,7 @@ function App() {
       /> */}
       <Route
         path="/learn"
-        element={isSignedIn ? <LearnPage /> : <Navigate to="/" />}
+        element={isSignedIn && !isParent ? <LearnPage /> : <Navigate to="/" />}
       />
 
       {/* Unauthenticated user routes go below */}

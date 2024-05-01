@@ -3,8 +3,37 @@ import BasePage from "./BasePage";
 import Card from "../components/CardComponent";
 import Transactions from "../components/Transactions";
 import AccountCard from "../components/AccountCard";
+import { useUser } from "@clerk/clerk-react";
 
-const DashboardPage = ({ user }) => {
+const DashboardPage = () => {
+  const { user } = useUser();
+
+  const hour = new Date().getHours();
+  let greeting;
+
+  if (hour < 12) {
+    greeting = (
+      <h1 className="text-2xl font-bold m-4">
+        Good morning, {user.firstName}{" "}
+        {user.publicMetadata.parent && <> (PARENT)</>}
+      </h1>
+    );
+  } else if (hour < 18) {
+    greeting = (
+      <h1 className="text-2xl font-bold m-4">
+        Good afternoon, {user.firstName}{" "}
+        {user.publicMetadata.parent && <> (PARENT)</>}
+      </h1>
+    );
+  } else {
+    greeting = (
+      <h1 className="text-2xl font-bold m-4">
+        Good evening, {user.firstName}{" "}
+        {user.publicMetadata.parent && <> (PARENT)</>}
+      </h1>
+    );
+  }
+
   return (
     <BasePage>
       <div className="flex justify-center">
@@ -13,23 +42,7 @@ const DashboardPage = ({ user }) => {
         <div className="p-6 min-h-screen max-w-4xl w-full">
           {" "}
           {/* Set maximum width and full width */}
-          {new Date().getHours() < 12 && (
-            <h1 className="text-2xl font-bold m-4">Good morning, user!</h1>
-            //   <h1 className="text-2xl font-bold m-4">
-            //   Good morning, {user.firstName}!
-            // </h1>
-          )}
-          {new Date().getHours() < 18 ? (
-            <h1 className="text-2xl font-bold m-4">Good afternoon, user!</h1>
-          ) : (
-            //   <h1 className="text-2xl font-bold m-4">
-            //   Good afternoon, {user.firstName}!
-            // </h1>
-            <h1 className="text-2xl font-bold m-4">Good evening, user!</h1>
-            //   <h1 className="text-2xl font-bold m-4">
-            //   Good evening, {user.firstName}!
-            // </h1>
-          )}
+          {greeting}
           <h1 className="text-2xl font-bold m-4">Bank accounts</h1>
           <AccountCard
             accountType="checking account"

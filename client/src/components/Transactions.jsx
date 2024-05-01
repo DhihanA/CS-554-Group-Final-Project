@@ -1,32 +1,66 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import queries from "../queries";
 
 const Transactions = () => {
   const { user } = useUser();
+  const [usersByAccountId, setUsersByAccountId] = useState({});
 
   const avatarUrl = user.imageUrl;
-  const {
-    loading: loading,
-    data: data,
-    error: error,
-  } = useQuery(queries.GET_ALL_TRANSACTIONS, {
-    fetchPolicy: "cache-and-network",
-    variables: {
-      // userId: user.id,
-      userId: "662ecfbe17460092d935a2e4",
-      accountType: "checking",
-    },
-  });
 
-  console.log(user);
+  //TODO: UNCOMMENT user.id AFTER GET_ALL_TRANSACTIONS FULLY WORKS
+  const queryMultiple = () => {
+    const res1 = useQuery(queries.GET_ALL_TRANSACTIONS, {
+      variables: {
+        // userId: user.id,
+        userId: "662ecfbe17460092d935a2e4", //!TESTING
+        accountType: "checking",
+      },
+      fetchPolicy: "cache-and-network",
+    });
+    const res2 = useQuery(queries.GET_ALL_TRANSACTIONS, {
+      variables: {
+        // userId: user.id,
+        userId: "662ecfbe17460092d935a2e4", //!TESTING
+        accountType: "checking",
+      },
+      fetchPolicy: "cache-and-network",
+    });
+    return [res1, res2];
+  };
+  const [
+    { loading: loadingChecking, data: checkingData, error: checkingError },
+    { loading: loadingSavings, data: savingsData, error: savingsError },
+  ] = queryMultiple();
 
-  if (!user || loading) {
+  //!UNCOMMENT below when getUserByAccountId done
+  // const [getUserByAccountId, { called, loading, data }] = useLazyQuery(
+  //   queries.GET_USER_BY_ACCOUNT_ID
+  // );
+
+  // const fetchUserData = (accountId) => {
+  //   if (!usersByAccountId[accountId]) {
+  //     getUserByAccountId({ variables: { accountId } });
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (data && data.getUserByAccountId) {
+  //     const newUserDetails = {
+  //       ...usersByAccountId,
+  //       [data.getUserByAccountId.id]: data.getUserByAccountId,
+  //     };
+  //     setUsersByAccountId(newUserDetails);
+  //   }
+  // }, [data, usersByAccountId]);
+
+  if (!user || loadingChecking || loadingSavings) {
     return <div>Loading...</div>;
   }
 
-  console.log(data);
+  if (checkingError) return <div>{checkingError.message}</div>;
+  if (savingsError) return <div>{savingsError.message}</div>;
 
   return (
     <div className="flex flex-col justify-center items-center">

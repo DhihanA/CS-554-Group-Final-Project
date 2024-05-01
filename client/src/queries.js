@@ -17,21 +17,30 @@ const GET_ALL_TRANSACTIONS = gql`
 //#endregion
 
 //#region GET BY ID QUERIES
-// const ARTIST_BY_ID = gql`
-//   query Query($id: String!) {
-//     getArtistById(_id: $id) {
-//       _id
-//       dateFormed
-//       members
-//       name
-//       numOfAlbums
-//       albums {
-//         title
-//         _id
-//       }
-//     }
-//   }
+const CHECKING_ACCOUNT_INFO_BY_USER_ID = gql`
+  query GetCheckingAccountInfo($userId: String!) {
+    getCheckingAccountInfo(userId: $userId) {
+      _id
+      balance
+      ownerId
+    }
+  }
+`;
+const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
+  query GetSavingsAccountInfo($userId: String!) {
+    getSavingsAccountInfo(userId: $userId) {
+      _id
+      currentBalance
+      interestRate
+      lastDateUpdated
+      ownerId
+      previousBalance
+    }
+  }
+`;
+// const GET_USER_INFO_BY_ID = gql`
 // `;
+
 //#endregion
 
 //#region ADD MUTATIONS
@@ -88,6 +97,9 @@ const GET_ALL_TRANSACTIONS = gql`
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   GET_ALL_TRANSACTIONS,
+  CHECKING_ACCOUNT_INFO_BY_USER_ID,
+  SAVINGS_ACCOUNT_INFO_BY_USER_ID,
+  // GET_USER_INFO_BY_ID,
 };
 
 export default exported;
