@@ -4,6 +4,7 @@ import {
   savingsAccount as savingsAccountCollection,
   checkingAccount as checkingAccountCollection,
 } from "../config/mongoCollections.js";
+import redisClient from "../clients/redisClient.js";
 
 export const accountResolvers = {
   Query: {
