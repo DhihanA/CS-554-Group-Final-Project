@@ -23,13 +23,13 @@ const client = new ApolloClient({
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ApolloProvider client={client}>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ApolloProvider client={client}>
       <BrowserRouter>
         <main className="dark text-foreground bg-background ">
           <App />
         </main>
       </BrowserRouter>
-    </ClerkProvider>
-  </ApolloProvider>
+    </ApolloProvider>
+  </ClerkProvider>
 );

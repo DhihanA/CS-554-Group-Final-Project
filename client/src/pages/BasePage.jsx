@@ -3,6 +3,7 @@ import "../index.css";
 import NavbarComponent from "../components/NavbarComponent";
 // import FooterComponent from "../components/FooterComponent";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import { ClerkProvider } from "@clerk/clerk-react";
 
 const BasePage = ({ children }) => {
   return (

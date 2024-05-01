@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import "./App.css";
+import ClerkEventHandlers from "./components/ClerkEventHandlers";
 
 // Import all pages here
 import HeroPage from "./pages/HeroPage";
@@ -28,47 +29,52 @@ function App() {
   if (isSignedIn && user) isParent = user.publicMetadata.parent;
 
   return (
-    <Routes>
-      {/* Authenticated user routes go below */}
+    <>
+      <ClerkEventHandlers />
+      <Routes>
+        {/* Authenticated user routes go below */}
 
-      {/* This is the only path both adults+children can access: */}
-      <Route
-        path="/dashboard"
-        element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
-      />
-      <Route
-        path="/transactions"
-        element={
-          isSignedIn && !isParent ? <TransactionsPage /> : <Navigate to="/" />
-        }
-      />
-      {/* <Route
+        {/* This is the only path both adults+children can access: */}
+        <Route
+          path="/dashboard"
+          element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/transactions"
+          element={
+            isSignedIn && !isParent ? <TransactionsPage /> : <Navigate to="/" />
+          }
+        />
+        {/* <Route
         path="/settings"
         element={isSignedIn ? <SettingsPage /> : <Navigate to="/" />}
       /> */}
-      <Route
-        path="/learn"
-        element={isSignedIn && !isParent ? <LearnPage /> : <Navigate to="/" />}
-      />
+        <Route
+          path="/learn"
+          element={
+            isSignedIn && !isParent ? <LearnPage /> : <Navigate to="/" />
+          }
+        />
 
-      {/* Unauthenticated user routes go below */}
-      {!isSignedIn && <Route path="/" element={<HeroPage />} />}
+        {/* Unauthenticated user routes go below */}
+        {!isSignedIn && <Route path="/" element={<HeroPage />} />}
 
-      <Route
-        path="/login"
-        element={!isSignedIn ? <LoginClerk /> : <Navigate to="/dashboard" />}
-      />
-      <Route
-        path="/signup"
-        element={!isSignedIn ? <SignUpClerk /> : <Navigate to="/dashboard" />}
-      />
+        <Route
+          path="/login"
+          element={!isSignedIn ? <LoginClerk /> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/signup"
+          element={!isSignedIn ? <SignUpClerk /> : <Navigate to="/dashboard" />}
+        />
 
-      {/* Redirect any unknown paths */}
-      <Route
-        path="*"
-        element={<Navigate replace to={isSignedIn ? "/dashboard" : "/"} />}
-      />
-    </Routes>
+        {/* Redirect any unknown paths */}
+        <Route
+          path="*"
+          element={<Navigate replace to={isSignedIn ? "/dashboard" : "/"} />}
+        />
+      </Routes>
+    </>
   );
 }
 
