@@ -8,9 +8,6 @@ const TransactionsPage = () => {
   return (
     <BasePage>
       <div>
-        {/* <Card />
-        <Card />
-        <Card /> */}
         <Transactions></Transactions>
         <div className="p-6 min-h-screen"></div>
       </div>

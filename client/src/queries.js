@@ -17,61 +17,50 @@ const GET_ALL_TRANSACTIONS = gql`
 //#endregion
 
 //#region GET BY ID QUERIES
-// const ARTIST_BY_ID = gql`
-//   query Query($id: String!) {
-//     getArtistById(_id: $id) {
-//       _id
-//       dateFormed
-//       members
-//       name
-//       numOfAlbums
-//       albums {
-//         title
-//         _id
-//       }
-//     }
-//   }
+const CHECKING_ACCOUNT_INFO_BY_USER_ID = gql`
+  query GetCheckingAccountInfo($userId: String!) {
+    getCheckingAccountInfo(userId: $userId) {
+      _id
+      balance
+      ownerId
+    }
+  }
+`;
+const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
+  query GetSavingsAccountInfo($userId: String!) {
+    getSavingsAccountInfo(userId: $userId) {
+      _id
+      currentBalance
+      interestRate
+      lastDateUpdated
+      ownerId
+      previousBalance
+    }
+  }
+`;
+// const GET_USER_INFO_BY_ID = gql`
 // `;
+
 //#endregion
 
 //#region ADD MUTATIONS
-// const ADD_ARTIST = gql`
-//   mutation createArtist(
-//     $name: String!
-//     $dateFormed: Date!
-//     $members: [String!]!
-//   ) {
-//     addArtist(name: $name, date_formed: $dateFormed, members: $members) {
-//       _id
-//       dateFormed
-//       members
-//       name
-//     }
-//   }
-// `;
+const CREATE_USER_IN_DB = gql`
+  mutation createUserInLocalDB($clerkUserId: String!) {
+    createUser(clerkUserId: $clerkUserId) {
+      _id
+    }
+  }
+`;
 //#endregion
 
 //#region EDIT MUTATIONS
-// const EDIT_ARTIST = gql`
-//   mutation EditArtist(
-//     $id: String!
-//     $name: String
-//     $dateFormed: Date
-//     $members: [String!]
-//   ) {
-//     editArtist(
-//       _id: $id
-//       name: $name
-//       date_formed: $dateFormed
-//       members: $members
-//     ) {
-//       _id
-//       dateFormed
-//       name
-//       members
-//     }
-//   }
-// `;
+const UPDATE_USER_IN_DB = gql`
+  mutation updateUserInLocalDB($clerkUserId: String!) {
+    updateUser(clerkUserId: $clerkUserId) {
+      _id
+    }
+  }
+`;
 //#endregion
 
 //#region REMOVE MUTATIONS
@@ -87,7 +76,14 @@ const GET_ALL_TRANSACTIONS = gql`
 
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
+  CREATE_USER_IN_DB,
+  UPDATE_USER_IN_DB,
+
   GET_ALL_TRANSACTIONS,
+  CHECKING_ACCOUNT_INFO_BY_USER_ID,
+  SAVINGS_ACCOUNT_INFO_BY_USER_ID,
+
+  // GET_USER_INFO_BY_ID,
 };
 
 export default exported;

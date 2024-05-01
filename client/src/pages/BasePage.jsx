@@ -2,7 +2,8 @@ import React from "react";
 import "../index.css";
 import NavbarComponent from "../components/NavbarComponent";
 // import FooterComponent from "../components/FooterComponent";
-import {SignedIn, SignedOut} from '@clerk/clerk-react';
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import { ClerkProvider } from "@clerk/clerk-react";
 
 const BasePage = ({ children }) => {
   return (
@@ -12,10 +13,10 @@ const BasePage = ({ children }) => {
       {/* pass in user content below; if not authenticated, pass in undefined */}
       {/* (passing in an empty object for now) */}
       <SignedIn>
-        <NavbarComponent user={{}}></NavbarComponent>
+        <NavbarComponent></NavbarComponent>
       </SignedIn>
       <SignedOut>
-        <NavbarComponent user={undefined}></NavbarComponent>
+        <NavbarComponent></NavbarComponent>
       </SignedOut>
       <div className="flex flex-col min-h-screen overflow-x-hidden">
         {children}
