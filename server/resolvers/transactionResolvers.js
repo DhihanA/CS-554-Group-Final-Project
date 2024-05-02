@@ -330,6 +330,8 @@ export const transactionResolvers = {
     ) => {
       try {
         const transactionsCol = await transactionsCollection();
+        const checkingCol = await checkingAccountCollection(); 
+    
         const transaction = await transactionsCol.findOne({
           _id: new ObjectId(transactionId),
         });
@@ -339,11 +341,18 @@ export const transactionResolvers = {
         if (transaction.type !== "Budgeted") {
           throw new GraphQLError("Transaction is not a budgeted transaction");
         }
-        const updates = {};
-        if (newAmount !== undefined) {
+    
+        // Calculate the amount difference if newAmount is provided
+        let amountDifference = 0;
+        if (newAmount !== undefined && newAmount !== transaction.amount) {
           if (newAmount <= 0) {
             throw new GraphQLError("Amount must be greater than 0");
           }
+          amountDifference = newAmount - transaction.amount;
+        }
+  
+        const updates = {};
+        if (amountDifference !== 0) {
           updates.amount = newAmount;
         }
         if (newDescription !== undefined) {
@@ -355,12 +364,19 @@ export const transactionResolvers = {
           { $set: updates }
         );
     
+        if (amountDifference !== 0) {
+          await checkingCol.updateOne(
+            { accountId: transaction.accountId },
+            { $inc: { balance: -amountDifference } } 
+          );
+        }
+    
         return {
           _id: transactionId,
           senderId: transaction.senderId,
           receiverId: transaction.receiverId,
-          amount: updates.amount || transaction.amount,
-          description: updates.description || transaction.description,
+          amount: newAmount || transaction.amount,
+          description: newDescription || transaction.description,
           type: "Budgeted",
         };
       } catch (error) {
@@ -409,5 +425,6 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     }
+    
   },
 };
