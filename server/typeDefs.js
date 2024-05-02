@@ -146,10 +146,10 @@ export const typeDefs = `#graphql
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
 
     # Transaction Mutations
-    addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!, type: TransferType!): Transaction
-    addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!, type: TransferType): Transaction
-    addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!, type: TransferType): Transaction
-    addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!, type: TransferType): Transaction
+    addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!): Transaction
+    addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!): Transaction
+    addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!): Transaction
+    addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!): Transaction
     editBudgetedTransaction(transactionId: String!, newName: String, newAmount: Float, newDescription: String): Transaction
     sendMoney(senderUserId: String!, receiverUserId: String!, amount: Float!): Boolean
     downloadTransactions(userId: String!): String

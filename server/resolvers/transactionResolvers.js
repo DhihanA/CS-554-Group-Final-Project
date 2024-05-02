@@ -231,7 +231,7 @@ export const transactionResolvers = {
         if (!savingsAccount) {
           throw new GraphQLError("Savings account not found");
         }
-        if (checkingAccount.currentBalance < amount) {
+        if (checkingAccount.balance < amount) {
           throw new GraphQLError("Insufficient balance in checking account");
         }
     
