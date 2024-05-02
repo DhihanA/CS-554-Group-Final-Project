@@ -325,7 +325,52 @@ export const transactionResolvers = {
         console.error("Error during saving to checking transfer:", error);
         throw new GraphQLError("Internal Server Error");
       }
-    }
+    },
+    editBudgetedTransaction: async (
+      _,
+      { transactionId, newAmount, newDescription }
+    ) => {
+      try {
+        const transactionsCol = await transactionsCollection();
+        const transaction = await transactionsCol.findOne({
+          _id: new ObjectId(transactionId),
+        });
+        if (!transaction) {
+          throw new GraphQLError("Transaction not found");
+        }
+        if (transaction.type !== "Budgeted") {
+          throw new GraphQLError("Transaction is not a budgeted transaction");
+        }
+        const updates = {};
+        if (newAmount !== undefined) {
+          if (newAmount <= 0) {
+            throw new GraphQLError("Amount must be greater than 0");
+          }
+          updates.amount = newAmount;
+        }
+        if (newDescription !== undefined) {
+          updates.description = newDescription;
+        }
     
-  },
+        await transactionsCol.updateOne(
+          { _id: new ObjectId(transactionId) },
+          { $set: updates }
+        );
+    
+        return {
+          _id: transactionId,
+          senderId: transaction.senderId,
+          receiverId: transaction.receiverId,
+          amount: updates.amount || transaction.amount,
+          description: updates.description || transaction.description,
+          type: "Budgeted",
+        };
+      } catch (error) {
+        console.error("Error editing budgeted transaction:", error);
+        throw new GraphQLError("Internal Server Error");
+      }
+    },
+    
+    
+},
 };
