@@ -1,5 +1,5 @@
 import { dbConnection, closeConnection } from "../config/mongoConnection.js";
-import { v4 as uuidv4 } from "uuid";
+import clerkClient from "../clients/clerkClient.js";
 
 //! Import collections like done below
 import {

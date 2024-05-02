@@ -6,7 +6,7 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 import "./App.css";
 import ClerkEventHandlers from "./components/ClerkEventHandlers";
 
