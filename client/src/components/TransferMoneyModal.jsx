@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 // import queries from "../../queries";
 
-const TransferMoneyModal = ({ toggleModal }) => {
+const TransferMoneyModal = ({ toggleModal, accountType }) => {
   /* useState hooks */
   // const [transactionName, setTransactionName] = useState("");
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
+
+  const [selectedAccount, setSelectedAccount] = useState(null); // State to track selected account
+  const [dropdownOpen, setDropdownOpen] = useState(false); // State to track dropdown menu open/close
+
 
   /* useMutation hooks */
   //! configure this after mutation is complete
@@ -46,6 +50,13 @@ const TransferMoneyModal = ({ toggleModal }) => {
     resetForm();
   };
 
+  const handleAccountSelect = (account) => {
+    setSelectedAccount(account);
+    document.activeElement.blur(); // gets rid of the dropdown afterwards
+    // setDropdownOpen(false); // Close the dropdown after selecting an option
+    console.log(account);
+  };
+
   /* Form submission */
   //!uncomment below after mutation above is complete
   const handleFormSubmit = (e) => {
@@ -65,8 +76,8 @@ const TransferMoneyModal = ({ toggleModal }) => {
     if (trimmedDescription.length === 0) {
       setError("Description should not be empty");
       return;
-    }
-
+    }    
+  
     const handleTransferMoney = async () => {
       try {
         await transferMoney({
@@ -103,6 +114,17 @@ const TransferMoneyModal = ({ toggleModal }) => {
                 required
               />
             </div> */}
+            {accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
+              <div className="dropdown">
+              <div tabIndex={0} className="btn m-1">Click</div>
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                  <li><a onClick={() => handleAccountSelect("Checking 1")}>Checking 1</a></li>
+                  <li><a onClick={() => handleAccountSelect("Checking 2")}>Checking 2</a></li>
+                </ul>
+              </div>
+              
+            ) : 
+            (<p className="pb-1 font-medium text-sm">* The transferred money will go into your Checking Account. *</p>)}
             <div className="mb-4">
               <input
                 type="number"
