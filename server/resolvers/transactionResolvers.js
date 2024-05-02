@@ -207,5 +207,125 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
+    addCheckingToSavingTransfer: async (
+      _,
+      { ownerId, amount, description, type }
+    ) => {
+      try {
+        if (amount <= 0) {
+          throw new GraphQLError("Amount must be greater than 0");
+        }
+        const checkingAccounts = await checkingAccountCollection();
+        const savingsAccounts = await savingsAccountCollection();
+    
+        const checkingAccount = await checkingAccounts.findOne({
+          ownerId: new ObjectId(ownerId)
+        });
+        const savingsAccount = await savingsAccounts.findOne({
+          ownerId: new ObjectId(ownerId)
+        });
+    
+        if (!checkingAccount) {
+          throw new GraphQLError("Checking account not found");
+        }
+        if (!savingsAccount) {
+          throw new GraphQLError("Savings account not found");
+        }
+        if (checkingAccount.balance < amount) {
+          throw new GraphQLError("Insufficient balance in checking account");
+        }
+    
+        const transaction = {
+          _id: new ObjectId(),
+          senderId: checkingAccount._id,
+          receiverId: savingsAccount._id,
+          amount: amount,
+          description: description.trim(),
+          type: 'CheckingToSavingTransfer'
+        };
+    
+        const transactionsCol = await transactionsCollection();
+        await transactionsCol.insertOne(transaction);
+    
+        await checkingAccounts.updateOne(
+          { _id: checkingAccount._id },
+          { $inc: { balance: -amount } }
+        );
+        await savingsAccounts.updateOne(
+          { _id: savingsAccount._id },
+          { 
+            $set: { previousBalance: savingsAccount.currentBalance },
+            $inc: { currentBalance: amount }
+          }
+        );
+    
+        return transaction;
+      } catch (error) {
+        console.error("Error during checking to saving transfer:", error);
+        throw new GraphQLError("Internal Server Error");
+      }
+    },
+    
+    
+
+    addSavingToCheckingTransfer: async (
+      _,
+      { ownerId, amount, description, type }
+    ) => {
+      try {
+        if (amount <= 0) {
+          throw new GraphQLError("Amount must be greater than 0");
+        }
+        const savingsAccounts = await savingsAccountCollection();
+        const checkingAccounts = await checkingAccountCollection();
+    
+        const savingsAccount = await savingsAccounts.findOne({
+          ownerId: new ObjectId(ownerId)
+        });
+        const checkingAccount = await checkingAccounts.findOne({
+          ownerId: new ObjectId(ownerId)
+        });
+    
+        if (!savingsAccount) {
+          throw new GraphQLError("Savings account not found");
+        }
+        if (!checkingAccount) {
+          throw new GraphQLError("Checking account not found");
+        }
+        if (savingsAccount.currentBalance < amount) {
+          throw new GraphQLError("Insufficient balance in savings account");
+        }
+    
+        const transaction = {
+          _id: new ObjectId(),
+          senderId: savingsAccount._id,
+          receiverId: checkingAccount._id,
+          amount: amount,
+          description: description.trim(),
+          type: 'SavingToCheckingTransfer'
+        };
+    
+        const transactionsCol = await transactionsCollection();
+        await transactionsCol.insertOne(transaction);
+    
+        await savingsAccounts.updateOne(
+          { _id: savingsAccount._id },
+          { 
+            $set: { previousBalance: savingsAccount.currentBalance },
+            $inc: { currentBalance: -amount }
+          }
+        );
+        await checkingAccounts.updateOne(
+          { _id: checkingAccount._id },
+          { $inc: { balance: amount } }
+        );
+    
+        return transaction;
+      } catch (error) {
+        console.error("Error during saving to checking transfer:", error);
+        throw new GraphQLError("Internal Server Error");
+      }
+    }
+    
   },
 };
