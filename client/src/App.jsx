@@ -23,7 +23,12 @@ function App() {
   const { isSignedIn, isLoaded, user } = useUser();
 
   if (!isLoaded)
-    return <span className="loading loading-infinity loading-lg"></span>;
+    // return <span className="loading loading-infinity loading-lg"></span>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-infinity loading-lg"></span>
+      </div>
+    );
 
   let isParent;
   if (isSignedIn && user) isParent = user.publicMetadata.parent;
