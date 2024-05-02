@@ -122,6 +122,11 @@ export const typeDefs = `#graphql
     SavingToCheckingTransfer
   }
 
+  type DeleteTransactionResponse {
+    success: Boolean!
+    message: String!
+  }
+
 
   type Query {
     # User Queries
@@ -153,5 +158,6 @@ export const typeDefs = `#graphql
     editBudgetedTransaction(transactionId: String!, newName: String, newAmount: Float, newDescription: String): Transaction
     sendMoney(senderUserId: String!, receiverUserId: String!, amount: Float!): Boolean
     downloadTransactions(userId: String!): String
+    deleteBudgetedTransaction(ownerId: String!, transactionId: String!): DeleteTransactionResponse
   }
 `;
