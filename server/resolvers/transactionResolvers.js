@@ -369,11 +369,6 @@ export const transactionResolvers = {
       }
     },
     
-    
-},
-};
-    },
-
     deleteBudgetedTransaction: async (_, { ownerId, transactionId }) => {
       try {
         const ownerIdObj = new ObjectId(ownerId);
