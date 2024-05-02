@@ -12,7 +12,8 @@ export default function NavbarComponent() {
   // https://dev.to/kunalukey/how-to-add-dark-mode-toggle-in-reactjs-tailwindcss-daisyui-1af9
   // learned how to do it from the above article and accompaning vid
   const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
+    // localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
+    "dark" // anytime application is opened in a new tab, it starts off in dark mode. fixed the above issue of first change not doing anything
   );
 
   // update state on toggle
