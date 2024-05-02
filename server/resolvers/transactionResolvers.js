@@ -366,7 +366,7 @@ export const transactionResolvers = {
     
         if (amountDifference !== 0) {
           await checkingCol.updateOne(
-            { accountId: transaction.accountId },
+            { ownerId: transaction.senderId },
             { $inc: { balance: -amountDifference } } 
           );
         }
