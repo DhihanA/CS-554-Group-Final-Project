@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AddBudgetedTransactionModal from "./AddBudgetedTransactionModal";
+import TransferMoneyModal from "./TransferMoneyModal";
 
 const AccountCard = ({
   accountType,
@@ -23,12 +24,18 @@ const AccountCard = ({
 
   const [isLearnMoreModalOpen, setIsLearnMoreModalOpen] = useState(false);
   const [isBTModalOpen, setIsBTModalOpen] = useState(false);
+  const [isTMModalOpen, setIsTMModalOpen] = useState(false);
 
   const toggleLearnMoreModal = () => {
     setIsLearnMoreModalOpen(!isLearnMoreModalOpen);
   };
+  // for budgeted transaction modal
   const toggleBTModal = () => {
     setIsBTModalOpen(!isBTModalOpen);
+  };
+  // for transfer money modal
+  const toggleTMModal = () => {
+    setIsTMModalOpen(!isTMModalOpen);
   };
 
   return (
@@ -72,7 +79,7 @@ const AccountCard = ({
           </p>
         </div>
         <div className="card-actions flex-col items-center">
-          <button className="btn btn-primary mb-2">Transfer money</button>
+          <button className="btn btn-primary mb-2" onClick={toggleTMModal}>Transfer money</button>
           {accountType.toUpperCase() === "CHECKING ACCOUNT" && (
             <button className="btn btn-secondary mb-2" onClick={toggleBTModal}>
               Create budgeted transaction
@@ -114,6 +121,10 @@ const AccountCard = ({
       )}
       {isBTModalOpen && (
         <AddBudgetedTransactionModal toggleModal={toggleBTModal} />
+      )}
+
+      {isTMModalOpen && (
+        <TransferMoneyModal toggleModal={toggleTMModal} />
       )}
     </div>
   );
