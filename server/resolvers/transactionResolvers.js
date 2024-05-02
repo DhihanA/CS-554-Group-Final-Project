@@ -268,10 +268,7 @@ export const transactionResolvers = {
       }
     },
 
-    addSavingToCheckingTransfer: async (
-      _,
-      { ownerId, amount, description, type }
-    ) => {
+    addSavingToCheckingTransfer: async (_, { ownerId, amount, description, type }) => {
       try {
         if (amount <= 0) {
           throw new GraphQLError("Amount must be greater than 0");
