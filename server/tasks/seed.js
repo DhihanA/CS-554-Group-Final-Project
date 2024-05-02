@@ -23,34 +23,37 @@ const main = async () => {
   const savingsCollection = await savingsAccount();
   const checkingCollection = await checkingAccount();
 
-  const usersIds = [new ObjectId(), //parent 1
-                    new ObjectId(), //parent 2
-                    new ObjectId(), //parent 3
-                    new ObjectId(), //child 1 to parent 1
-                    new ObjectId(), //child 2 to parent 1
-                    new ObjectId(), //child 3 to parent 1
-                    new ObjectId(), //child 4 to parent 2
-                    new ObjectId(), //child 5 to parent 2
-                    new ObjectId(), //child 6 to parent 3
-                  ];
+  const usersIds = [
+    new ObjectId(), //parent 1
+    new ObjectId(), //parent 2
+    new ObjectId(), //parent 3
+    new ObjectId(), //child 1 to parent 1
+    new ObjectId(), //child 2 to parent 1
+    new ObjectId(), //child 3 to parent 1
+    new ObjectId(), //child 4 to parent 2
+    new ObjectId(), //child 5 to parent 2
+    new ObjectId(), //child 6 to parent 3
+  ];
   const transactionIds = [new ObjectId()];
-  const savingsIds = [new ObjectId(), //child 1's savings account
-                      new ObjectId(), //child 2's savings account
-                      new ObjectId(), //child 3's savings account
-                      new ObjectId(), //child 4's savings account
-                      new ObjectId(), //child 5's savings account
-                      new ObjectId()  //child 6's savings account
-                    ];
-  const checkingIds = [new ObjectId(), //parent 1's checking account
-                      new ObjectId(), //parent 2's checking account
-                      new ObjectId(), //parent 3's checking account
-                      new ObjectId(), //child 1's checking account
-                      new ObjectId(), //child 2's checking account
-                      new ObjectId(), //child 3's checking account
-                      new ObjectId(), //child 4's checking account
-                      new ObjectId(), //child 5's checking account
-                      new ObjectId(), //child 6's checking account
-                    ];
+  const savingsIds = [
+    new ObjectId(), //child 1's savings account
+    new ObjectId(), //child 2's savings account
+    new ObjectId(), //child 3's savings account
+    new ObjectId(), //child 4's savings account
+    new ObjectId(), //child 5's savings account
+    new ObjectId(), //child 6's savings account
+  ];
+  const checkingIds = [
+    new ObjectId(), //parent 1's checking account
+    new ObjectId(), //parent 2's checking account
+    new ObjectId(), //parent 3's checking account
+    new ObjectId(), //child 1's checking account
+    new ObjectId(), //child 2's checking account
+    new ObjectId(), //child 3's checking account
+    new ObjectId(), //child 4's checking account
+    new ObjectId(), //child 5's checking account
+    new ObjectId(), //child 6's checking account
+  ];
 
   /* Call queries below */
 
@@ -59,121 +62,121 @@ const main = async () => {
     {
       _id: usersIds[0],
       parentId: undefined,
-	    verificationCode: "123456",
-	    verified: undefined,
-      firstName: "Luke", 
-      lastName: "Bianchi", 
-      emailAddresses: ["parent1@gmail.com"], 
-      username: "lkbnch", 
+      verificationCode: "123456",
+      verified: undefined,
+      firstName: "Luke",
+      lastName: "Bianchi",
+      emailAddresses: ["parent1@gmail.com"],
+      username: "lkbnch",
       dob: Date(2003, 5, 17),
-      completedQuestionIds: undefined
+      completedQuestionIds: undefined,
     },
     //child 1
     {
       _id: usersIds[3],
       parentId: usersIds[0],
-	    verificationCode: undefined,
-	    verified: true,
-      firstName: "Kinga", 
-      lastName: "Kurcaba", 
-      emailAddresses: ["child1@gmail.com"], 
-      username: "giggleKing", 
+      verificationCode: undefined,
+      verified: true,
+      firstName: "Kinga",
+      lastName: "Kurcaba",
+      emailAddresses: ["child1@gmail.com"],
+      username: "giggleKing",
       dob: Date(2005, 9, 12),
-      completedQuestionIds: []
+      completedQuestionIds: [],
     },
     //child 2
     {
       _id: usersIds[4],
       parentId: usersIds[0],
-	    verificationCode: undefined,
-	    verified: true,
-      firstName: "Ilvya", 
-      lastName: "Gesh", 
-      emailAddresses: ["child2@gmail.com"], 
-      username: "IcelandicIceQueen369", 
+      verificationCode: undefined,
+      verified: true,
+      firstName: "Ilvya",
+      lastName: "Gesh",
+      emailAddresses: ["child2@gmail.com"],
+      username: "IcelandicIceQueen369",
       dob: Date(2003, 9, 27),
-      completedQuestionIds: []
+      completedQuestionIds: [],
     },
     //child 3
     {
       _id: usersIds[5],
       parentId: usersIds[0],
-	    verificationCode: undefined,
-	    verified: true,
-      firstName: "Katarini", 
-      lastName: "Nikiforuk", 
-      emailAddresses: ["child3@gmail.com"], 
-      username: "NikiForuk49", 
+      verificationCode: undefined,
+      verified: true,
+      firstName: "Katarini",
+      lastName: "Nikiforuk",
+      emailAddresses: ["child3@gmail.com"],
+      username: "NikiForuk49",
       dob: Date(2004, 10, 12),
-      completedQuestionIds: []
+      completedQuestionIds: [],
     },
     //parent 2
     {
       _id: usersIds[1],
       parentId: undefined,
-	    verificationCode: "123457",
-	    verified: undefined,
-      firstName: "Harshil", 
-      lastName: "Ganapathi", 
-      emailAddresses: ["parent2@gmail.com"], 
-      username: "harshilg03", 
+      verificationCode: "123457",
+      verified: undefined,
+      firstName: "Harshil",
+      lastName: "Ganapathi",
+      emailAddresses: ["parent2@gmail.com"],
+      username: "harshilg03",
       dob: Date(2003, 4, 20),
-      completedQuestionIds: undefined
+      completedQuestionIds: undefined,
     },
     //child 4
     {
       _id: usersIds[6],
       parentId: usersIds[1],
-	    verificationCode: undefined,
-	    verified: true,
-      firstName: "Jack", 
-      lastName: "Gibson", 
-      emailAddresses: ["child4@gmail.com"], 
-      username: "GibsonIsDaddy", 
+      verificationCode: undefined,
+      verified: true,
+      firstName: "Jack",
+      lastName: "Gibson",
+      emailAddresses: ["child4@gmail.com"],
+      username: "GibsonIsDaddy",
       dob: Date(2003, 11, 12),
-      completedQuestionIds: []
+      completedQuestionIds: [],
     },
     //child 5
     {
       _id: usersIds[7],
       parentId: usersIds[1],
-	    verificationCode: undefined,
-	    verified: true,
-      firstName: "Natalia", 
-      lastName: "Rutgers", 
-      emailAddresses: ["child5@gmail.com"], 
-      username: "HooRahGoBigRed", 
+      verificationCode: undefined,
+      verified: true,
+      firstName: "Natalia",
+      lastName: "Rutgers",
+      emailAddresses: ["child5@gmail.com"],
+      username: "HooRahGoBigRed",
       dob: Date(2005, 3, 9),
-      completedQuestionIds: []
+      completedQuestionIds: [],
     },
     //parent 3
     {
       _id: usersIds[2],
       parentId: undefined,
-	    verificationCode: "123458",
-	    verified: undefined,
-      firstName: "Greg", 
-      lastName: "Plaskon", 
-      emailAddresses: ["parent3@gmail.com"], 
-      username: "InseminateTheAsshole420", 
+      verificationCode: "123458",
+      verified: undefined,
+      firstName: "Greg",
+      lastName: "Plaskon",
+      emailAddresses: ["parent3@gmail.com"],
+      username: "InseminateTheAsshole420",
       dob: Date(1965, 1, 20),
-      completedQuestionIds: undefined
+      completedQuestionIds: undefined,
     },
     //child 6
     {
       _id: usersIds[8],
       parentId: usersIds[2],
-	    verificationCode: undefined,
-	    verified: true,
-      firstName: "Nick", 
-      lastName: "Plaskon", 
-      emailAddresses: ["child6@gmail.com"], 
-      username: "FoopahPain6969", 
+      verificationCode: undefined,
+      verified: true,
+      firstName: "Nick",
+      lastName: "Plaskon",
+      emailAddresses: ["child6@gmail.com"],
+      username: "FoopahPain6969",
       dob: Date(2003, 10, 1),
-      completedQuestionIds: []
+      completedQuestionIds: [],
     },
-  ])
-  
+  ]);
+
   await transactionsCollection.insertMany([
     {
       _id: transactionIds[0],
@@ -304,7 +307,7 @@ const main = async () => {
       _id: checkingIds[8],
       ownerId: usersIds[8],
       balance: 1000,
-    }
+    },
   ]);
 
   console.log("Done seeding database");
