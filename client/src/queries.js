@@ -6,7 +6,7 @@ const GET_ALL_TRANSACTIONS = gql`
     getAllTransactions(userId: $userId, accountType: $accountType) {
       _id
       amount
-      date
+      # date
       description
       receiverId
       senderId
@@ -44,19 +44,26 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
 //#endregion
 
 //#region ADD MUTATIONS
-const CREATE_USER_IN_DB = gql`
-  mutation createUserInLocalDB($clerkUserId: String!) {
-    createUser(clerkUserId: $clerkUserId) {
-      _id
-    }
-  }
-`;
+// const CREATE_USER_IN_DB = gql`
+//   mutation createUserInLocalDB($clerkUserId: String!) {
+//     createUser(clerkUserId: $clerkUserId) {
+//       _id
+//     }
+//   }
+// `;
 //#endregion
 
 //#region EDIT MUTATIONS
-const UPDATE_USER_IN_DB = gql`
-  mutation updateUserInLocalDB($clerkUserId: String!) {
-    updateUser(clerkUserId: $clerkUserId) {
+// const UPDATE_USER_IN_DB = gql`
+//   mutation updateUserInLocalDB($clerkUserId: String!) {
+//     updateUser(clerkUserId: $clerkUserId) {
+//       _id
+//     }
+//   }
+// `;
+const CREATE_OR_UPDATE_USER_IN_DB = gql`
+  mutation createOrUpdateUserInDB($clerkUserId: String!) {
+    createOrUpdateUser(clerkUserId: $clerkUserId) {
       _id
     }
   }
@@ -76,8 +83,9 @@ const UPDATE_USER_IN_DB = gql`
 
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
-  CREATE_USER_IN_DB,
-  UPDATE_USER_IN_DB,
+  CREATE_OR_UPDATE_USER_IN_DB,
+  // CREATE_USER_IN_DB,
+  // UPDATE_USER_IN_DB,
 
   GET_ALL_TRANSACTIONS,
   CHECKING_ACCOUNT_INFO_BY_USER_ID,

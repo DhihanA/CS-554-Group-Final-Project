@@ -85,7 +85,7 @@ export const typeDefs = `#graphql
     verificationCode: String # undefined for children
     firstName: String!
     lastName: String!
-    emailAddress: String!
+    emailAddresses: [String]!
     username: String!
     dob: Date!
     completedQuestionIds: [Int] # undefined for Parent
@@ -138,6 +138,7 @@ export const typeDefs = `#graphql
 
   type Mutation {
     # User Mutations
+    createOrUpdateUserInLocalDB(clerkUserId: String!): User
     createUserInLocalDB(clerkUserId: String!): User
     updateUserInLocalDB(clerkUserId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User

@@ -22,10 +22,7 @@ const client = new ApolloClient({
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ClerkProvider
-    publishableKey={PUBLISHABLE_KEY}
-    onLoad={() => console.log("Clerk loaded")}
-  >
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
     <ApolloProvider client={client}>
       <BrowserRouter>
         <App />
