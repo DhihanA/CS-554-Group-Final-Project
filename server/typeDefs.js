@@ -80,12 +80,12 @@ export const typeDefs = `#graphql
 
   type User {
     _id: String!
-    clerkId: String!
+    clerkId: String
     parentId: String # undefined for Parent
     verificationCode: String # undefined for children
     firstName: String!
     lastName: String!
-    emailAddress: String!
+    emailAddresses: [String!]
     username: String!
     dob: Date!
     completedQuestionIds: [Int] # undefined for Parent
@@ -112,6 +112,7 @@ export const typeDefs = `#graphql
     receiverId: String!
     amount: Float!
     description: String
+    dateofTransaction: Date!
     type: TransferType
   }
 
@@ -130,7 +131,8 @@ export const typeDefs = `#graphql
 
   type Query {
     # User Queries
-    getUserInfo(userId: String!): User
+    getUserInfo(ownerId: String!): User
+    getAllUsers: [User]
     getChildren(parentUserId: String!): [User] #new
 
     # Account Queries
