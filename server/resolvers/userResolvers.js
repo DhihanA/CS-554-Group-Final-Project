@@ -23,12 +23,15 @@ await updateUserAddParent("user_2fk8aRObMHQDixP9M5hdA7mu0xY");
 export const userResolvers = {
   Query: {},
   Mutation: {
+    //!TODO: Jesal: fix this
     createOrUpdateUserInLocalDB: async (_, { clerkUserId }) => {
       try {
         const clerkUser = await clerkClient.users.getUser(clerkUserId);
         const usersCol = await usersCollection();
-        const localUser = await usersCol.findOne({ clerkUserId: clerkUser.id });
-        const fiveSecondsAgo = new Date(Date.now() - 5000);
+        const localUser = await usersCol.findOne({ clerkId: clerkUser.id });
+        console.log("localUser: ", localUser);
+        console.log("clerkUser: ", clerkUser);
+        // const fiveSecondsAgo = new Date(Date.now() - 5000);
 
         let allEmailAddresses = [];
         for (const email of clerkUser.emailAddresses)
@@ -36,26 +39,26 @@ export const userResolvers = {
 
         // if user in db, update them if their updatedAt date is within 5 sec
         if (localUser) {
-          if (new Date(clerkUser.updatedAt) > fiveSecondsAgo) {
-            await usersCol.updateOne(
-              { clerkUserId: clerkUser.id },
-              {
-                $set: {
-                  firstName: clerkUser.firstName,
-                  lastName: clerkUser.lastName,
-                  emailAddresses: allEmailAddresses,
-                  username: clerkUser.username,
-                  // dob: new Date (clerkUser.publicMetadata.dob),
-                },
-              }
-            );
-            const updatedUser = await usersCol.findOne({
-              clerkUserId: clerkUser.id,
-            });
-            return updatedUser;
-          } else {
-            return localUser;
-          }
+          // if (new Date(clerkUser.updatedAt) > fiveSecondsAgo) {
+          await usersCol.updateOne(
+            { clerkUserId: clerkUser.id },
+            {
+              $set: {
+                firstName: clerkUser.firstName,
+                lastName: clerkUser.lastName,
+                emailAddresses: allEmailAddresses,
+                username: clerkUser.username,
+                // dob: new Date (clerkUser.publicMetadata.dob),
+              },
+            }
+          );
+          const updatedUser = await usersCol.findOne({
+            clerkUserId: clerkUser.id,
+          });
+          return updatedUser;
+          // } else {
+          //   return localUser;
+          // }
         } else {
           // parentId is only populated for children; undefined for parents
           const parentId = clerkUser.publicMetadata.parentId || undefined;
@@ -84,7 +87,7 @@ export const userResolvers = {
             lastName: clerkUser.lastName,
             emailAddresses: allEmailAddresses,
             username: clerkUser.username,
-            dob: new Date(clerkUser.publicMetadata.dob),
+            dob: new Date(clerkUser.privateMetadata.dob),
             completedQuestionIds: completedQuestionIds, // empty for new children, undef for parents
           });
 

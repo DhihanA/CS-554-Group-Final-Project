@@ -68,7 +68,7 @@ const main = async () => {
       lastName: "Bianchi",
       emailAddresses: ["parent1@gmail.com"],
       username: "lkbnch",
-      dob: Date(2003, 5, 17),
+      dob: new Date(2003, 5, 17),
       completedQuestionIds: undefined,
     },
     //child 1
@@ -81,7 +81,7 @@ const main = async () => {
       lastName: "Kurcaba",
       emailAddresses: ["child1@gmail.com"],
       username: "giggleKing",
-      dob: Date(2005, 9, 12),
+      dob: new Date(2005, 9, 12),
       completedQuestionIds: [],
     },
     //child 2
@@ -94,7 +94,7 @@ const main = async () => {
       lastName: "Gesh",
       emailAddresses: ["child2@gmail.com"],
       username: "IcelandicIceQueen369",
-      dob: Date(2003, 9, 27),
+      dob: new Date(2003, 9, 27),
       completedQuestionIds: [],
     },
     //child 3
@@ -107,7 +107,7 @@ const main = async () => {
       lastName: "Nikiforuk",
       emailAddresses: ["child3@gmail.com"],
       username: "NikiForuk49",
-      dob: Date(2004, 10, 12),
+      dob: new Date(2004, 10, 12),
       completedQuestionIds: [],
     },
     //parent 2
@@ -120,7 +120,7 @@ const main = async () => {
       lastName: "Ganapathi",
       emailAddresses: ["parent2@gmail.com"],
       username: "harshilg03",
-      dob: Date(2003, 4, 20),
+      dob: new Date(2003, 4, 20),
       completedQuestionIds: undefined,
     },
     //child 4
@@ -133,7 +133,7 @@ const main = async () => {
       lastName: "Gibson",
       emailAddresses: ["child4@gmail.com"],
       username: "GibsonIsDaddy",
-      dob: Date(2003, 11, 12),
+      dob: new Date(2003, 11, 12),
       completedQuestionIds: [],
     },
     //child 5
@@ -146,7 +146,7 @@ const main = async () => {
       lastName: "Rutgers",
       emailAddresses: ["child5@gmail.com"],
       username: "HooRahGoBigRed",
-      dob: Date(2005, 3, 9),
+      dob: new Date(2005, 3, 9),
       completedQuestionIds: [],
     },
     //parent 3
@@ -159,7 +159,7 @@ const main = async () => {
       lastName: "Plaskon",
       emailAddresses: ["parent3@gmail.com"],
       username: "InseminateTheAsshole420",
-      dob: Date(1965, 1, 20),
+      dob: new Date(1965, 1, 20),
       completedQuestionIds: undefined,
     },
     //child 6
@@ -172,7 +172,7 @@ const main = async () => {
       lastName: "Plaskon",
       emailAddresses: ["child6@gmail.com"],
       username: "FoopahPain6969",
-      dob: Date(2003, 10, 1),
+      dob: new Date(2003, 10, 1),
       completedQuestionIds: [],
     },
   ]);

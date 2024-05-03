@@ -62,9 +62,18 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
 //   }
 // `;
 const CREATE_OR_UPDATE_USER_IN_DB = gql`
-  mutation createOrUpdateUserInDB($clerkUserId: String!) {
-    createOrUpdateUser(clerkUserId: $clerkUserId) {
+  mutation Mutation($clerkUserId: String!) {
+    createOrUpdateUserInLocalDB(clerkUserId: $clerkUserId) {
       _id
+      clerkId
+      completedQuestionIds
+      firstName
+      lastName
+      parentId
+      username
+      verificationCode
+      emailAddresses
+      dob
     }
   }
 `;
