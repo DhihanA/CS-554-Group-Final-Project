@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import piggyBankLogo from "../assets/piggyBankIcon.png";
+// import piggyBankLogo from "../assets/piggyBankIcon.png";
+import piggyBankLogo from '../assets/piggyBankIconColored.png';
+
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 

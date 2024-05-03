@@ -6,7 +6,7 @@ const GET_ALL_TRANSACTIONS = gql`
     getAllTransactions(userId: $userId, accountType: $accountType) {
       _id
       amount
-      date
+      # date
       description
       receiverId
       senderId

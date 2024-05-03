@@ -15,7 +15,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
   const [selectedOption, setSelectedOption] = useState(option2); // track the user's selected option, defaulted to option2 (savings)
 
   // !! query to display all the users in the dropdown
-  // const {loading, error, data} = useQuery(queries.GET_USERS, {
+  // const {loading, error, data} = useQuery(queries.GET_ALL_USERS, {
   //   fetchPolicy: 'cache-and-network'
   // });
 
