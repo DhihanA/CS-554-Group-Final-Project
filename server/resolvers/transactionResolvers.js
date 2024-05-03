@@ -196,6 +196,7 @@ export const transactionResolvers = {
           receiverId: new ObjectId(ownerId),
           amount,
           description: description.trim(),
+          dateOfTransaction: new Date(),
           type: "Budgeted",
         };
 
@@ -241,6 +242,7 @@ export const transactionResolvers = {
           receiverId: savingsAccount._id,
           amount: amount,
           description: description.trim(),
+          dateOfTransaction: new Date(),
           type: 'CheckingToSavingTransfer'
         };
     
@@ -266,10 +268,7 @@ export const transactionResolvers = {
       }
     },
 
-    addSavingToCheckingTransfer: async (
-      _,
-      { ownerId, amount, description, type }
-    ) => {
+    addSavingToCheckingTransfer: async (_, { ownerId, amount, description, type }) => {
       try {
         if (amount <= 0) {
           throw new GraphQLError("Amount must be greater than 0");
@@ -300,6 +299,7 @@ export const transactionResolvers = {
           receiverId: checkingAccount._id,
           amount: amount,
           description: description.trim(),
+          dateOfTransaction: new Date(),
           type: 'SavingToCheckingTransfer'
         };
     
@@ -377,6 +377,7 @@ export const transactionResolvers = {
           receiverId: transaction.receiverId,
           amount: newAmount || transaction.amount,
           description: newDescription || transaction.description,
+          dateOfTransaction: new Date(),
           type: "Budgeted",
         };
       } catch (error) {
