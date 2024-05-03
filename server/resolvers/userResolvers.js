@@ -1,6 +1,9 @@
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
-import { users as usersCollection } from "../config/mongoCollections.js";
+import { users as usersCollection,
+  savingsAccount as savingsAccountCollection,
+  checkingAccount as checkingAccountCollection,
+ } from "../config/mongoCollections.js";
 import clerkClient from "../clients/clerkClient.js";
 
 //!TESTING
@@ -32,6 +35,48 @@ export const userResolvers = {
       const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
       return user;
     },
+    getUserByAccountId: async (_, { accountId }) => {
+      const CheckingAccountCol = await checkingAccountCollection();
+      const account = await CheckingAccountCol.findOne({ _id: new ObjectId(accountId) });
+      const SavingsAccountCol = await savingsAccountCollection();
+      const account2 = await SavingsAccountCol.findOne({ _id: new ObjectId(accountId) });
+      if (account) {
+        const usersCol = await usersCollection();
+        const user = await usersCol.findOne({ _id: new ObjectId(account.ownerId) });
+        return user;
+      } else if (account2) {
+        const usersCol = await usersCollection();
+        const user = await usersCol.findOne({ _id: new ObjectId(account2.ownerId) });
+        return user;
+      } else {
+        throw new GraphQLError("Account Not Found", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+    },
+    getChildren: async (_, { parentUserId }) => {
+      const usersCol = await usersCollection();
+      const objectId = new ObjectId(parentUserId); 
+      const children = await usersCol.find({ parentId: objectId }).toArray();
+      return children;
+    },
+    getVerificationCode: async (_, { userId }) => {
+      const usersCol = await usersCollection();
+      const user = await usersCol.findOne({ _id: new ObjectId(userId) });
+      if (!user) {
+        throw new GraphQLError("Account Not Found", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      return user.verificationCode;
+    },
+
+
+    
+
+
+    
+    
   },
   Mutation: {
     // this mutation should be called directly AFTER the user has been created in clerk

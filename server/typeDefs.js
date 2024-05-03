@@ -133,7 +133,9 @@ export const typeDefs = `#graphql
     # User Queries
     getUserInfo(ownerId: String!): User
     getAllUsers: [User]
+    getUserByAccountId(accountId: String!): User
     getChildren(parentUserId: String!): [User] #new
+    getVerificationCode(userId: String!): String
 
     # Account Queries
     getCheckingAccountInfo(userId: String!): CheckingAccount
