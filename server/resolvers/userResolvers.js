@@ -16,19 +16,19 @@ async function updateUser(userId, privateMetadata, publicMetadata) {
     console.error("Error updating user: ", error);
   }
 }
-// adding verificationCode, dob to "parent tester 1" user to test
-await updateUser(
-  "user_2fvTlpi6NYrdtGUwDTSBH9bMBd0",
-  { verificationCode: "123456", dob: "01/03/2000" },
-  {}
-);
+// // adding verificationCode, dob to "parent tester 1" user to test
+// await updateUser(
+//   "user_2fvTlpi6NYrdtGUwDTSBH9bMBd0",
+//   { verificationCode: "123456", dob: "01/03/2000" },
+//   {}
+// );
 
-// adding dob, verified, completedQuestionIds to "child tester 1" user to test
-await updateUser(
-  "user_2g1FcBlpiqWWC3zh6rbcpiFGo0e",
-  { dob: "01/03/2010" },
-  { verified: false, completedQuestionIds: [] }
-);
+// // adding dob, verified, completedQuestionIds to "child tester 1" user to test
+// await updateUser(
+//   "user_2g1FcBlpiqWWC3zh6rbcpiFGo0e",
+//   { dob: "01/03/2010" },
+//   { verified: false, completedQuestionIds: [] }
+// );
 
 export const userResolvers = {
   Query: {
