@@ -79,16 +79,17 @@ export const typeDefs = `#graphql
   scalar Date
 
   type User {
-    _id: String!
-    clerkId: String
-    parentId: String # undefined for Parent
-    verificationCode: String # undefined for children
+    id: String!
+    # clerkId: String
+    # parentId: String # undefined for Parent
+    # verificationCode: String # undefined for children
     firstName: String!
     lastName: String!
-    emailAddresses: [String!]
-    username: String!
-    dob: Date!
-    completedQuestionIds: [Int] # undefined for Parent
+    imageUrl: String!
+    # emailAddresses: [String!]
+    # username: String!
+    # dob: Date!
+    # completedQuestionIds: [Int] # undefined for Parent
   }
 
   type CheckingAccount {
@@ -145,9 +146,9 @@ export const typeDefs = `#graphql
 
   type Mutation {
     # User Mutations
-    createOrUpdateUserInLocalDB(clerkUserId: String!): User
-    createUserInLocalDB(clerkUserId: String!): User
-    updateUserInLocalDB(clerkUserId: String!): User
+    # createOrUpdateUserInLocalDB(clerkUserId: String!): User
+    # createUserInLocalDB(clerkUserId: String!): User
+    # updateUserInLocalDB(clerkUserId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
 
     # Account Mutations

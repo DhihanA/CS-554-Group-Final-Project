@@ -4,12 +4,11 @@ import { users as usersCollection } from "../config/mongoCollections.js";
 import clerkClient from "../clients/clerkClient.js";
 
 //!TESTING
-async function updateUserAddParent(userId) {
+async function updateUser(userId, privateMetadata, publicMetadata) {
   try {
     const updatedUser = await clerkClient.users.updateUser(userId, {
-      public_metadata: {
-        parent: true,
-      },
+      privateMetadata: privateMetadata || {},
+      publicMetadata: publicMetadata || {},
     });
 
     console.log("Updated user:", updatedUser);
@@ -17,8 +16,19 @@ async function updateUserAddParent(userId) {
     console.error("Error updating user: ", error);
   }
 }
-// adding parent field to user jesal to test
-await updateUserAddParent("user_2fk8aRObMHQDixP9M5hdA7mu0xY");
+// adding verificationCode, dob to "parent tester 1" user to test
+await updateUser(
+  "user_2fvTlpi6NYrdtGUwDTSBH9bMBd0",
+  { verificationCode: "123456", dob: "01/03/2000" },
+  {}
+);
+
+// adding dob, verified, completedQuestionIds to "child tester 1" user to test
+await updateUser(
+  "user_2g1FcBlpiqWWC3zh6rbcpiFGo0e",
+  { dob: "01/03/2010" },
+  { verified: false, completedQuestionIds: [] }
+);
 
 export const userResolvers = {
   Query: {
@@ -182,9 +192,19 @@ export const userResolvers = {
 
     // this mutation should ONLY be called on children, NOT parents
     verifyChild: async (_, { userId, verificationCode }) => {
-      let user;
+      userId = userId.toString().trim();
+      verificationCode = verificationCode.toString().trim();
+      if (verificationCode.length !== 6) {
+        throw new GraphQLError(
+          "Incorrect Verification Code; it should be 6 digits",
+          {
+            extensions: { code: "BAD_USER_INPUT" },
+          }
+        );
+      }
+
       try {
-        user = await clerkClient.users.getUser(clerkUserId);
+        await clerkClient.users.getUser(userId);
       } catch (e) {
         throw new GraphQLError("Account Not Found", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
@@ -193,47 +213,48 @@ export const userResolvers = {
 
       let allClerkUsers;
       try {
-        allClerkUsers = await clerkClient.users.getUserList().data;
+        allClerkUsers = await clerkClient.users.getUserList();
       } catch (e) {
         throw new GraphQLError("Could not get all users", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
-      let parent = allClerkUsers.filter((user) => {
-        user.privateMetadata.verificationCode.toString() ===
-          verificationCode.toString();
-      });
 
-      if (parent.length <= 0) {
+      let parent;
+      for (const user of allClerkUsers.data) {
+        const metadata = user.privateMetadata;
+        if (
+          metadata &&
+          metadata.verificationCode &&
+          metadata.verificationCode.toString() === verificationCode
+        ) {
+          parent = user;
+          break;
+        }
+      }
+
+      console.log("parent", parent);
+
+      if (!parent) {
         throw new GraphQLError("Incorrect Verification Code", {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
 
-      parent = parent[0];
-
       try {
-        await clerkClient.updateUser(userId, {
-          publicMetadata: {
-            verified: true,
-            parentId: parent.id,
-          },
-        });
+        const publicMetadata = {
+          verified: true,
+          parentId: parent.id,
+        };
+        await updateUser(userId, {}, publicMetadata);
       } catch (e) {
         throw new GraphQLError("Could not verify user", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
 
-      let updatedChild;
-      try {
-        updatedChild = await clerkClient.users.getUser(clerkUserId);
-      } catch (e) {
-        throw new GraphQLError("Account Not Found", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
-      }
-
+      let updatedChild = await clerkClient.users.getUser(userId);
+      console.log("updatedChild", updatedChild);
       return updatedChild;
     },
   },

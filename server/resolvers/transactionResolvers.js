@@ -218,14 +218,14 @@ export const transactionResolvers = {
         }
         const checkingAccounts = await checkingAccountCollection();
         const savingsAccounts = await savingsAccountCollection();
-    
+
         const checkingAccount = await checkingAccounts.findOne({
-          ownerId: new ObjectId(ownerId)
+          ownerId: new ObjectId(ownerId),
         });
         const savingsAccount = await savingsAccounts.findOne({
-          ownerId: new ObjectId(ownerId)
+          ownerId: new ObjectId(ownerId),
         });
-    
+
         if (!checkingAccount) {
           throw new GraphQLError("Checking account not found");
         }
@@ -235,7 +235,7 @@ export const transactionResolvers = {
         if (checkingAccount.balance < amount) {
           throw new GraphQLError("Insufficient balance in checking account");
         }
-    
+
         const transaction = {
           _id: new ObjectId(),
           senderId: checkingAccount._id,
@@ -243,24 +243,24 @@ export const transactionResolvers = {
           amount: amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
-          type: 'CheckingToSavingTransfer'
+          type: "CheckingToSavingTransfer",
         };
-    
+
         const transactionsCol = await transactionsCollection();
         await transactionsCol.insertOne(transaction);
-    
+
         await checkingAccounts.updateOne(
           { _id: checkingAccount._id },
           { $inc: { balance: -amount } }
         );
         await savingsAccounts.updateOne(
           { _id: savingsAccount._id },
-          { 
+          {
             $set: { previousBalance: savingsAccount.currentBalance },
-            $inc: { currentBalance: amount }
+            $inc: { currentBalance: amount },
           }
         );
-    
+
         return transaction;
       } catch (error) {
         console.error("Error during checking to saving transfer:", error);
@@ -268,21 +268,24 @@ export const transactionResolvers = {
       }
     },
 
-    addSavingToCheckingTransfer: async (_, { ownerId, amount, description, type }) => {
+    addSavingToCheckingTransfer: async (
+      _,
+      { ownerId, amount, description, type }
+    ) => {
       try {
         if (amount <= 0) {
           throw new GraphQLError("Amount must be greater than 0");
         }
         const savingsAccounts = await savingsAccountCollection();
         const checkingAccounts = await checkingAccountCollection();
-    
+
         const savingsAccount = await savingsAccounts.findOne({
-          ownerId: new ObjectId(ownerId)
+          ownerId: new ObjectId(ownerId),
         });
         const checkingAccount = await checkingAccounts.findOne({
-          ownerId: new ObjectId(ownerId)
+          ownerId: new ObjectId(ownerId),
         });
-    
+
         if (!savingsAccount) {
           throw new GraphQLError("Savings account not found");
         }
@@ -292,7 +295,7 @@ export const transactionResolvers = {
         if (savingsAccount.currentBalance < amount) {
           throw new GraphQLError("Insufficient balance in savings account");
         }
-    
+
         const transaction = {
           _id: new ObjectId(),
           senderId: savingsAccount._id,
@@ -300,24 +303,24 @@ export const transactionResolvers = {
           amount: amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
-          type: 'SavingToCheckingTransfer'
+          type: "SavingToCheckingTransfer",
         };
-    
+
         const transactionsCol = await transactionsCollection();
         await transactionsCol.insertOne(transaction);
-    
+
         await savingsAccounts.updateOne(
           { _id: savingsAccount._id },
-          { 
+          {
             $set: { previousBalance: savingsAccount.currentBalance },
-            $inc: { currentBalance: -amount }
+            $inc: { currentBalance: -amount },
           }
         );
         await checkingAccounts.updateOne(
           { _id: checkingAccount._id },
           { $inc: { balance: amount } }
         );
-    
+
         return transaction;
       } catch (error) {
         console.error("Error during saving to checking transfer:", error);
@@ -330,8 +333,8 @@ export const transactionResolvers = {
     ) => {
       try {
         const transactionsCol = await transactionsCollection();
-        const checkingCol = await checkingAccountCollection(); 
-    
+        const checkingCol = await checkingAccountCollection();
+
         const transaction = await transactionsCol.findOne({
           _id: new ObjectId(transactionId),
         });
@@ -341,7 +344,7 @@ export const transactionResolvers = {
         if (transaction.type !== "Budgeted") {
           throw new GraphQLError("Transaction is not a budgeted transaction");
         }
-    
+
         // Calculate the amount difference if newAmount is provided
         let amountDifference = 0;
         if (newAmount !== undefined && newAmount !== transaction.amount) {
@@ -350,7 +353,7 @@ export const transactionResolvers = {
           }
           amountDifference = newAmount - transaction.amount;
         }
-  
+
         const updates = {};
         if (amountDifference !== 0) {
           updates.amount = newAmount;
@@ -358,19 +361,19 @@ export const transactionResolvers = {
         if (newDescription !== undefined) {
           updates.description = newDescription;
         }
-    
+
         await transactionsCol.updateOne(
           { _id: new ObjectId(transactionId) },
           { $set: updates }
         );
-    
+
         if (amountDifference !== 0) {
           await checkingCol.updateOne(
             { ownerId: transaction.senderId },
-            { $inc: { balance: -amountDifference } } 
+            { $inc: { balance: -amountDifference } }
           );
         }
-    
+
         return {
           _id: transactionId,
           senderId: transaction.senderId,
@@ -385,47 +388,49 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
-    
+
     deleteBudgetedTransaction: async (_, { ownerId, transactionId }) => {
       try {
         const ownerIdObj = new ObjectId(ownerId);
         const transactionIdObj = new ObjectId(transactionId);
-        
+
         const caCollection = await checkingAccountCollection();
         const transactionsCol = await transactionsCollection();
-    
+
         // Find the transaction to delete
-        const transaction = await transactionsCol.findOne({ _id: transactionIdObj, senderId: ownerIdObj });
+        const transaction = await transactionsCol.findOne({
+          _id: transactionIdObj,
+          senderId: ownerIdObj,
+        });
         if (!transaction) {
           throw new GraphQLError("Transaction not found");
         }
-    
+
         // Check the type of transaction
         if (transaction.type !== "Budgeted") {
           throw new GraphQLError("Only budgeted transactions can be deleted");
         }
-    
+
         // Check if the account associated with the transaction exists
         const account = await caCollection.findOne({ ownerId: ownerIdObj });
         if (!account) {
           throw new GraphQLError("Checking account not found");
         }
-    
+
         // Update the account balance by adding back the transaction amount
         await caCollection.updateOne(
           { _id: account._id },
           { $inc: { balance: transaction.amount } }
         );
-    
+
         // Delete the transaction from the transactions collection
         await transactionsCol.deleteOne({ _id: transactionIdObj });
-    
+
         return { success: true, message: "Transaction deleted successfully" };
       } catch (error) {
         console.error("Error deleting budgeted transaction:", error);
         throw new GraphQLError("Internal Server Error");
       }
-    }
-    
+    },
   },
 };
