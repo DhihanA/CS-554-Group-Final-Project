@@ -186,4 +186,8 @@ const main = async () => {
   await closeConnection();
 };
 
-main().catch(console.error);
+try {
+  await main();
+} catch (e) {
+  console.log(e);
+}
