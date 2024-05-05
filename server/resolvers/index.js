@@ -5,9 +5,22 @@ import clerkClient from "../clients/clerkClient.js";
 
 
 export const resolvers = {
+  AccountType: {
+    __resolveType(obj, contextValue, info){
+      // Only Author has a name field
+      if(obj.interestRate){
+        return 'SavingsAccount';
+      }
+      // Only Book has a title field
+      if(obj.balance){
+        return 'CheckingAccount';
+      }
+      return null; // GraphQLError is thrown
+    },
+  },
   SavingsAccount: {
     owner: async (ParentValue) => {
-      const ownerId = ParentValue.ownerId;
+      const ownerId = ParentValue.ownerId.trim();
       const user = await clerkClient.users.getUser(ownerId);
       return user;
     }
