@@ -49,10 +49,7 @@ export const typeDefs = `#graphql
 
   type Query {
     # User Queries
-    getUserInfo(ownerId: String!): User
-    getAllUsers: [User]
     getChildren(parentUserId: String!): [User]
-    getUserByAccountId(accountId: String!): [User]
 
     # Account Queries
     getCheckingAccountInfo(userId: String!): CheckingAccount

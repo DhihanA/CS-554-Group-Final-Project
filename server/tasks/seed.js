@@ -46,7 +46,7 @@ const main = async () => {
       receiverId: savingsIds[0], //id of account money has been sent to
       amount: 200,
       description: "Payment for school supplies",
-      dateofTransaction: new Date(),
+      dateOfTransaction: new Date(),
       type: "Transfer",
     },
     {
@@ -55,7 +55,7 @@ const main = async () => {
       receiverId: savingsIds[0], //id of account money has been sent to
       amount: 100,
       description: "Payment for school supplies",
-      dateofTransaction: new Date(),
+      dateOfTransaction: new Date(),
       type: "Transfer",
     },
   ]);

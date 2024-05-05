@@ -137,6 +137,9 @@ export const transactionResolvers = {
           receiverId: new ObjectId(receiverId),
           amount: amount,
           description: description.trim(),
+          ownerOfReceiver: receiverAccount.ownerId,
+          ownerOfSender: senderAccount.ownerId,
+          dateOfTransaction: new Date(),
           type: "Transfer",
         };
 
@@ -191,8 +194,10 @@ export const transactionResolvers = {
           _id: new ObjectId(),
           senderId: ownerId,
           receiverId: ownerId,
-          amount,
+          amount: amount,
           description: description.trim(),
+          ownerOfReceiver: ownerId,
+          ownerOfSender: ownerId,
           dateOfTransaction: new Date(),
           type: "Budgeted",
         };
