@@ -8,20 +8,21 @@ import redisClient from "../clients/redisClient.js";
 
 export const accountResolvers = {
   Query: {
-    getCheckingAccountInfo: async (_, { userId, senderId }) => {
+    getCheckingAccountInfo: async (_, { userId }) => {
       try {
-          const accountCollection = await checkingAccountCollection();
-          const account = await accountCollection.findOne({
-            ownerId: userId,
-          });
+        const accountCollection = await checkingAccountCollection();
+        const account = await accountCollection.findOne({
+          ownerId: userId,
+        });
 
-          if (!account) {
-            console.log("Account not found in database.");
-            throw new GraphQLError("Checking Account Not Found", {
-              extensions: { code: "NOT_FOUND" },
-          });}
-          console.log("Account found, caching and returning.");
-          return account;
+        if (!account) {
+          console.log("Account not found in database.");
+          throw new GraphQLError("Checking Account Not Found", {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+        console.log("Account found, caching and returning.");
+        return account;
       } catch (error) {
         console.error("Error fetching checking account info:", error);
         if (error instanceof TypeError && error.message.includes("ObjectId")) {
@@ -35,22 +36,21 @@ export const accountResolvers = {
         });
       }
     },
-    getSavingsAccountInfo: async (_, { userId, accountId }) => {
+    getSavingsAccountInfo: async (_, { userId }) => {
       try {
-          const accountCollection = await savingsAccountCollection();
-          const objectId = new ObjectId(userId);
-          const account = await accountCollection.findOne({
-            ownerId: objectId,
+        const accountCollection = await savingsAccountCollection();
+        const account = await accountCollection.findOne({
+          ownerId: userId,
+        });
+
+        if (!account) {
+          throw new GraphQLError("Savings Account Not Found", {
+            extensions: { code: "NOT_FOUND" },
           });
-
-          if (!account) {
-            throw new GraphQLError("Savings Account Not Found", {
-              extensions: { code: "NOT_FOUND" },
-            });}
-
-          return account;
         }
-      catch (error) {
+
+        return account;
+      } catch (error) {
         throw new GraphQLError("Internal Server Error", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
