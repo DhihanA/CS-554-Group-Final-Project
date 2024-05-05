@@ -5,7 +5,7 @@ import {
   checkingAccount,
 } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
-import { createUsers } from "./clerkUserFunctions.js";
+import userIds from "./staticClerkIds.json" assert { type: "json" };
 
 //! all passwords from users from seed.js are hardcoded to Test123$567*
 
@@ -17,14 +17,6 @@ const main = async () => {
   const transactionsCollection = await transactions();
   const savingsCollection = await savingsAccount();
   const checkingCollection = await checkingAccount();
-
-  const createdUsers = await createUsers();
-  const userIds = createdUsers.reduce((acc, user) => {
-    acc[user.username] = user.id;
-    return acc;
-  }, {});
-
-  console.log("Created User Ids:", userIds);
 
   const transactionIds = [new ObjectId()];
   const savingsIds = [
