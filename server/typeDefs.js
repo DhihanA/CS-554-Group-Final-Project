@@ -10,23 +10,23 @@ export const typeDefs = `#graphql
 
   type CheckingAccount {
     _id: String!
-    ownerId: String!
+    owner: User!
     balance: Float!
   }
 
   type SavingsAccount {
     _id: String!
-    ownerId: String!
+    owner: User!
     currentBalance: Float!
     previousBalance: Float!
     interestRate: Float!
     lastDateUpdated: Date!
   }
 
-  type Transaction {
+  type Transactions {
     _id: String!
-    senderId: String!
-    receiverId: String!
+    sender: AccountType!
+    receiver: AccountType!
     amount: Float!
     description: String
     dateOfTransaction: Date!
@@ -45,6 +45,7 @@ export const typeDefs = `#graphql
     message: String!
   }
 
+  union AccountType = SavingsAccount | CheckingAccount
 
   type Query {
     # User Queries
@@ -54,11 +55,11 @@ export const typeDefs = `#graphql
     getUserByAccountId(accountId: String!): [User]
 
     # Account Queries
-    getCheckingAccountInfo(userId: String!): CheckingAccount
-    getSavingsAccountInfo(userId: String!): SavingsAccount
+    getCheckingAccountInfo(userId: String, accountId: String): CheckingAccount
+    getSavingsAccountInfo(userId: String, accountId: String): SavingsAccount
 
     # Transaction Queries
-    getAllTransactions(userId: String!, accountType: String!): [Transaction]
+    getAllTransactions(userId: String!, accountType: String!): [Transactions]
   }
 
   type Mutation {
@@ -69,11 +70,11 @@ export const typeDefs = `#graphql
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
 
     # Transaction Mutations
-    addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!): Transaction
-    addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!): Transaction
-    addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!): Transaction
-    addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!): Transaction
-    editBudgetedTransaction(transactionId: String!, newAmount: Float, newDescription: String): Transaction
+    addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!): Transactions
+    addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!): Transactions
+    addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!): Transactions
+    addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!): Transactions
+    editBudgetedTransaction(transactionId: String!, newAmount: Float, newDescription: String): Transactions
     downloadTransactions(userId: String!): String
     deleteBudgetedTransaction(ownerId: String!, transactionId: String!): DeleteTransactionResponse
   }

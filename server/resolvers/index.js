@@ -1,8 +1,52 @@
 import { userResolvers } from "./userResolvers.js";
 import { transactionResolvers } from "./transactionResolvers.js";
 import { accountResolvers } from "./accountResolvers.js";
+import clerkClient from "../clients/clerkClient.js";
+
 
 export const resolvers = {
+  SavingsAccount: {
+    owner: async (ParentValue) => {
+      const ownerId = ParentValue.ownerId;
+      const user = await clerkClient.users.getUser(ownerId);
+      return user;
+    }
+  },
+  CheckingAccount: {
+    owner: async (ParentValue) => {
+      const ownerId = ParentValue.ownerId.trim();
+      const user = await clerkClient.users.getUser(ownerId);
+      return user;
+    }
+  },
+  Transactions: {
+    sender: async (ParentValue) => {
+      const accountId = ParentValue.senderId;
+      let account = await accountResolvers.getCheckingAccountInfo(accountId);
+      if (!account) {
+        account = await accountResolvers.getSavingsAccountInfo(accountId);
+      }
+
+      if (!account) throw new GraphQLError("Account with that _id does not exist", {
+        extensions: { code: "NOT_FOUND" },
+      });
+
+      return account;
+    },
+    receiver: async (ParentValue) => {
+      const accountId = ParentValue.recieverId;
+      let account = await accountResolvers.getCheckingAccountInfo(accountId);
+      if (!account) {
+        account = await accountResolvers.getSavingsAccountInfo(accountId);
+      }
+
+      if (!account) throw new GraphQLError("Account with that _id does not exist", {
+        extensions: { code: "NOT_FOUND" },
+      });
+      
+      return account;
+    }
+  },
   Query: {
     ...userResolvers.Query,
     ...transactionResolvers.Query,
