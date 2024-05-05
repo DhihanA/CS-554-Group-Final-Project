@@ -127,7 +127,7 @@ export const typeDefs = `#graphql
     # User Queries
     getUserInfo(ownerId: String!): User
     getAllUsers: [User]
-    getChildren(parentUserId: String!): [User] #new
+    getChildren(parentUserId: String!): [User]
 
     # Account Queries
     getCheckingAccountInfo(userId: String!): CheckingAccount
@@ -139,9 +139,6 @@ export const typeDefs = `#graphql
 
   type Mutation {
     # User Mutations
-    # createOrUpdateUserInLocalDB(clerkUserId: String!): User
-    # createUserInLocalDB(clerkUserId: String!): User
-    # updateUserInLocalDB(clerkUserId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
 
     # Account Mutations
