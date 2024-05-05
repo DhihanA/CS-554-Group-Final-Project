@@ -31,6 +31,8 @@ const DashboardPage = ({ isParent }) => {
     );
   }
 
+  console.log(user.id);
+
   return (
     <BasePage>
       <div className="flex justify-center">

@@ -9,8 +9,7 @@ import {
   UserButton,
 } from "@clerk/clerk-react";
 
-
-import CustomDataForm from './CustomDataForm.jsx';
+// import CustomDataForm from './CustomDataForm.jsx';
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -43,16 +42,16 @@ const SignUpClerk = () => {
     }
   };
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
-            <SignedIn>
-            <Navigate to={'/'} />
-            </SignedIn>
-            <SignedOut>
-                <SignUp signInUrl='/login' afterSignUpUrl="/fillinfo"/>
-            </SignedOut>
-        </div>
-    );
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <SignedIn>
+        <Navigate to={"/"} />
+      </SignedIn>
+      <SignedOut>
+        <SignUp signInUrl="/login" afterSignUpUrl="/fillinfo" />
+      </SignedOut>
+    </div>
+  );
 };
 
 export default SignUpClerk;
