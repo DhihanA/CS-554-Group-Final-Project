@@ -9,7 +9,7 @@ import {
     UserButton
 } from "@clerk/clerk-react";
 
-import RolePrompt from '../components/RolePrompt.jsx';
+import CustomDataForm from './CustomDataForm.jsx';
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -49,12 +49,7 @@ const SignUpClerk = () => {
             <Navigate to={'/'} />
             </SignedIn>
             <SignedOut>
-                {customComplete ? <>
-                        <button className="my-4" onClick={() => setCustomComplete(false)}>Go Back</button>
-                        <SignUp signInUrl='/login' onSignUp={() => {console.log("this is being reached"); handlePostSignUp()}}/>
-                    </>
-                    : <RolePrompt setCustomData={setCustomData} setCustomComplete={setCustomComplete}/>
-                }
+                <SignUp signInUrl='/login' afterSignUpUrl="/fillinfo"/>
             </SignedOut>
         </div>
     );

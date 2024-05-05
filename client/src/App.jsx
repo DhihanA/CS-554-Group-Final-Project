@@ -19,6 +19,7 @@ import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
 import HowTo from "./pages/HowTo";
+import CustomDataForm from './pages/CustomDataForm';
 
 function App() {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -36,8 +37,12 @@ function App() {
 
   // uncomment after metadata stuff done:
   let isParent = false;
+  let hasRole = true;
   if (isSignedIn && user && user.publicMetadata.verificationCode)
     isParent = true;
+  if (isSignedIn && user.publicMetadata.role) {
+    hasRole = true;
+  }
 
   return (
     <>
@@ -94,6 +99,11 @@ function App() {
         <Route
           path="*"
           element={<Navigate replace to={isSignedIn ? "/dashboard" : "/"} />}
+        />
+
+        <Route 
+          path="/fillinfo"
+          element = {<CustomDataForm />}
         />
       </Routes>
     </>
