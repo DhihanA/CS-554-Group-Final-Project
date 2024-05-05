@@ -18,7 +18,7 @@ export const userResolvers = {
     getChildren: async (_, { parentId }) => {},
 
     // we do not need this if we make CheckingAccount/SavingsAccount a related field of Transactions
-    getUserByAccountId: async (_, { accountId }) => {},
+    // getUserByAccountId: async (_, { accountId }) => {},
   },
   Mutation: {
     // this mutation should ONLY be called on children, NOT parents

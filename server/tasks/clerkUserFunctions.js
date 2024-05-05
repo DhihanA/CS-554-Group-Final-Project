@@ -33,12 +33,14 @@ const createUser = async (
     };
     publicMetadata = {
       verificationCode: Math.floor(100000 + Math.random() * 900000).toString(),
+      role: "parent",
     };
   } else {
     privateMetadata = {
       dob: "01/01/2010",
     };
     publicMetadata = {
+      role: "child",
       verified: false,
       // completedQuestionIds will be populated to [] upon verifyChild
       // parentId will be populated upon verifyChild

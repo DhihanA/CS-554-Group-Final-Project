@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { Link } from "react-router-dom";
 // import piggyBankLogo from "../assets/piggyBankIcon.png";
-import piggyBankLogo from '../assets/piggyBankIconColored.png';
+import piggyBankLogo from "../assets/piggyBankIconColored.png";
 
 import { UserButton, useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 
 export default function NavbarComponent() {
   const { isSignedIn, isLoaded, user } = useUser();
-  let isParent;
-  if (isSignedIn && user) isParent = user.publicMetadata.parent;
+  let isParent = false;
+  if (isSignedIn && user && user.publicMetadata.verificationCode)
+    isParent = true;
 
   // https://dev.to/kunalukey/how-to-add-dark-mode-toggle-in-reactjs-tailwindcss-daisyui-1af9
   // learned how to do it from the above article and accompaning vid
@@ -38,12 +39,14 @@ export default function NavbarComponent() {
     document.documentElement.setAttribute("data-theme", localTheme);
   }, [theme]);
 
-  const routes = {
-    "My Transactions": "/transactions",
-    // Settings: "/settings",
-    "Learn n' Earn": "/learn",
-    "How To Start": "/howto" // added the ability to navigate to how to section in the navbar
-  };
+  let routes = {};
+  if (!isParent) {
+    routes = {
+      "My Transactions": "/transactions",
+      "Learn n' Earn": "/learn",
+      "How To Start": "/howto", // added the ability to navigate to how to section in the navbar
+    };
+  }
 
   return (
     <div className="navbar bg-base-100">
