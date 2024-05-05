@@ -6,6 +6,8 @@ import {
   checkingAccount as checkingAccountCollection,
 } from "../config/mongoCollections.js";
 import redisClient from "../clients/redisClient.js";
+import { accountResolvers } from "./accountResolvers.js";
+
 
 export const transactionResolvers = {
   Query: {
@@ -105,33 +107,26 @@ export const transactionResolvers = {
     },
   },
   Mutation: {
-    addTransferTransaction: async (
-      _,
-      { senderId, receiverId, amount, description }
-    ) => {
+    addTransferTransaction: async (_, { senderId, receiverId, amount, description }) => {
       try {
         if (senderId === receiverId) {
-          throw new GraphQLError(
-            "Sender and Receiver cannot be the same for transfer transactions"
-          );
+          throw new GraphQLError("Sender and Receiver cannot be the same for transfer transactions");
         }
         if (amount <= 0) {
           throw new GraphQLError("Amount must be greater than 0");
         }
-        const caCollection = await checkingAccountCollection();
-        const senderAccount = await caCollection.findOne({
-          _id: new ObjectId(senderId),
-        });
-        const receiverAccount = await caCollection.findOne({
-          _id: new ObjectId(receiverId),
-        });
+        
+        const senderAccount = await accountResolvers.Query.getCheckingAccountInfo(_, { userId: senderId });
+        const receiverAccount = await accountResolvers.Query.getCheckingAccountInfo(_, { userId: receiverId });
 
         if (!senderAccount) {
           throw new GraphQLError("Sender checking account not found");
         }
+        console.log("Sender Account:", senderAccount);
         if (!receiverAccount) {
           throw new GraphQLError("Receiver checking account not found");
         }
+        console.log("Receiver Account:", receiverAccount);
         if (senderAccount.balance < amount) {
           throw new GraphQLError("Sender does not have sufficient balance");
         }
@@ -148,12 +143,13 @@ export const transactionResolvers = {
         const transactionsCol = await transactionsCollection();
         await transactionsCol.insertOne(transaction);
 
+        const caCollection = await checkingAccountCollection();
         await caCollection.updateOne(
-          { _id: new ObjectId(senderId) },
+          { ownerId: new ObjectId(senderId) },
           { $inc: { balance: -amount } }
         );
         await caCollection.updateOne(
-          { _id: new ObjectId(receiverId) },
+          { ownerId: new ObjectId(receiverId) },
           { $inc: { balance: amount } }
         );
 
@@ -163,6 +159,7 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
+
 
     addBudgetedTransaction: async (
       _,

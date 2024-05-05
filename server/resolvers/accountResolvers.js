@@ -8,12 +8,11 @@ import redisClient from "../clients/redisClient.js";
 
 export const accountResolvers = {
   Query: {
-    getCheckingAccountInfo: async (_, { userId, senderId }) => {
+    getCheckingAccountInfo: async (_, { userId }) => {
       try {
           const accountCollection = await checkingAccountCollection();
-          const objectId = new ObjectId(userId);
           const account = await accountCollection.findOne({
-            ownerId: objectId,
+            ownerId: userId,
           });
 
           if (!account) {
@@ -36,7 +35,7 @@ export const accountResolvers = {
         });
       }
     },
-    getSavingsAccountInfo: async (_, { userId, accountId }) => {
+    getSavingsAccountInfo: async (_, { userId }) => {
       try {
           const accountCollection = await savingsAccountCollection();
           const objectId = new ObjectId(userId);
