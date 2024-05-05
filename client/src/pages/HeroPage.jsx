@@ -24,9 +24,12 @@ const HeroPage = () => {
             {/* <Link to="/dashboard" className="btn btn-app-primary">
               View Dashboard
             </Link> */}
-            <button className="btn btn-app-secondary" onClick={toggleStartModal}>
+            {/* <button className="btn btn-app-secondary" onClick={toggleStartModal}>
               How To Start*
-            </button>
+            </button> */}
+            <Link to={"/howto"} className="btn btn-app-secondary">
+              *How To Start*
+            </Link>
           </div>
           
           <div className="grid grid-cols-2 gap-8">
@@ -50,7 +53,7 @@ const HeroPage = () => {
         </div>
       </div>
 
-      {isStartModalOpen && (
+      {/* {isStartModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box">
             <h3 className="font-bold text-lg">WOOO</h3>
@@ -69,7 +72,7 @@ const HeroPage = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
     </BasePage>
   );

@@ -14,7 +14,7 @@ const Transactions = () => {
     const res1 = useQuery(queries.GET_ALL_TRANSACTIONS, {
       variables: {
         // userId: user.id,
-        userId: "6633fd1669effc4f26e0da8f", //!TESTING
+        userId: "6636dbaa0bef45fdf0328ab5", //!TESTING
         accountType: "checking",
       },
       fetchPolicy: "cache-and-network",
@@ -22,7 +22,7 @@ const Transactions = () => {
     const res2 = useQuery(queries.GET_ALL_TRANSACTIONS, {
       variables: {
         // userId: user.id,
-        userId: "6633fd1669effc4f26e0da8f", //!TESTING
+        userId: "6636dbaa0bef45fdf0328ab5", //!TESTING
         accountType: "checking",
       },
       fetchPolicy: "cache-and-network",

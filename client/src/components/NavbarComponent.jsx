@@ -42,6 +42,7 @@ export default function NavbarComponent() {
     "My Transactions": "/transactions",
     // Settings: "/settings",
     "Learn n' Earn": "/learn",
+    "How To Start": "/howto" // added the ability to navigate to how to section in the navbar
   };
 
   return (
