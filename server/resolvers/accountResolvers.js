@@ -10,6 +10,7 @@ export const accountResolvers = {
     getCheckingAccountInfo: async (_, { userId }) => {
       try {
         const accountCollection = await checkingAccountCollection();
+        // console.log(userId);
         const account = await accountCollection.findOne({
           ownerId: userId,
         });

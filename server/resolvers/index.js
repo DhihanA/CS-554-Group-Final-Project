@@ -34,7 +34,7 @@ export const resolvers = {
   },
   Transactions: {
     sender: async (ParentValue) => {
-      const accountId = ParentValue.senderId;
+      const accountId = ParentValue.ownerOfSender;
       let account = await accountResolvers.Query.getCheckingAccountInfo(null, { userId: accountId });
       if (!account) {
         account = await accountResolvers.Query.getSavingsAccountInfo(null, { userId: accountId });
@@ -47,7 +47,7 @@ export const resolvers = {
       return account;
     },
     receiver: async (ParentValue) => {
-      const accountId = ParentValue.receiverId;
+      const accountId = ParentValue.ownerOfReceiver;
       let account = await accountResolvers.Query.getCheckingAccountInfo(null, { userId: accountId });
       if (!account) {
         account = await accountResolvers.Query.getSavingsAccountInfo(null, { userId: accountId });

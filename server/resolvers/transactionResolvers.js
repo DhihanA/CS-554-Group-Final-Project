@@ -303,6 +303,8 @@ export const transactionResolvers = {
           amount: amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
+          ownerOfReceiver: ownerId,
+          ownerOfSender: ownerId,
           type: "SavingToCheckingTransfer",
         };
 
