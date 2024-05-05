@@ -18,6 +18,7 @@ import TransactionsPage from "./pages/TransactionsPage";
 import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
+import HowTo from "./pages/HowTo";
 
 function App() {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -54,6 +55,11 @@ function App() {
               <Navigate to="/" />
             )
           }
+        />
+        {/* howto page */}
+        <Route
+          path="/howto"
+          element={<HowTo />}
         />
         <Route
           path="/transactions"

@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 // import queries from "../../queries";
 
-const TransferMoneyModal = ({ toggleModal }) => {
+const TransferMoneyModal = ({ toggleModal, accountType }) => {
   /* useState hooks */
   // const [transactionName, setTransactionName] = useState("");
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
+
+  const [dropdownOpen, setDropdownOpen] = useState(false); // track if dropdown is open or closed
+  let option1 = 'Other User';
+  let option2 = 'Savings';
+  const [selectedOption, setSelectedOption] = useState(option2); // track the user's selected option, defaulted to option2 (savings)
+
+  // !! query to display all the users in the dropdown
+  // const {loading, error, data} = useQuery(queries.GET_ALL_USERS, {
+  //   fetchPolicy: 'cache-and-network'
+  // });
 
   /* useMutation hooks */
   //! configure this after mutation is complete
@@ -46,6 +56,13 @@ const TransferMoneyModal = ({ toggleModal }) => {
     resetForm();
   };
 
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+    document.activeElement.blur(); // gets rid of the dropdown afterwards
+    // setDropdownOpen(false); // closing dropdown menu after selecting an option
+    console.log(option);
+  };
+
   /* Form submission */
   //!uncomment below after mutation above is complete
   const handleFormSubmit = (e) => {
@@ -65,8 +82,8 @@ const TransferMoneyModal = ({ toggleModal }) => {
     if (trimmedDescription.length === 0) {
       setError("Description should not be empty");
       return;
-    }
-
+    }    
+  
     const handleTransferMoney = async () => {
       try {
         await transferMoney({
@@ -103,6 +120,24 @@ const TransferMoneyModal = ({ toggleModal }) => {
                 required
               />
             </div> */}
+            {accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
+              <div className="dropdown">
+              <div tabIndex={0} className="btn m-1">Click</div>
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                  <li><a onClick={() => handleOptionSelect(option2)}>{option2}</a></li>
+                  <li><a onClick={() => handleOptionSelect(option1)}>{option1}</a></li>
+                </ul>
+              </div>
+              
+            ) : (
+              undefined)}
+
+            {selectedOption === option2 && accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
+              <p className="pb-1 font-medium text-sm">* The transferred money will go into your Savings Account. *</p>
+            ) : selectedOption === option1 && accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
+              <p className="pb-1 font-medium text-sm">* PUT A TEXTBOX HERE *</p>
+            ) : <p className="pb-1 font-medium text-sm">* The transferred money will go into your Checking Account. *</p>}
+            
             <div className="mb-4">
               <input
                 type="number"
