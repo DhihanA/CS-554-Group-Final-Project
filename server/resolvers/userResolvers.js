@@ -245,6 +245,7 @@ export const userResolvers = {
         const publicMetadata = {
           verified: true,
           parentId: parent.id,
+          completedQuestionIds: [],
         };
         await updateUser(userId, {}, publicMetadata);
       } catch (e) {

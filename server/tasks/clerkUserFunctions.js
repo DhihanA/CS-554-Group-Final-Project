@@ -18,13 +18,39 @@ const SEED_USERNAMES = [
 ];
 
 //! all passwords are hardcoded to Test123$567*
-const createUser = async (firstName, lastName, username, emailAddresses) => {
+const createUser = async (
+  firstName,
+  lastName,
+  username,
+  emailAddresses,
+  parent
+) => {
+  let privateMetadata = {};
+  let publicMetadata = {};
+  if (parent) {
+    privateMetadata = {
+      verificationCode: Math.floor(100000 + Math.random() * 900000).toString(),
+      dob: "01/01/2000",
+    };
+  } else {
+    privateMetadata = {
+      dob: "01/01/2010",
+    };
+    publicMetadata = {
+      verified: false,
+      // completedQuestionIds will be populated to [] upon verifyChild
+      // parentId will be populated upon verifyChild
+    };
+  }
+
   const createdUser = await clerkClient.users.createUser({
     firstName,
     lastName,
     username,
     emailAddress: emailAddresses,
     password: "Test123$567*",
+    privateMetadata,
+    publicMetadata,
   });
   return createdUser;
 };
@@ -48,12 +74,14 @@ export const createUsers = async () => {
   await deleteAllUsers();
   console.log("Creating seed users...");
   for (const username of SEED_USERNAMES) {
+    const parent = username.includes("parent");
     const email = username + "@gmail.com";
     const createdUser = await createUser(
       username,
       username.split("").reverse().join(""),
       username,
-      [email]
+      [email],
+      parent
     );
     createdUsers.push(createdUser);
   }
