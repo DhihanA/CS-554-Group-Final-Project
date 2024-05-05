@@ -62,10 +62,7 @@ function App() {
           }
         />
         {/* howto page */}
-        <Route
-          path="/howto"
-          element={<HowTo />}
-        />
+        <Route path="/howto" element={<HowTo />} />
         <Route
           path="/transactions"
           element={
