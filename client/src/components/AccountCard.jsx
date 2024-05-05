@@ -124,7 +124,7 @@ const AccountCard = ({
       )}
 
       {isTMModalOpen && (
-        <TransferMoneyModal toggleModal={toggleTMModal} />
+        <TransferMoneyModal toggleModal={toggleTMModal} accountType={accountType} />
       )}
     </div>
   );

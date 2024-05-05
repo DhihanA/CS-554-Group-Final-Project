@@ -14,6 +14,5 @@ const getCollectionFn = (collection) => {
 };
 
 export const transactions = getCollectionFn("transactions");
-export const users = getCollectionFn("users");
 export const savingsAccount = getCollectionFn("savingsAccount");
 export const checkingAccount = getCollectionFn("checkingAccount");

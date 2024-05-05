@@ -6,7 +6,7 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 import "./App.css";
 import ClerkEventHandlers from "./components/ClerkEventHandlers";
 
@@ -18,6 +18,7 @@ import TransactionsPage from "./pages/TransactionsPage";
 import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
+import HowTo from "./pages/HowTo";
 
 function App() {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -30,19 +31,35 @@ function App() {
       </div>
     );
 
-  let isParent;
-  if (isSignedIn && user) isParent = user.publicMetadata.parent;
+  // let isParent;
+  // if (isSignedIn && user) isParent = user.publicMetadata.parent;
+
+  // uncomment after metadata stuff done:
+  let isParent = false;
+  if (isSignedIn && user && user.publicMetadata.verificationCode)
+    isParent = true;
 
   return (
     <>
-      <ClerkEventHandlers />
+      {/* <ClerkEventHandlers /> */}
       <Routes>
         {/* Authenticated user routes go below */}
 
         {/* This is the only path both adults+children can access: */}
         <Route
           path="/dashboard"
-          element={isSignedIn ? <DashboardPage /> : <Navigate to="/" />}
+          element={
+            isSignedIn ? (
+              <DashboardPage isParent={isParent} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        {/* howto page */}
+        <Route
+          path="/howto"
+          element={<HowTo />}
         />
         <Route
           path="/transactions"
