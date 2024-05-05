@@ -1,4 +1,11 @@
 import clerkClient from "../clients/clerkClient.js";
+import fs from "fs";
+
+/* https://iamwebwiz.medium.com/how-to-fix-dirname-is-not-defined-in-es-module-scope-34d94a86694d */
+import path from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SEED_USERNAMES = [
   // child1, child2 associated with parent1
@@ -73,7 +80,7 @@ const deleteAllUsers = async () => {
   console.log("Deleted all previous seed users ✅");
 };
 
-export const createUsers = async () => {
+const createUsers = async () => {
   let createdUsers = [];
   await deleteAllUsers();
   console.log("Creating seed users...");
@@ -92,3 +99,25 @@ export const createUsers = async () => {
   console.log("Created seed users ✅");
   return createdUsers;
 };
+
+const writeToJson = async () => {
+  const createdUsers = await createUsers();
+  const userIds = createdUsers.reduce((acc, user) => {
+    acc[user.username] = user.id;
+    return acc;
+  }, {});
+
+  fs.writeFile(
+    __dirname + "/staticClerkIds.json",
+    JSON.stringify(userIds),
+    (err) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log("File saved!");
+      console.log("Created users and Ids", userIds);
+    }
+  );
+};
+
+await writeToJson();
