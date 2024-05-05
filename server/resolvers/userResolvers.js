@@ -5,7 +5,7 @@ import clerkClient from "../clients/clerkClient.js";
 export const userResolvers = {
   Query: {
     //! TODO: Ajit write user resolvers via clerkClient
-    // These two queries are unneccesary
+    // These two queries are unneccesary since we only access the user through related fields
     // getAllUsers: async () => {
     //   // const usersCol = await usersCollection();
     //   // const allUsers = await usersCol.find({}).toArray();
@@ -16,7 +16,14 @@ export const userResolvers = {
     //   // const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
     //   // return user;
     // },
-    getChildren: async (_, { parentId }) => {},
+    getChildren: async (_, { parentId }) => {
+      const allUsers = await clerkClient.userList();
+      const children = allUsers.filter((user) => {
+        if (user.publicMetadata.parentId === parentId)
+          return user;
+      })
+      return children;
+    },
   },
   Mutation: {
     // todo: jesal: create checking / savings (if child) for user + add account ids to clerk publicMetadata
