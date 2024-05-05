@@ -5,20 +5,21 @@ import clerkClient from "../clients/clerkClient.js";
 export const userResolvers = {
   Query: {
     //! TODO: Ajit write user resolvers via clerkClient
-    getAllUsers: async () => {
-      // const usersCol = await usersCollection();
-      // const allUsers = await usersCol.find({}).toArray();
-      // return allUsers;
+    // These two queries are unneccesary
+    // getAllUsers: async () => {
+    //   // const usersCol = await usersCollection();
+    //   // const allUsers = await usersCol.find({}).toArray();
+    //   // return allUsers;
+    // },
+    // getUserInfo: async (_, { ownerId }) => {
+    //   // const usersCol = await usersCollection();
+    //   // const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
+    //   // return user;
+    // },
+    getChildren: async (_, { parentId }) => {
+      
     },
-    getUserInfo: async (_, { ownerId }) => {
-      // const usersCol = await usersCollection();
-      // const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
-      // return user;
-    },
-    getChildren: async (_, { parentId }) => {},
 
-    // we do not need this if we make CheckingAccount/SavingsAccount a related field of Transactions
-    getUserByAccountId: async (_, { accountId }) => {},
   },
   Mutation: {
     // this mutation should ONLY be called on children, NOT parents
