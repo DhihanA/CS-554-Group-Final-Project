@@ -1,6 +1,11 @@
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import clerkClient from "../clients/clerkClient.js";
+import {
+  savingsAccount as savingsAccountCollection,
+  checkingAccount as checkingAccountCollection,
+  savingsAccount,
+} from "../config/mongoCollections.js";
 
 export const userResolvers = {
   Query: {
@@ -26,8 +31,76 @@ export const userResolvers = {
     },
   },
   Mutation: {
-    // todo: jesal: create checking / savings (if child) for user + add account ids to clerk publicMetadata
-    createAccountsAndUpdateUserInClerk: async (_, { userId }) => {},
+    //! todo: jesal: test
+    createAccountsAndUpdateUserInClerk: async (_, { userId }) => {
+      const userId_ = userId.toString().trim();
+
+      let thisUser;
+      try {
+        thisUser = await clerkClient.users.getUser(userId_);
+      } catch (e) {
+        throw new GraphQLError("Account Not Found", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+
+      /* Create a checking account + add to clerk public metadata if user does not already have */
+      if (
+        !(thisUser.publicMetadata && thisUser.publicMetadata.checkingAccountId)
+      ) {
+        try {
+          const checkingCollection = await checkingAccount();
+          let createdCheckingAccount = await checkingCollection.insertOne({
+            _id: new ObjectId(),
+            ownerId: thisUser.id.toString(),
+            balance: 500,
+          });
+
+          await clerkClient.users.updateUser(userId_, {
+            publicMetadata: {
+              checkingAccountId: createdCheckingAccount.insertedId.toString(),
+            },
+          });
+        } catch (e) {
+          throw new GraphQLError(
+            "Could not create checking account for this user",
+            {
+              extensions: { code: "INTERNAL_SERVER_ERROR" },
+            }
+          );
+        }
+      }
+
+      /* Create a savings account + add to clerk public metadata if user does not already have */
+      if (
+        !(thisUser.publicMetadata && thisUser.publicMetadata.savingsAccountId)
+      ) {
+        try {
+          const savingsCollection = await savingsAccount();
+          let createdSavingsAccount = await savingsCollection.insertOne({
+            _id: new ObjectId(),
+            ownerId: thisUser.id.toString(),
+            balance: 500,
+          });
+
+          await clerkClient.users.updateUser(userId_, {
+            publicMetadata: {
+              savingsAccountId: createdSavingsAccount.insertedId.toString(),
+            },
+          });
+        } catch (e) {
+          throw new GraphQLError(
+            "Could not create savings account for this user",
+            {
+              extensions: { code: "INTERNAL_SERVER_ERROR" },
+            }
+          );
+        }
+      }
+
+      /* Get updated user + return them */
+      return await clerkClient.users.getUser(userId_);
+    },
 
     // this mutation should ONLY be called on children, NOT parents
     verifyChild: async (_, { userId, verificationCode }) => {
