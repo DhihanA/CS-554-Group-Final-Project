@@ -10,42 +10,40 @@ const Transactions = () => {
   const avatarUrl = user.imageUrl;
 
   //TODO: UNCOMMENT user.id AFTER GET_ALL_TRANSACTIONS FULLY WORKS
-  // const queryMultiple = () => {
-  //   const res1 = useQuery(queries.GET_ALL_TRANSACTIONS, {
-  //     variables: {
-  //       // userId: user.id,
-  //       userId: "6632dfa8f44750c0af69ca7d", //!TESTING
-  //       accountType: "checking",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   const res2 = useQuery(queries.GET_ALL_TRANSACTIONS, {
-  //     variables: {
-  //       // userId: user.id,
-  //       userId: "6632dfa8f44750c0af69ca7d", //!TESTING
-  //       accountType: "savings",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   return [res1, res2];
-  // };
-  // const [
-  //   { loading: loadingChecking, data: checkingData, error: checkingError },
-  //   { loading: loadingSavings, data: savingsData, error: savingsError },
-  // ] = queryMultiple();
+  const queryMultiple = () => {
+    const res1 = useQuery(queries.GET_ALL_TRANSACTIONS, {
+      variables: {
+        userId: user.id,
+        accountType: "checking",
+      },
+      fetchPolicy: "cache-and-network",
+    });
+    const res2 = useQuery(queries.GET_ALL_TRANSACTIONS, {
+      variables: {
+        userId: user.id,
+        accountType: "savings",
+      },
+      fetchPolicy: "cache-and-network",
+    });
+    return [res1, res2];
+  };
+  const [
+    { loading: loadingChecking, data: checkingData, error: checkingError },
+    { loading: loadingSavings, data: savingsData, error: savingsError },
+  ] = queryMultiple();
 
-  const {
-    loading: loadingChecking,
-    data: checkingData,
-    error: checkingError,
-  } = useQuery(queries.GET_ALL_TRANSACTIONS, {
-    variables: {
-      // userId: user.id,
-      userId: "6632dfa8f44750c0af69ca7d", //!TESTING
-      accountType: "checking",
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  // const {
+  //   loading: loadingChecking,
+  //   data: checkingData,
+  //   error: checkingError,
+  // } = useQuery(queries.GET_ALL_TRANSACTIONS, {
+  //   variables: {
+  //     // userId: user.id,
+  //     userId: user.id, //!TESTING
+  //     accountType: "checking",
+  //   },
+  //   fetchPolicy: "cache-and-network",
+  // });
 
   //!UNCOMMENT below when getUserByAccountId done
   // const [getUserByAccountId, { called, loading, data }] = useLazyQuery(
@@ -68,16 +66,15 @@ const Transactions = () => {
   //   }
   // }, [data, usersByAccountId]);
 
-  if (
-    !user ||
-    loadingChecking
-    // || loadingSavings
-  ) {
+  if (!user || loadingChecking || loadingSavings) {
     return <div>Loading...</div>;
   }
 
   if (checkingError) return <div>{checkingError.message}</div>;
-  // if (savingsError) return <div>{savingsError.message}</div>;
+  if (savingsError) return <div>{savingsError.message}</div>;
+
+  console.log(checkingData);
+  console.log(savingsData);
 
   return (
     <div className="flex flex-col justify-center items-center">

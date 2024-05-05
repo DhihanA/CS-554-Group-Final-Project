@@ -25,7 +25,7 @@ export const transactionResolvers = {
         const checkingAccounts = await checkingAccountCollection();
         if (args.accountType.trim() === "savings") {
           const foundAccount = await savingsAccounts.findOne(
-            { ownerId: new ObjectId(args.userId.trim()) },
+            { ownerId: args.userId.trim() },
             { projection: { _id: 1 } }
           );
           if (!foundAccount) {
@@ -64,7 +64,7 @@ export const transactionResolvers = {
         }
         if (args.accountType.trim() === "checking") {
           const foundAccount = await checkingAccounts.findOne(
-            { ownerId: new ObjectId(args.userId.trim()) },
+            { ownerId: args.userId.trim() },
             { projection: { _id: 1 } }
           );
           if (!foundAccount) {

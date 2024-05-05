@@ -29,8 +29,10 @@ const createUser = async (
   let publicMetadata = {};
   if (parent) {
     privateMetadata = {
-      verificationCode: Math.floor(100000 + Math.random() * 900000).toString(),
       dob: "01/01/2000",
+    };
+    publicMetadata = {
+      verificationCode: Math.floor(100000 + Math.random() * 900000).toString(),
     };
   } else {
     privateMetadata = {
