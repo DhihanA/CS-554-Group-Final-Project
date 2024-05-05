@@ -11,9 +11,8 @@ export const accountResolvers = {
     getCheckingAccountInfo: async (_, { userId, senderId }) => {
       try {
           const accountCollection = await checkingAccountCollection();
-          const objectId = new ObjectId(userId);
           const account = await accountCollection.findOne({
-            ownerId: objectId,
+            ownerId: userId,
           });
 
           if (!account) {
