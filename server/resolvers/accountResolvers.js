@@ -8,7 +8,7 @@ import redisClient from "../clients/redisClient.js";
 
 export const accountResolvers = {
   Query: {
-    getCheckingAccountInfo: async (_, { userId }) => {
+    getCheckingAccountInfo: async (_, { userId, senderId }) => {
       try {
           const accountCollection = await checkingAccountCollection();
           const objectId = new ObjectId(userId);
@@ -36,7 +36,7 @@ export const accountResolvers = {
         });
       }
     },
-    getSavingsAccountInfo: async (_, { userId }) => {
+    getSavingsAccountInfo: async (_, { userId, accountId }) => {
       try {
           const accountCollection = await savingsAccountCollection();
           const objectId = new ObjectId(userId);

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node tasks/seed.js"
+    "seed": "node tasks/seed.js",
+    "start": "nodemon server.js"
   },
   "author": "Dhihan Ahmed 20005914 Luke Bianchi 20005985 Jesal Gandhi 20006223 Jacob Gurevich 20006224 Ajit Kandasamy 20006210",
   "license": "ISC",
@@ -17,6 +18,7 @@
     "express": "^4.19.2",
     "graphql": "^16.8.1",
     "mongodb": "^6.5.0",
+    "nodemon": "^3.1.0",
     "redis": "^4.6.13"
   }
 }
