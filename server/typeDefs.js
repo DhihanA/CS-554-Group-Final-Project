@@ -131,8 +131,8 @@ export const typeDefs = `#graphql
     getChildren(parentUserId: String!): [User]
 
     # Account Queries
-    getCheckingAccountInfo(userId: String, accountId: String): CheckingAccount
-    getSavingsAccountInfo(userId: String, accountId: String): SavingsAccount
+    getCheckingAccountInfo(userId: String!): CheckingAccount
+    getSavingsAccountInfo(userId: String!): SavingsAccount
 
     # Transaction Queries
     getAllTransactions(userId: String!, accountType: String!): [Transactions]
@@ -140,6 +140,7 @@ export const typeDefs = `#graphql
 
   type Mutation {
     # User Mutations
+    createAccountsAndUpdateUserInClerk(userId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
 
     # Account Mutations
