@@ -280,10 +280,10 @@ export const transactionResolvers = {
         const checkingAccounts = await checkingAccountCollection();
 
         const savingsAccount = await savingsAccounts.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
         const checkingAccount = await checkingAccounts.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
 
         if (!savingsAccount) {
