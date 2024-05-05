@@ -16,12 +16,12 @@ export const userResolvers = {
     //   // const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
     //   // return user;
     // },
-    getChildren: async (_, { parentId }) => {
-      
-    },
-
+    getChildren: async (_, { parentId }) => {},
   },
   Mutation: {
+    // todo: jesal: create checking / savings (if child) for user + add account ids to clerk publicMetadata
+    createAccountsAndUpdateUserInClerk: async (_, { userId }) => {},
+
     // this mutation should ONLY be called on children, NOT parents
     verifyChild: async (_, { userId, verificationCode }) => {
       userId = userId.toString().trim();
