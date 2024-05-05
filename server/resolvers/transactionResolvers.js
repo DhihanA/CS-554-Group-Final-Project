@@ -175,7 +175,7 @@ export const transactionResolvers = {
         }
         const caCollection = await checkingAccountCollection();
         const account = await caCollection.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
         if (!account) {
           throw new GraphQLError("Checking account not found");
@@ -192,8 +192,8 @@ export const transactionResolvers = {
 
         const transaction = {
           _id: new ObjectId(),
-          senderId: new ObjectId(ownerId),
-          receiverId: new ObjectId(ownerId),
+          senderId: ownerId,
+          receiverId: ownerId,
           amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
