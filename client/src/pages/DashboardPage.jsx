@@ -5,7 +5,7 @@ import Transactions from "../components/Transactions";
 import AccountCard from "../components/AccountCard";
 import { useUser } from "@clerk/clerk-react";
 
-const DashboardPage = () => {
+const DashboardPage = ({ isParent }) => {
   const { user } = useUser();
 
   const hour = new Date().getHours();
@@ -14,22 +14,19 @@ const DashboardPage = () => {
   if (hour < 12) {
     greeting = (
       <h1 className="text-2xl font-bold m-4">
-        Good morning, {user.firstName}{" "}
-        {user.publicMetadata.parent && <> (PARENT)</>}
+        Good morning, {user.firstName} {isParent && <> (PARENT)</>}
       </h1>
     );
   } else if (hour < 18) {
     greeting = (
       <h1 className="text-2xl font-bold m-4">
-        Good afternoon, {user.firstName}{" "}
-        {user.publicMetadata.parent && <> (PARENT)</>}
+        Good afternoon, {user.firstName} {isParent && <> (PARENT)</>}
       </h1>
     );
   } else {
     greeting = (
       <h1 className="text-2xl font-bold m-4">
-        Good evening, {user.firstName}{" "}
-        {user.publicMetadata.parent && <> (PARENT)</>}
+        Good evening, {user.firstName} {isParent && <> (PARENT)</>}
       </h1>
     );
   }

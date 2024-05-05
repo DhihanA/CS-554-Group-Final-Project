@@ -13,17 +13,15 @@ const Transactions = () => {
   const queryMultiple = () => {
     const res1 = useQuery(queries.GET_ALL_TRANSACTIONS, {
       variables: {
-        // userId: user.id,
-        userId: "6636dbaa0bef45fdf0328ab5", //!TESTING
+        userId: user.id,
         accountType: "checking",
       },
       fetchPolicy: "cache-and-network",
     });
     const res2 = useQuery(queries.GET_ALL_TRANSACTIONS, {
       variables: {
-        // userId: user.id,
-        userId: "6636dbaa0bef45fdf0328ab5", //!TESTING
-        accountType: "checking",
+        userId: user.id,
+        accountType: "savings",
       },
       fetchPolicy: "cache-and-network",
     });
@@ -33,6 +31,19 @@ const Transactions = () => {
     { loading: loadingChecking, data: checkingData, error: checkingError },
     { loading: loadingSavings, data: savingsData, error: savingsError },
   ] = queryMultiple();
+
+  // const {
+  //   loading: loadingChecking,
+  //   data: checkingData,
+  //   error: checkingError,
+  // } = useQuery(queries.GET_ALL_TRANSACTIONS, {
+  //   variables: {
+  //     // userId: user.id,
+  //     userId: user.id, //!TESTING
+  //     accountType: "checking",
+  //   },
+  //   fetchPolicy: "cache-and-network",
+  // });
 
   //!UNCOMMENT below when getUserByAccountId done
   // const [getUserByAccountId, { called, loading, data }] = useLazyQuery(
@@ -61,6 +72,9 @@ const Transactions = () => {
 
   if (checkingError) return <div>{checkingError.message}</div>;
   if (savingsError) return <div>{savingsError.message}</div>;
+
+  console.log(checkingData);
+  console.log(savingsData);
 
   return (
     <div className="flex flex-col justify-center items-center">

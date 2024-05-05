@@ -1,148 +1,93 @@
 import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
-import { users as usersCollection } from "../config/mongoCollections.js";
 import clerkClient from "../clients/clerkClient.js";
 
-//!TESTING
-async function updateUserAddParent(userId) {
-  try {
-    const updatedUser = await clerkClient.users.updateUser(userId, {
-      public_metadata: {
-        parent: true,
-      },
-    });
-
-    console.log("Updated user:", updatedUser);
-  } catch (error) {
-    console.error("Error updating user: ", error);
-  }
-}
-// adding parent field to user jesal to test
-await updateUserAddParent("user_2fk8aRObMHQDixP9M5hdA7mu0xY");
-
 export const userResolvers = {
-  Query: { //! TODO: Jesal edit seed to have clerkid
+  Query: {
+    //! TODO: Ajit write user resolvers via clerkClient
     getAllUsers: async () => {
-      const usersCol = await usersCollection();
-      const allUsers = await usersCol.find({}).toArray();
-      return allUsers;
+      // const usersCol = await usersCollection();
+      // const allUsers = await usersCol.find({}).toArray();
+      // return allUsers;
     },
     getUserInfo: async (_, { ownerId }) => {
-      const usersCol = await usersCollection();
-      const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
-      return user;
+      // const usersCol = await usersCollection();
+      // const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
+      // return user;
     },
+    getChildren: async (_, { parentId }) => {},
+
+    // we do not need this if we make CheckingAccount/SavingsAccount a related field of Transactions
+    getUserByAccountId: async (_, { accountId }) => {},
   },
   Mutation: {
-    // this mutation should be called directly AFTER the user has been created in clerk
-    // (WE ARE ASSUMING parentId IS GIVEN DURING SIGNUP, NOT AFTER)
-    // parentId should be added to publicMetadata of clerk user (if they are child) before calling this shit
-    createUserInLocalDB: async (_, { clerkUserId }) => {
+    // this mutation should ONLY be called on children, NOT parents
+    verifyChild: async (_, { userId, verificationCode }) => {
+      userId = userId.toString().trim();
+      verificationCode = verificationCode.toString().trim();
+      if (verificationCode.length !== 6) {
+        throw new GraphQLError(
+          "Incorrect Verification Code; it should be 6 digits",
+          {
+            extensions: { code: "BAD_USER_INPUT" },
+          }
+        );
+      }
+
       try {
-        const clerkUser = await clerkClient.users.getUser(clerkUserId);
-
-        // parentId is only populated for children; undefined for parents
-        const parentId = clerkUser.publicMetadata.parentId || undefined;
-        console.log(parentId);
-
-        let completedQuestionIds;
-        let verificationCode;
-        let verified;
-        if (!(parentId === undefined)) {
-          completedQuestionIds = [];
-          verificationCode = Math.floor(100000 + Math.random() * 900000);
-          verified = false;
-        } else {
-          completedQuestionIds = undefined;
-          verificationCode = undefined;
-          verified = undefined;
-        }
-
-        const usersCol = await usersCollection();
-        const thisUser = await usersCol.insertOne({
-          _id: new ObjectId(),
-          clerkId: clerkUserId,
-          parentId,
-          verificationCode: verificationCode,
-          verified: verified,
-          firstName: clerkUser.firstName,
-          lastName: clerkUser.lastName,
-          emailAddress: clerkUser.emailAddresses,
-          username: clerkUser.username,
-          dob: clerkUser.publicMetadata.dob,
-          completedQuestionIds: completedQuestionIds, // empty for new children, undef for parents
-        });
-
-        const newUser = await usersCol.findOne({
-          _id: new ObjectId(thisUser.insertedId),
-        });
-
-        //! TODO: create a checking account for this user (set ownerId as _id)
-        // if they are a child, create checking + savings each with $500
-        // if they are parent, create only checking with max money (99999999999 or sumn)
-
-        return newUser;
+        await clerkClient.users.getUser(userId);
       } catch (e) {
-        console.log("Error creating user in local database:", e);
-        throw new GraphQLError(e, {
+        throw new GraphQLError("Account Not Found", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
-    },
 
-    // TODO: Jesal
-    updateUserInLocalDB: async (_, { clerkUserId }) => {},
+      let allClerkUsers;
+      try {
+        allClerkUsers = await clerkClient.users.getUserList();
+      } catch (e) {
+        throw new GraphQLError("Could not get all users", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
 
-    // this mutation should ONLY be called on children, NOT parents
-    //!NOT WORKING/TESTED YET: Jesal
-    verifyChild: async (_, { userId, verificationCode }) => {
-      const usersCol = await usersCollection();
-
-      const user = await usersCol.findOne(
-        { _id: new ObjectId(userId) },
-        {
-          projection: {
-            _id: 0,
-            parentId: 1,
-          },
+      let parent;
+      for (const user of allClerkUsers.data) {
+        const metadata = user.privateMetadata;
+        if (
+          metadata &&
+          metadata.verificationCode &&
+          metadata.verificationCode.toString() === verificationCode
+        ) {
+          parent = user;
+          break;
         }
-      );
-      if (!user) {
-        throw new GraphQLError("Account Not Found", {
+      }
+
+      console.log("parent", parent);
+
+      if (!parent) {
+        throw new GraphQLError("Incorrect Verification Code", {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
 
-      const parent = await usersCol.findOne(
-        { _id: new ObjectId(user.parentId) },
-        {
-          projection: {
-            _id: 0,
-            verificationCode: 1,
-          },
-        }
-      );
-      if (!parent) {
-        throw new GraphQLError("Parent account Not Found", {
+      try {
+        const publicMetadata = {
+          verified: true,
+          parentId: parent.id,
+          completedQuestionIds: [],
+        };
+        await updateUser(userId, {}, publicMetadata);
+      } catch (e) {
+        throw new GraphQLError("Could not verify user", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
 
-      let verifiedUser;
-      if (verificationCode.toString() === parent.verificationCode.toString()) {
-        try {
-          verifiedUser = await usersCol.findOneAndUpdate(
-            { _id: new ObjectId(userId) },
-            { verified: true },
-            { returnDocument: after }
-          );
-        } catch (e) {
-          throw new GraphQLError("Unable to verify user", {
-            extensions: { code: "INTERNAL_SERVER_ERROR" },
-          });
-        }
-      }
-      return verifiedUser;
+      let updatedChild = await clerkClient.users.getUser(userId);
+      console.log("updatedChild", updatedChild);
+      return updatedChild;
     },
   },
 };
