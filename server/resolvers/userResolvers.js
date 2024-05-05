@@ -21,7 +21,18 @@ async function updateUserAddParent(userId) {
 await updateUserAddParent("user_2fk8aRObMHQDixP9M5hdA7mu0xY");
 
 export const userResolvers = {
-  Query: {},
+  Query: { //! TODO: Jesal edit seed to have clerkid
+    getAllUsers: async () => {
+      const usersCol = await usersCollection();
+      const allUsers = await usersCol.find({}).toArray();
+      return allUsers;
+    },
+    getUserInfo: async (_, { ownerId }) => {
+      const usersCol = await usersCollection();
+      const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
+      return user;
+    },
+  },
   Mutation: {
     // this mutation should be called directly AFTER the user has been created in clerk
     // (WE ARE ASSUMING parentId IS GIVEN DURING SIGNUP, NOT AFTER)

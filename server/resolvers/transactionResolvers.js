@@ -138,8 +138,8 @@ export const transactionResolvers = {
 
         const transaction = {
           _id: new ObjectId(),
-          senderId: senderId,
-          receiverId: receiverId,
+          senderId: new ObjectId(senderId),
+          receiverId: new ObjectId(receiverId),
           amount: amount,
           description: description.trim(),
           type: "Transfer",
@@ -192,10 +192,11 @@ export const transactionResolvers = {
 
         const transaction = {
           _id: new ObjectId(),
-          senderId: ownerId,
-          receiverId: ownerId,
+          senderId: new ObjectId(ownerId),
+          receiverId: new ObjectId(ownerId),
           amount,
           description: description.trim(),
+          dateOfTransaction: new Date(),
           type: "Budgeted",
         };
 
@@ -241,6 +242,7 @@ export const transactionResolvers = {
           receiverId: savingsAccount._id,
           amount: amount,
           description: description.trim(),
+          dateOfTransaction: new Date(),
           type: 'CheckingToSavingTransfer'
         };
     
@@ -265,13 +267,8 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
-    
-    
 
-    addSavingToCheckingTransfer: async (
-      _,
-      { ownerId, amount, description, type }
-    ) => {
+    addSavingToCheckingTransfer: async (_, { ownerId, amount, description, type }) => {
       try {
         if (amount <= 0) {
           throw new GraphQLError("Amount must be greater than 0");
@@ -302,6 +299,7 @@ export const transactionResolvers = {
           receiverId: checkingAccount._id,
           amount: amount,
           description: description.trim(),
+          dateOfTransaction: new Date(),
           type: 'SavingToCheckingTransfer'
         };
     
@@ -323,6 +321,108 @@ export const transactionResolvers = {
         return transaction;
       } catch (error) {
         console.error("Error during saving to checking transfer:", error);
+        throw new GraphQLError("Internal Server Error");
+      }
+    },
+    editBudgetedTransaction: async (
+      _,
+      { transactionId, newAmount, newDescription }
+    ) => {
+      try {
+        const transactionsCol = await transactionsCollection();
+        const checkingCol = await checkingAccountCollection(); 
+    
+        const transaction = await transactionsCol.findOne({
+          _id: new ObjectId(transactionId),
+        });
+        if (!transaction) {
+          throw new GraphQLError("Transaction not found");
+        }
+        if (transaction.type !== "Budgeted") {
+          throw new GraphQLError("Transaction is not a budgeted transaction");
+        }
+    
+        // Calculate the amount difference if newAmount is provided
+        let amountDifference = 0;
+        if (newAmount !== undefined && newAmount !== transaction.amount) {
+          if (newAmount <= 0) {
+            throw new GraphQLError("Amount must be greater than 0");
+          }
+          amountDifference = newAmount - transaction.amount;
+        }
+  
+        const updates = {};
+        if (amountDifference !== 0) {
+          updates.amount = newAmount;
+        }
+        if (newDescription !== undefined) {
+          updates.description = newDescription;
+        }
+    
+        await transactionsCol.updateOne(
+          { _id: new ObjectId(transactionId) },
+          { $set: updates }
+        );
+    
+        if (amountDifference !== 0) {
+          await checkingCol.updateOne(
+            { ownerId: transaction.senderId },
+            { $inc: { balance: -amountDifference } } 
+          );
+        }
+    
+        return {
+          _id: transactionId,
+          senderId: transaction.senderId,
+          receiverId: transaction.receiverId,
+          amount: newAmount || transaction.amount,
+          description: newDescription || transaction.description,
+          dateOfTransaction: new Date(),
+          type: "Budgeted",
+        };
+      } catch (error) {
+        console.error("Error editing budgeted transaction:", error);
+        throw new GraphQLError("Internal Server Error");
+      }
+    },
+    
+    deleteBudgetedTransaction: async (_, { ownerId, transactionId }) => {
+      try {
+        const ownerIdObj = new ObjectId(ownerId);
+        const transactionIdObj = new ObjectId(transactionId);
+        
+        const caCollection = await checkingAccountCollection();
+        const transactionsCol = await transactionsCollection();
+    
+        // Find the transaction to delete
+        const transaction = await transactionsCol.findOne({ _id: transactionIdObj, senderId: ownerIdObj });
+        if (!transaction) {
+          throw new GraphQLError("Transaction not found");
+        }
+    
+        // Check the type of transaction
+        if (transaction.type !== "Budgeted") {
+          throw new GraphQLError("Only budgeted transactions can be deleted");
+        }
+    
+        // Check if the account associated with the transaction exists
+        const account = await caCollection.findOne({ ownerId: ownerIdObj });
+        if (!account) {
+          throw new GraphQLError("Checking account not found");
+        }
+    
+        // Update the account balance by adding back the transaction amount
+        await caCollection.updateOne(
+          { _id: account._id },
+          { $inc: { balance: transaction.amount } }
+        );
+    
+        // Delete the transaction from the transactions collection
+        await transactionsCol.deleteOne({ _id: transactionIdObj });
+    
+        return { success: true, message: "Transaction deleted successfully" };
+      } catch (error) {
+        console.error("Error deleting budgeted transaction:", error);
         throw new GraphQLError("Internal Server Error");
       }
     }

@@ -80,12 +80,12 @@ export const typeDefs = `#graphql
 
   type User {
     _id: String!
-    clerkId: String!
+    clerkId: String
     parentId: String # undefined for Parent
     verificationCode: String # undefined for children
     firstName: String!
     lastName: String!
-    emailAddress: String!
+    emailAddresses: [String!]
     username: String!
     dob: Date!
     completedQuestionIds: [Int] # undefined for Parent
@@ -112,6 +112,7 @@ export const typeDefs = `#graphql
     receiverId: String!
     amount: Float!
     description: String
+    dateofTransaction: Date!
     type: TransferType
   }
 
@@ -122,10 +123,16 @@ export const typeDefs = `#graphql
     SavingToCheckingTransfer
   }
 
+  type DeleteTransactionResponse {
+    success: Boolean!
+    message: String!
+  }
+
 
   type Query {
     # User Queries
-    getUserInfo(userId: String!): User
+    getUserInfo(ownerId: String!): User
+    getAllUsers: [User]
     getChildren(parentUserId: String!): [User] #new
 
     # Account Queries
@@ -150,8 +157,8 @@ export const typeDefs = `#graphql
     addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!): Transaction
     addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!): Transaction
     addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!): Transaction
-    editBudgetedTransaction(transactionId: String!, newName: String, newAmount: Float, newDescription: String): Transaction
-    sendMoney(senderUserId: String!, receiverUserId: String!, amount: Float!): Boolean
+    editBudgetedTransaction(transactionId: String!, newAmount: Float, newDescription: String): Transaction
     downloadTransactions(userId: String!): String
+    deleteBudgetedTransaction(ownerId: String!, transactionId: String!): DeleteTransactionResponse
   }
 `;
