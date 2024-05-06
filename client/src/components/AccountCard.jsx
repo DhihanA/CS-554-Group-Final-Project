@@ -62,22 +62,6 @@ const AccountCard = ({
       <div className="divider divider-horizontal"></div>{" "}
       {/* This is to create a vertical divider */}
       <div className="flex flex-col justify-center p-4">
-        <div className="mb-4">
-          <p className="text-sm text-success text-center">
-            +{formattedDeposits}
-          </p>
-          <p className="text-xs text-base-content text-opacity-40 text-center">
-            All deposits
-          </p>
-        </div>
-        <div className="mb-4">
-          <p className="text-sm text-error text-center">
-            -{formattedWithdrawals}
-          </p>
-          <p className="text-xs text-base-content text-opacity-40 text-center">
-            All withdrawals
-          </p>
-        </div>
         <div className="card-actions flex-col items-center">
           <button className="btn btn-primary mb-2" onClick={toggleTMModal}>Transfer money</button>
           {accountType.toUpperCase() === "CHECKING ACCOUNT" && (
