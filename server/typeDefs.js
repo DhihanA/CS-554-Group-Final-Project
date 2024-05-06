@@ -47,6 +47,7 @@ export const typeDefs = `#graphql
 
   union AccountType = SavingsAccount | CheckingAccount
 
+
   type Query {
     # User Queries
     getChildren(parentUserId: String!): [User]
