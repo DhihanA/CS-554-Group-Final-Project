@@ -55,6 +55,7 @@ export const typeDefs = `#graphql
     # Account Queries
     getCheckingAccountInfo(userId: String!): CheckingAccount
     getSavingsAccountInfo(userId: String!): SavingsAccount
+    getAccountByAccountId(accountId: String!): AccountType
 
     # Transaction Queries
     getAllTransactions(userId: String!, accountType: String!): [Transactions]

@@ -94,6 +94,8 @@ const DashboardPage = ({ isParent }) => {
     );
   }
 
+
+
   if (!isParent && checkingData && savingsData) {
     const {getCheckingAccountInfo} = checkingData;
     // setCheckingAccInfo(getCheckingAccountInfo); 
