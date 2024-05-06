@@ -44,6 +44,8 @@ function App() {
     hasRole = true;
   }
 
+  
+
   return (
     <>
       {/* <ClerkEventHandlers /> */}
@@ -99,10 +101,11 @@ function App() {
         />
 
 
-        {/* <Route 
+        <Route 
           path="/fillinfo"
-          element = {<CustomDataForm />}
-        /> */}
+          element = {hasRole || !isSignedIn? <Navigate to="/dashboard" /> : <CustomDataForm /> }
+        />
+      
       </Routes>
     </>
   );
