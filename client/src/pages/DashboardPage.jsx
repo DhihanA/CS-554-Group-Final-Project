@@ -1,4 +1,4 @@
-import {React, useState} from "react";
+import { React, useState } from "react";
 import BasePage from "./BasePage";
 import Card from "../components/CardComponent";
 import Transactions from "../components/Transactions";
@@ -12,7 +12,7 @@ const DashboardPage = ({ isParent }) => {
   // const [savingsAccInfo, setSavingsAccInfo] = useState(undefined);
 
   const { user } = useUser();
-  console.log('user here: ', user.id);
+  console.log("user here: ", user.id);
 
   // https://medium.com/@khorvath3327/implementing-a-hashing-algorithm-in-node-js-9bbe56caab28
   // func to create a 4 digut num based on ther checking/savings acc id
@@ -53,23 +53,30 @@ const DashboardPage = ({ isParent }) => {
   // ] = queryMultiple();
 
   // * successful single query of checking acc info by user ID
-  const {loading: checkingLoading, error: checkingError, data: checkingData} = useQuery(queries.CHECKING_ACCOUNT_INFO_BY_USER_ID, {
+  const {
+    loading: checkingLoading,
+    error: checkingError,
+    data: checkingData,
+  } = useQuery(queries.CHECKING_ACCOUNT_INFO_BY_USER_ID, {
     variables: {
-      userId: user.id
+      userId: user.id,
       // accountType: "checking",
     },
     fetchPolicy: "cache-and-network",
   });
 
   // * successful single query of savings acc info by user ID
-  const {loading: savingsLoading, error: savingsError, data: savingsData} = useQuery(queries.SAVINGS_ACCOUNT_INFO_BY_USER_ID, {
+  const {
+    loading: savingsLoading,
+    error: savingsError,
+    data: savingsData,
+  } = useQuery(queries.SAVINGS_ACCOUNT_INFO_BY_USER_ID, {
     variables: {
-      userId: user.id
+      userId: user.id,
       // accountType: "savings",
     },
     fetchPolicy: "cache-and-network",
   });
-  
 
   const hour = new Date().getHours();
   let greeting;
@@ -94,22 +101,19 @@ const DashboardPage = ({ isParent }) => {
     );
   }
 
-
-
   if (!isParent && checkingData && savingsData) {
-    const {getCheckingAccountInfo} = checkingData;
-    // setCheckingAccInfo(getCheckingAccountInfo); 
+    const { getCheckingAccountInfo } = checkingData;
+    // setCheckingAccInfo(getCheckingAccountInfo);
     console.log(getCheckingAccountInfo);
 
-    const {getSavingsAccountInfo} = savingsData;
+    const { getSavingsAccountInfo } = savingsData;
     console.log(getSavingsAccountInfo);
 
     const checkingAccNum = createAccNum(getCheckingAccountInfo._id);
-    console.log('checking acc ID code: ', checkingAccNum);
+    console.log("checking acc ID code: ", checkingAccNum);
 
     const savingsAccNum = createAccNum(getSavingsAccountInfo._id);
-    console.log('checking acc ID code: ', savingsAccNum);
-
+    console.log("checking acc ID code: ", savingsAccNum);
 
     return (
       <BasePage>
@@ -135,23 +139,25 @@ const DashboardPage = ({ isParent }) => {
         </div>
       </BasePage>
     );
-  }
-  else if (!isParent && (checkingError || savingsError) ) {
+  } else if (!isParent && (checkingError || savingsError)) {
     return (
       <BasePage>
         <div className="flex justify-center">
           {" "}
           <div className="p-6 min-h-screen max-w-4xl w-full">
             {" "}
-            <h1 className="text-2xl font-bold m-4">{checkingError ? checkingError.message : savingsError ? savingsError.message : 'Something went wrong...'}</h1>
+            <h1 className="text-2xl font-bold m-4">
+              {checkingError
+                ? checkingError.message
+                : savingsError
+                ? savingsError.message
+                : "Something went wrong..."}
+            </h1>
           </div>
         </div>
       </BasePage>
-    );  
-
-  }
-
-  else if (isParent) {
+    );
+  } else if (isParent) {
     return (
       <BasePage>
         <div className="flex justify-center">
@@ -164,9 +170,7 @@ const DashboardPage = ({ isParent }) => {
         </div>
       </BasePage>
     );
-
   }
-
 };
 
 export default DashboardPage;

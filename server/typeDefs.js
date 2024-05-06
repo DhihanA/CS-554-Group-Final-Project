@@ -76,7 +76,7 @@ export const typeDefs = `#graphql
     addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!): Transactions
     addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!): Transactions
     editBudgetedTransaction(transactionId: String!, newAmount: Float, newDescription: String): Transactions
-    downloadTransactions(userId: String!): String
     deleteBudgetedTransaction(ownerId: String!, transactionId: String!): DeleteTransactionResponse
+    downloadTransactions(transactions: String!): String
   }
 `;

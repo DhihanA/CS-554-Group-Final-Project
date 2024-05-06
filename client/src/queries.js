@@ -2,15 +2,53 @@ import { gql } from "@apollo/client";
 
 //#region GET ALL QUERIES
 const GET_ALL_TRANSACTIONS = gql`
-  query getAllTransactions($userId: String!, $accountType: String!) {
+  query GetAllTransactions($userId: String!, $accountType: String!) {
     getAllTransactions(userId: $userId, accountType: $accountType) {
       _id
       amount
-      # date
+      dateOfTransaction
       description
-      receiverId
-      senderId
       type
+      receiver {
+        ... on SavingsAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+        ... on CheckingAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+      }
+      sender {
+        ... on SavingsAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+        ... on CheckingAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+      }
     }
   }
 `;
@@ -95,6 +133,12 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
 // `;
 //#endregion
 
+const GENERATE_PDF_MUTATION = gql`
+  mutation Mutation($transactions: String!) {
+    downloadTransactions(transactions: $transactions)
+  }
+`;
+
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   CREATE_OR_UPDATE_USER_IN_DB,
@@ -104,6 +148,8 @@ let exported = {
   GET_ALL_TRANSACTIONS,
   CHECKING_ACCOUNT_INFO_BY_USER_ID,
   SAVINGS_ACCOUNT_INFO_BY_USER_ID,
+
+  GENERATE_PDF_MUTATION,
 
   // GET_USER_INFO_BY_ID,
 };
