@@ -18,6 +18,7 @@ export const userResolvers = {
     },
 
     // test after parentId
+    // parent will call this query on dashboard with THEIR own id
     getChildren: async (_, { parentId }) => {
       const allUsers = await clerkClient.users.getUserList();
       const children = allUsers.data.filter((user) => {

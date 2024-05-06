@@ -29,6 +29,7 @@ const Transactions = () => {
       const pdfData = await generatePDF({
         variables: {
           transactions: JSON.stringify(data.getAllTransactions),
+          userId: user.id,
         },
       });
 

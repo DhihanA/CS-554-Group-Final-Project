@@ -134,8 +134,8 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
 //#endregion
 
 const GENERATE_PDF_MUTATION = gql`
-  mutation Mutation($transactions: String!) {
-    downloadTransactions(transactions: $transactions)
+  mutation Mutation($transactions: String!, $userId: String!) {
+    downloadTransactions(transactions: $transactions, userId: $userId)
   }
 `;
 
