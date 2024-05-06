@@ -203,8 +203,6 @@ export const transactionResolvers = {
           receiverId: new ObjectId(receiverId),
           amount: amount,
           description: description.trim(),
-          ownerOfReceiver: receiverAccount.ownerId,
-          ownerOfSender: senderAccount.ownerId,
           dateOfTransaction: new Date(),
           type: "Transfer",
         };
@@ -260,8 +258,6 @@ export const transactionResolvers = {
           receiverId: new ObjectId(account._id),
           amount: amount,
           description: description.trim(),
-          ownerOfReceiver: ownerId,
-          ownerOfSender: ownerId,
           dateOfTransaction: new Date(),
           type: "Budgeted",
         };
@@ -369,8 +365,6 @@ export const transactionResolvers = {
           amount: amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
-          ownerOfReceiver: ownerId,
-          ownerOfSender: ownerId,
           type: "SavingToCheckingTransfer",
         };
 
