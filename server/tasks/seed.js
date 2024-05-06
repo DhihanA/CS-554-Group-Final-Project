@@ -47,6 +47,8 @@ const main = async () => {
       amount: 200,
       description: "Payment for school supplies",
       dateOfTransaction: new Date(),
+      ownerOfReceiver: null,
+      ownerOfSender: null,
       type: "Transfer",
     },
     {
@@ -56,6 +58,8 @@ const main = async () => {
       amount: 100,
       description: "Payment for school supplies",
       dateOfTransaction: new Date(),
+      ownerOfReceiver: null,
+      ownerOfSender: null,
       type: "Transfer",
     },
   ]);
