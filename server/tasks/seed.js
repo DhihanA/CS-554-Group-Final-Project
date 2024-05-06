@@ -6,6 +6,7 @@ import {
 } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import userIds from "./staticClerkIds.json" assert { type: "json" };
+import clerkClient from "../clients/clerkClient.js";
 
 //! all passwords from users from seed.js are hardcoded to Test123$567*
 
@@ -60,7 +61,7 @@ const main = async () => {
     },
   ]);
 
-  await savingsCollection.insertMany([
+  const insertedSavingsAccountIds = await savingsCollection.insertMany([
     //child 1's savings account
     {
       _id: savingsIds[0],
@@ -117,7 +118,7 @@ const main = async () => {
     },
   ]);
 
-  await checkingCollection.insertMany([
+  const insertedCheckingAccountIds = await checkingCollection.insertMany([
     //parent 1's checking account
     {
       _id: checkingIds[0],
@@ -173,6 +174,41 @@ const main = async () => {
       balance: 1000,
     },
   ]);
+
+  /* Add corresponding savings/checking account ids to publicMetadata of clerk users */
+  let childCounter = 1;
+  for (const savingsAccountId of insertedSavingsAccountIds.insertedIds) {
+    let currentChildKey = `child${childCounter}`;
+    let userId = userIds[currentChildKey];
+    let thisUser = await clerkClient.users.getUser(userId);
+    let publicMetadata = thisUser.publicMetadata;
+    await clerkClient.users.updateUser(userId, {
+      publicMetadata: {
+        ...publicMetadata,
+        savingsAccountId: savingsAccountId.toString(),
+      },
+    });
+    childCounter++;
+  }
+
+  // fix
+  childCounter = 1;
+  let parentCounter = 1;
+  for (const checkingAccountId of insertedCheckingAccountIds.insertedIds) {
+    let currentChildKey = `child${childCounter}`;
+    let currentParentKey = `child${parentCounter}`;
+    let userId = userIds[currentChildKey];
+    let thisUser = await clerkClient.users.getUser(userId);
+    let publicMetadata = thisUser.publicMetadata;
+    await clerkClient.users.updateUser(userId, {
+      publicMetadata: {
+        ...publicMetadata,
+        savingsAccountId: savingsAccountId.toString(),
+      },
+    });
+    childCounter++;
+    parentCounter++;
+  }
 
   console.log("Done seeding database");
   await closeConnection();
