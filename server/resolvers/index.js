@@ -48,9 +48,13 @@ export const resolvers = {
     },
     receiver: async (ParentValue) => {
       const accountId = ParentValue.ownerOfReceiver;
-      let account = await accountResolvers.Query.getCheckingAccountInfo(null, { userId: accountId });
+      const receiverId = ParentValue.receiverId;
+      // console.log(accountId)
+
+      let account = await accountResolvers.Query.getSavingsAccountInfo(null, { userId: accountId });
+      
       if (!account) {
-        account = await accountResolvers.Query.getSavingsAccountInfo(null, { userId: accountId });
+        account = await accountResolvers.Query.getCheckingAccountInfo(null, { userId: accountId });
       }
 
       if (!account) throw new GraphQLError("Account with that _id does not exist", {
