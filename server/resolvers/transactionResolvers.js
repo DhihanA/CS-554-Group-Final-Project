@@ -6,6 +6,7 @@ import {
   checkingAccount as checkingAccountCollection,
 } from "../config/mongoCollections.js";
 import redisClient from "../clients/redisClient.js";
+import wkhtmltopdf from "wkhtmltopdf";
 
 export const transactionResolvers = {
   Query: {
@@ -439,5 +440,6 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
+    downloadTransactions: async (_, { userId }) => {},
   },
 };

@@ -2,15 +2,53 @@ import { gql } from "@apollo/client";
 
 //#region GET ALL QUERIES
 const GET_ALL_TRANSACTIONS = gql`
-  query getAllTransactions($userId: String!, $accountType: String!) {
+  query GetAllTransactions($userId: String!, $accountType: String!) {
     getAllTransactions(userId: $userId, accountType: $accountType) {
       _id
       amount
-      # date
+      dateOfTransaction
       description
-      receiverId
-      senderId
       type
+      receiver {
+        ... on SavingsAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+        ... on CheckingAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+      }
+      sender {
+        ... on SavingsAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+        ... on CheckingAccount {
+          _id
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+      }
     }
   }
 `;
