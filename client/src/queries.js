@@ -22,7 +22,9 @@ const CHECKING_ACCOUNT_INFO_BY_USER_ID = gql`
     getCheckingAccountInfo(userId: $userId) {
       _id
       balance
-      ownerId
+      owner {
+        id
+      }
     }
   }
 `;
@@ -31,9 +33,12 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
     getSavingsAccountInfo(userId: $userId) {
       _id
       currentBalance
+      previousBalance
       interestRate
       lastDateUpdated
-      ownerId
+      owner {
+        id
+      }
       previousBalance
     }
   }

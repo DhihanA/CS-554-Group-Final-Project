@@ -56,6 +56,37 @@ export const accountResolvers = {
         });
       }
     },
+    getAccountByAccountId: async (_, { accountId }) => {
+      const accountId_ = accountId.toString().trim();
+      let account;
+      try {
+        const checkingCollection = await checkingAccountCollection();
+        account = await checkingCollection.findOne({
+          _id: new ObjectId(accountId_),
+        });
+        if (account) return account;
+      } catch (e) {
+        throw new GraphQLError("Internal Server Error", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+      try {
+        const savingsCollection = await savingsAccountCollection();
+        account = await savingsCollection.findOne({
+          _id: new ObjectId(accountId_),
+        });
+        if (account) return account;
+      } catch (e) {
+        throw new GraphQLError("Internal Server Error", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+      if (!account) {
+        throw new GraphQLError("No account with this accountId found", {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+    },
   },
   Mutation: {
     updateSavingsBalanceForLogin: async (_, { accountId }) => {
