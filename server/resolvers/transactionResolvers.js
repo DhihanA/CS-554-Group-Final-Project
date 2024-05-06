@@ -70,105 +70,61 @@ const generateTransactionsHtml = (transactions) => {
 
 export const transactionResolvers = {
   Query: {
-    getAllTransactions: async (_, args) => {
-      let cacheKey = `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`;
+    getAllTransactions: async (
+      _,
+      { userId, checkingAccountId, savingsAccountId }
+    ) => {
+      let cacheKey = `allTransactions:${userId.trim()}`;
       let exists = await redisClient.exists(cacheKey);
       if (exists) {
         let list = await redisClient.lRange(
-          `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
+          `allTransactions:${userId.trim()}`,
           0,
           -1
         );
         return list.map((str) => JSON.parse(str));
       } else {
         const transactions = await transactionsCollection();
-        const savingsAccounts = await savingsAccountCollection();
-        const checkingAccounts = await checkingAccountCollection();
-        if (args.accountType.trim() === "savings") {
-          const foundAccount = await savingsAccounts.findOne(
-            { ownerId: args.userId.trim() },
-            { projection: { _id: 1 } }
-          );
-          if (!foundAccount) {
-            throw new GraphQLError("Account Not Found", {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
-          const foundTransactions = await transactions
-            .find({
-              $or: [
-                { senderId: foundAccount._id },
-                { receiverId: foundAccount._id },
-              ],
-            })
-            .toArray();
-          if (!foundTransactions) {
-            throw new GraphQLError("User has no transactions", {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
+        const foundTransactions = await transactions
+          .find({
+            $or: [
+              {
+                $or: [
+                  { senderId: new ObjectId(savingsAccountId) },
+                  { senderId: new ObjectId(checkingAccountId) },
+                ],
+              },
+              {
+                $or: [
+                  { receiverId: new ObjectId(savingsAccountId) },
+                  { receiverId: new ObjectId(checkingAccountId) },
+                ],
+              },
+            ],
+          })
+          .toArray();
 
-          //push transactions to the redis object
-          foundTransactions.forEach((transaction) => {
-            redisClient.rPush(
-              `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
-              JSON.stringify(transaction)
-            );
-          });
-          //set expiration
-          await redisClient.expire(
-            `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
-            3600
+        //push transactions to the redis object
+        foundTransactions.forEach((transaction) => {
+          redisClient.rPush(
+            `allTransactions:${userId.trim()}`,
+            JSON.stringify(transaction)
           );
+        });
+        console.log(checkingAccountId);
+        console.log(savingsAccountId);
+        console.log(foundTransactions);
+        //set expiration
+        await redisClient.expire(`allTransactions:${userId.trim()}`, 3600);
 
-          return foundTransactions;
-        }
-        if (args.accountType.trim() === "checking") {
-          const foundAccount = await checkingAccounts.findOne(
-            { ownerId: args.userId.trim() },
-            { projection: { _id: 1 } }
-          );
-          if (!foundAccount) {
-            throw new GraphQLError("Account Not Found", {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
-          const foundTransactions = await transactions
-            .find({
-              $or: [
-                { senderId: foundAccount._id },
-                { receiverId: foundAccount._id },
-              ],
-            })
-            .toArray();
-          if (!foundTransactions) {
-            throw new GraphQLError("User has no transactions", {
-              extensions: { code: "BAD_USER_INPUT" },
-            });
-          }
-
-          //push transactions to the redis object
-          foundTransactions.forEach((transaction) => {
-            redisClient.rPush(
-              `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
-              JSON.stringify(transaction)
-            );
-          });
-          //set expiration
-          await redisClient.expire(
-            `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
-            3600
-          );
-
-          return foundTransactions;
-        }
+        return foundTransactions;
       }
     },
   },
   Mutation: {
     addTransferTransaction: async (
       _,
-      { senderId, receiverId, amount, description }
+      { userId, senderId, receiverId, amount, description }
     ) => {
       try {
         if (senderId === receiverId) {
@@ -218,7 +174,7 @@ export const transactionResolvers = {
           { _id: new ObjectId(receiverId) },
           { $inc: { balance: amount } }
         );
-
+        await redisClient.del(`allTransactions:${userId.trim()}`);
         return transaction;
       } catch (error) {
         console.error("Error creating transfer transaction:", error);
@@ -264,6 +220,7 @@ export const transactionResolvers = {
 
         const transactionsCol = await transactionsCollection();
         await transactionsCol.insertOne(transaction);
+        await redisClient.del(`allTransactions:${ownerId.trim()}`);
         return transaction;
       } catch (error) {
         console.error("Error creating budgeted transaction:", error);
@@ -322,7 +279,7 @@ export const transactionResolvers = {
             $inc: { currentBalance: amount },
           }
         );
-
+        await redisClient.del(`allTransactions:${ownerId.trim()}`);
         return transaction;
       } catch (error) {
         console.error("Error during checking to saving transfer:", error);
@@ -382,7 +339,7 @@ export const transactionResolvers = {
           { _id: checkingAccount._id },
           { $inc: { balance: amount } }
         );
-
+        await redisClient.del(`allTransactions:${ownerId.trim()}`);
         return transaction;
       } catch (error) {
         console.error("Error during saving to checking transfer:", error);
@@ -391,7 +348,7 @@ export const transactionResolvers = {
     },
     editBudgetedTransaction: async (
       _,
-      { transactionId, newAmount, newDescription }
+      { userId, transactionId, newAmount, newDescription }
     ) => {
       try {
         const transactionsCol = await transactionsCollection();
@@ -435,7 +392,7 @@ export const transactionResolvers = {
             { $inc: { balance: -amountDifference } }
           );
         }
-
+        await redisClient.del(`allTransactions:${userId.trim()}`);
         return {
           _id: transactionId,
           senderId: transaction.senderId,
@@ -487,7 +444,7 @@ export const transactionResolvers = {
 
         // Delete the transaction from the transactions collection
         await transactionsCol.deleteOne({ _id: transactionIdObj });
-
+        await redisClient.del(`allTransactions:${ownerId.trim()}`);
         return { success: true, message: "Transaction deleted successfully" };
       } catch (error) {
         console.error("Error deleting budgeted transaction:", error);
