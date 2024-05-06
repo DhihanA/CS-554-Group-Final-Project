@@ -10,11 +10,11 @@ export const accountResolvers = {
     getCheckingAccountInfo: async (_, { userId }) => {
       try {
         const accountCollection = await checkingAccountCollection();
-        // console.log(userId);
+        
         const account = await accountCollection.findOne({
           ownerId: userId,
         });
-
+        
         if (!account) {
           console.log("Account not found in database.");
           throw new GraphQLError("Checking Account Not Found", {
