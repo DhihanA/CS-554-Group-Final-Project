@@ -8,28 +8,25 @@ import {
 
 export const userResolvers = {
   Query: {
-    //! TODO: Ajit write user resolvers via clerkClient
-    // These two queries are unneccesary since we only access the user through related fields
-    // getAllUsers: async () => {
-    //   // const usersCol = await usersCollection();
-    //   // const allUsers = await usersCol.find({}).toArray();
-    //   // return allUsers;
-    // },
-    // getUserInfo: async (_, { ownerId }) => {
-    //   // const usersCol = await usersCollection();
-    //   // const user = await usersCol.findOne({ _id: new ObjectId(ownerId) });
-    //   // return user;
-    // },
+    getAllChildren: async () => {
+      const allUsers = await clerkClient.users.getUserList();
+      const allChildren = allUsers.data.filter((user) => {
+        if (!(user.publicMetadata && user.publicMetadata.verificationCode))
+          return user;
+      });
+      return allChildren;
+    },
+
+    // test after parentId
     getChildren: async (_, { parentId }) => {
-      const allUsers = await clerkClient.userList();
-      const children = allUsers.filter((user) => {
+      const allUsers = await clerkClient.users.getUserList();
+      const children = allUsers.data.filter((user) => {
         if (user.publicMetadata.parentId === parentId) return user;
       });
       return children;
     },
   },
   Mutation: {
-    //! todo: jesal: test
     createAccountsAndUpdateUserInClerk: async (_, { userId }) => {
       const userId_ = userId.toString().trim();
 
