@@ -10,7 +10,7 @@ import {
 } from "@clerk/clerk-react";
 
 
-import CustomDataForm from './CustomDataForm.jsx';
+// import CustomDataForm from './CustomDataForm.jsx';
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
