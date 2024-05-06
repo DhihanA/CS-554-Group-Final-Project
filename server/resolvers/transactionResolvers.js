@@ -142,6 +142,9 @@ export const transactionResolvers = {
           receiverId: new ObjectId(receiverId),
           amount: amount,
           description: description.trim(),
+          ownerOfReceiver: receiverAccount.ownerId,
+          ownerOfSender: senderAccount.ownerId,
+          dateOfTransaction: new Date(),
           type: "Transfer",
         };
 
@@ -175,7 +178,7 @@ export const transactionResolvers = {
         }
         const caCollection = await checkingAccountCollection();
         const account = await caCollection.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
         if (!account) {
           throw new GraphQLError("Checking account not found");
@@ -192,10 +195,12 @@ export const transactionResolvers = {
 
         const transaction = {
           _id: new ObjectId(),
-          senderId: new ObjectId(ownerId),
-          receiverId: new ObjectId(ownerId),
-          amount,
+          senderId: ownerId,
+          receiverId: ownerId,
+          amount: amount,
           description: description.trim(),
+          ownerOfReceiver: ownerId,
+          ownerOfSender: ownerId,
           dateOfTransaction: new Date(),
           type: "Budgeted",
         };
@@ -220,10 +225,10 @@ export const transactionResolvers = {
         const savingsAccounts = await savingsAccountCollection();
 
         const checkingAccount = await checkingAccounts.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
         const savingsAccount = await savingsAccounts.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
 
         if (!checkingAccount) {
@@ -280,10 +285,10 @@ export const transactionResolvers = {
         const checkingAccounts = await checkingAccountCollection();
 
         const savingsAccount = await savingsAccounts.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
         const checkingAccount = await checkingAccounts.findOne({
-          ownerId: new ObjectId(ownerId),
+          ownerId: ownerId,
         });
 
         if (!savingsAccount) {
@@ -303,6 +308,8 @@ export const transactionResolvers = {
           amount: amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
+          ownerOfReceiver: ownerId,
+          ownerOfSender: ownerId,
           type: "SavingToCheckingTransfer",
         };
 
