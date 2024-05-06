@@ -176,39 +176,39 @@ const main = async () => {
   ]);
 
   /* Add corresponding savings/checking account ids to publicMetadata of clerk users */
-  let childCounter = 1;
-  for (const savingsAccountId of insertedSavingsAccountIds.insertedIds) {
-    let currentChildKey = `child${childCounter}`;
-    let userId = userIds[currentChildKey];
-    let thisUser = await clerkClient.users.getUser(userId);
-    let publicMetadata = thisUser.publicMetadata;
-    await clerkClient.users.updateUser(userId, {
-      publicMetadata: {
-        ...publicMetadata,
-        savingsAccountId: savingsAccountId.toString(),
-      },
-    });
-    childCounter++;
-  }
+  // let childCounter = 1;
+  // for (const savingsAccountId of insertedSavingsAccountIds.insertedIds) {
+  //   let currentChildKey = `child${childCounter}`;
+  //   let userId = userIds[currentChildKey];
+  //   let thisUser = await clerkClient.users.getUser(userId);
+  //   let publicMetadata = thisUser.publicMetadata;
+  //   await clerkClient.users.updateUser(userId, {
+  //     publicMetadata: {
+  //       ...publicMetadata,
+  //       savingsAccountId: savingsAccountId.toString(),
+  //     },
+  //   });
+  //   childCounter++;
+  // }
 
   // fix
-  childCounter = 1;
-  let parentCounter = 1;
-  for (const checkingAccountId of insertedCheckingAccountIds.insertedIds) {
-    let currentChildKey = `child${childCounter}`;
-    let currentParentKey = `child${parentCounter}`;
-    let userId = userIds[currentChildKey];
-    let thisUser = await clerkClient.users.getUser(userId);
-    let publicMetadata = thisUser.publicMetadata;
-    await clerkClient.users.updateUser(userId, {
-      publicMetadata: {
-        ...publicMetadata,
-        savingsAccountId: savingsAccountId.toString(),
-      },
-    });
-    childCounter++;
-    parentCounter++;
-  }
+  // childCounter = 1;
+  // let parentCounter = 1;
+  // for (const checkingAccountId of insertedCheckingAccountIds.insertedIds) {
+  //   let currentChildKey = `child${childCounter}`;
+  //   let currentParentKey = `child${parentCounter}`;
+  //   let userId = userIds[currentChildKey];
+  //   let thisUser = await clerkClient.users.getUser(userId);
+  //   let publicMetadata = thisUser.publicMetadata;
+  //   await clerkClient.users.updateUser(userId, {
+  //     publicMetadata: {
+  //       ...publicMetadata,
+  //       savingsAccountId: savingsAccountId.toString(),
+  //     },
+  //   });
+  //   childCounter++;
+  //   parentCounter++;
+  // }
 
   console.log("Done seeding database");
   await closeConnection();
