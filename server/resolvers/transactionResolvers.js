@@ -6,8 +6,67 @@ import {
   checkingAccount as checkingAccountCollection,
 } from "../config/mongoCollections.js";
 import redisClient from "../clients/redisClient.js";
-import { accountResolvers } from "./accountResolvers.js";
+import wkhtmltopdf from "wkhtmltopdf";
 
+const htmlToPdf = async (html) => {
+  return new Promise((resolve, reject) => {
+    wkhtmltopdf(html, { pageSize: "letter" }, (err, stream) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      const chunks = [];
+      stream.on("data", (chunk) => chunks.push(chunk));
+      stream.on("end", () => {
+        const pdfBuffer = Buffer.concat(chunks);
+        resolve(pdfBuffer.toString("base64"));
+      });
+    });
+  });
+};
+
+const generateTransactionsHtml = (transactions) => {
+  const rows = transactions
+    .map(
+      (t) => `
+    <tr>
+      <td>${t.dateOfTransaction}</td>
+      <td>${t.description}</td>
+      <td>${t.amount}</td>
+      <td>${t.type}</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `
+    <html>
+    <head>
+      <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+      </style>
+    </head>
+    <body>
+      <h1>Transaction Report</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+};
 
 export const transactionResolvers = {
   Query: {
@@ -434,6 +493,20 @@ export const transactionResolvers = {
       } catch (error) {
         console.error("Error deleting budgeted transaction:", error);
         throw new GraphQLError("Internal Server Error");
+      }
+    },
+    downloadTransactions: async (_, { transactions }) => {
+      try {
+        let transactionsJson = JSON.parse(transactions);
+
+        const htmlContent = generateTransactionsHtml(transactionsJson);
+        const pdfBase64 = await htmlToPdf(htmlContent);
+        return pdfBase64;
+      } catch (e) {
+        console.log("Error downloading transactions PDF:", e);
+        throw new GraphQLError("Failed to generate PDF", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
       }
     },
   },
