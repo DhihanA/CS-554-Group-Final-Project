@@ -133,6 +133,12 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
 // `;
 //#endregion
 
+const GENERATE_PDF_MUTATION = gql`
+  mutation Mutation($transactions: String!) {
+    downloadTransactions(transactions: $transactions)
+  }
+`;
+
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   CREATE_OR_UPDATE_USER_IN_DB,
@@ -142,6 +148,8 @@ let exported = {
   GET_ALL_TRANSACTIONS,
   CHECKING_ACCOUNT_INFO_BY_USER_ID,
   SAVINGS_ACCOUNT_INFO_BY_USER_ID,
+
+  GENERATE_PDF_MUTATION,
 
   // GET_USER_INFO_BY_ID,
 };

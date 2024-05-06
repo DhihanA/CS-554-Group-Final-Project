@@ -21,62 +21,29 @@ const Transactions = () => {
     },
     fetchPolicy: "cache-and-network",
   });
+  const [generatePDF, { data: pdfData, loading: pdfLoading, error: pdfError }] =
+    useMutation(queries.GENERATE_PDF_MUTATION);
 
-  // const queryMultiple = () => {
-  //   const res1 = useQuery(queries.GET_ALL_TRANSACTIONS, {
-  //     variables: {
-  //       userId: user.id,
-  //       accountType: "checking",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   const res2 = useQuery(queries.GET_ALL_TRANSACTIONS, {
-  //     variables: {
-  //       userId: user.id,
-  //       accountType: "savings",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   return [res1, res2];
-  // };
-  // const [
-  //   { loading: loadingChecking, data: checkingData, error: checkingError },
-  //   { loading: loadingSavings, data: savingsData, error: savingsError },
-  // ] = queryMultiple();
+  const handleDownload = async () => {
+    try {
+      const pdfData = await generatePDF({
+        variables: {
+          transactions: JSON.stringify(data.getAllTransactions),
+        },
+      });
 
-  // const {
-  //   loading: loadingChecking,
-  //   data: checkingData,
-  //   error: checkingError,
-  // } = useQuery(queries.GET_ALL_TRANSACTIONS, {
-  //   variables: {
-  //     // userId: user.id,
-  //     userId: user.id, //!TESTING
-  //     accountType: "checking",
-  //   },
-  //   fetchPolicy: "cache-and-network",
-  // });
-
-  //!UNCOMMENT below when getUserByAccountId done
-  // const [getUserByAccountId, { called, loading, data }] = useLazyQuery(
-  //   queries.GET_USER_BY_ACCOUNT_ID
-  // );
-
-  // const fetchUserData = (accountId) => {
-  //   if (!usersByAccountId[accountId]) {
-  //     getUserByAccountId({ variables: { accountId } });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (data && data.getUserByAccountId) {
-  //     const newUserDetails = {
-  //       ...usersByAccountId,
-  //       [data.getUserByAccountId.id]: data.getUserByAccountId,
-  //     };
-  //     setUsersByAccountId(newUserDetails);
-  //   }
-  // }, [data, usersByAccountId]);
+      if (pdfData && pdfData.data && pdfData.data.downloadTransactions) {
+        const link = document.createElement("a");
+        link.href = `data:application/pdf;base64,${pdfData.data.downloadTransactions}`;
+        link.download = "transactions.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (err) {
+      console.error("Error downloading the transactions PDF:", err);
+    }
+  };
 
   if (!user || loading) {
     return <div>Loading...</div>;
@@ -146,6 +113,7 @@ const Transactions = () => {
           )}
         </div>
       </div>
+      <button onClick={handleDownload}>Download PDF</button>
     </div>
   );
 };
