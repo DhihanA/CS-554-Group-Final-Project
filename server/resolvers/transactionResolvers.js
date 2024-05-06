@@ -192,8 +192,8 @@ export const transactionResolvers = {
 
         const transaction = {
           _id: new ObjectId(),
-          senderId: ownerId,
-          receiverId: ownerId,
+          senderId: new ObjectId(account._id),
+          receiverId: new ObjectId(account._id),
           amount: amount,
           description: description.trim(),
           ownerOfReceiver: ownerId,

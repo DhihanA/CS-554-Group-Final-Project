@@ -4,7 +4,6 @@ import clerkClient from "../clients/clerkClient.js";
 import {
   savingsAccount as savingsAccountCollection,
   checkingAccount as checkingAccountCollection,
-  savingsAccount,
 } from "../config/mongoCollections.js";
 
 export const userResolvers = {
@@ -24,9 +23,8 @@ export const userResolvers = {
     getChildren: async (_, { parentId }) => {
       const allUsers = await clerkClient.userList();
       const children = allUsers.filter((user) => {
-        if (user.publicMetadata.parentId === parentId)
-          return user;
-      })
+        if (user.publicMetadata.parentId === parentId) return user;
+      });
       return children;
     },
   },
@@ -45,22 +43,29 @@ export const userResolvers = {
       }
 
       /* Create a checking account + add to clerk public metadata if user does not already have */
+      let publicMetadataPrev = thisUser.publicMetadata;
       if (
         !(thisUser.publicMetadata && thisUser.publicMetadata.checkingAccountId)
       ) {
         try {
-          const checkingCollection = await checkingAccount();
+          const checkingCollection = await checkingAccountCollection();
           let createdCheckingAccount = await checkingCollection.insertOne({
             _id: new ObjectId(),
             ownerId: thisUser.id.toString(),
-            balance: 500,
+            balance: thisUser.publicMetadata.role === "child" ? 500 : 999999999,
           });
+
+          console.log(createdCheckingAccount);
 
           await clerkClient.users.updateUser(userId_, {
             publicMetadata: {
+              ...publicMetadataPrev,
               checkingAccountId: createdCheckingAccount.insertedId.toString(),
             },
           });
+
+          publicMetadataPrev.checkingAccountId =
+            createdCheckingAccount.insertedId.toString();
         } catch (e) {
           throw new GraphQLError(
             "Could not create checking account for this user",
@@ -71,20 +76,27 @@ export const userResolvers = {
         }
       }
 
-      /* Create a savings account + add to clerk public metadata if user does not already have */
+      /* Create a savings account for children only + add to clerk public metadata if user does not already have */
       if (
-        !(thisUser.publicMetadata && thisUser.publicMetadata.savingsAccountId)
+        !(
+          thisUser.publicMetadata && thisUser.publicMetadata.savingsAccountId
+        ) &&
+        thisUser.publicMetadata.role === "child"
       ) {
         try {
-          const savingsCollection = await savingsAccount();
+          const savingsCollection = await savingsAccountCollection();
           let createdSavingsAccount = await savingsCollection.insertOne({
             _id: new ObjectId(),
             ownerId: thisUser.id.toString(),
-            balance: 500,
+            currentBalance: 500,
+            previousBalance: 500,
+            interestRate: 5.3,
+            lastDateUpdated: new Date(),
           });
 
           await clerkClient.users.updateUser(userId_, {
             publicMetadata: {
+              ...publicMetadataPrev,
               savingsAccountId: createdSavingsAccount.insertedId.toString(),
             },
           });
