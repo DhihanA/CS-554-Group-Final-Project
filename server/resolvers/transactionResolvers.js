@@ -78,7 +78,7 @@ export const transactionResolvers = {
       let exists = await redisClient.exists(cacheKey);
       if (exists) {
         let list = await redisClient.lRange(
-          `allTransactions:${userId.trim()}`,
+          `allTransactions:${args.userId.trim()}:${args.accountType.trim()}`,
           0,
           -1
         );
@@ -114,30 +114,32 @@ export const transactionResolvers = {
         //set expiration
         await redisClient.expire(`allTransactions:${userId.trim()}`, 3600);
 
-        return foundTransactions;
+          return foundTransactions;
+        }
       }
     },
   },
   Mutation: {
     addTransferTransaction: async (
       _,
-      { senderId, receiverId, amount, description }
+      { senderOwnerId, receiverOwnerId, amount, description }
     ) => {
-      if (senderId === receiverId) {
-        throw new GraphQLError(
-          "Sender and Receiver cannot be the same for transfer transactions"
-        );
-      }
-      if (amount <= 0) {
-        throw new GraphQLError("Amount must be greater than 0");
-      }
-      const caCollection = await checkingAccountCollection();
-      const senderAccount = await caCollection.findOne({
-        _id: new ObjectId(senderId),
-      });
-      const receiverAccount = await caCollection.findOne({
-        _id: new ObjectId(receiverId),
-      });
+      try {
+        if (senderId === receiverId) {
+          throw new GraphQLError(
+            "Sender and Receiver cannot be the same for transfer transactions"
+          );
+        }
+        if (amount <= 0) {
+          throw new GraphQLError("Amount must be greater than 0");
+        }
+        const caCollection = await checkingAccountCollection();
+        const senderAccount = await caCollection.findOne({
+          _id: new ObjectId(senderId),
+        });
+        const receiverAccount = await caCollection.findOne({
+          _id: new ObjectId(receiverId),
+        });
 
       if (!senderAccount) {
         throw new GraphQLError("Sender checking account not found");
@@ -151,10 +153,12 @@ export const transactionResolvers = {
       try {
         const transaction = {
           _id: new ObjectId(),
-          senderId: new ObjectId(senderId),
-          receiverId: new ObjectId(receiverId),
+          senderId: new ObjectId(senderAccount._id),
+          receiverId: new ObjectId(receiverAccount._id),
           amount: amount,
           description: description.trim(),
+          ownerOfReceiver: receiverAccount.ownerId,
+          ownerOfSender: senderAccount.ownerId,
           dateOfTransaction: new Date(),
           type: "Transfer",
         };
@@ -169,11 +173,11 @@ export const transactionResolvers = {
         });
 
         await caCollection.updateOne(
-          { _id: new ObjectId(senderId) },
+          { _id: new ObjectId(senderAccount._id) },
           { $inc: { balance: -amount } }
         );
         await caCollection.updateOne(
-          { _id: new ObjectId(receiverId) },
+          { _id: new ObjectId(receiverAccount._id) },
           { $inc: { balance: amount } }
         );
         await redisClient.del(`allTransactions:${senderUser.ownerId.trim()}`);
