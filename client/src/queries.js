@@ -107,13 +107,29 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
 //#endregion
 
 //#region ADD MUTATIONS
-// const CREATE_USER_IN_DB = gql`
-//   mutation createUserInLocalDB($clerkUserId: String!) {
-//     createUser(clerkUserId: $clerkUserId) {
-//       _id
-//     }
-//   }
-// `;
+const VERIFY_CHILD_MUTATION = gql`
+  mutation verifyChild($userId: String!, $verificationCode: String!) {
+    verifyChild(userId: $userId, verificationCode: $verificationCode) {
+      id
+    }
+  }
+`;
+
+const ADD_ROLE_AND_DOB_MUTATION = gql`
+  mutation addRoleAndDOB($userId: String!, $dob: Date!, $role: Role!) {
+    addRoleAndDOB(userId: $userId, dob: $dob, role: $role)
+  }
+`;
+
+const CREATE_ACCOUNTS_MUTATION = gql`
+  mutation createAccountsAndUpdateUserInClerk($userId: String!) {
+    createAccountsAndUpdateUserInClerk(userId: $userId) {
+      firstName
+      lastName
+    }
+  }
+`;
+
 //#endregion
 
 //#region EDIT MUTATIONS
