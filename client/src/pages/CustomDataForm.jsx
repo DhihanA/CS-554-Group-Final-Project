@@ -53,7 +53,8 @@ const CustomDataForm = () => {
 
   const [updateParentUser] = useMutation(parentMutation);
 
-  const submitCustomData = async () => {
+  const submitCustomData = async (e) => {
+    e.preventDefault();
     // changing the date format to MM/DD/YYYY
     const date = new Date(dateOfBirth);
     const adjustedDate = new Date(
@@ -93,8 +94,7 @@ const CustomDataForm = () => {
         });
       }
       console.log(response);
-      navigate("/dashboard");
-      return;
+      window.location.reload();
     } catch (e) {
       console.log(e);
       setError(e.message);
@@ -147,7 +147,7 @@ const CustomDataForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <form className="flex flex-col items-center justify-center min-h-screen p-4" onSubmit={submitCustomData}>
       <img src={piggybank} className="object-cover h-48 w-50" />
       <h2 className="my-8">Please fill in the following information:</h2>
       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -190,13 +190,13 @@ const CustomDataForm = () => {
       {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
 
       <button
-        onClick={() => submitCustomData(role, dateOfBirth, verificationCode)}
+        type='submit'
         className={`btn mt-4 ${isButtonActive ? "" : "btn-disabled"}`}
         disabled={!isButtonActive}
       >
         Continue
       </button>
-    </div>
+    </form>
   );
 };
 
