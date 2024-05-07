@@ -176,39 +176,64 @@ const main = async () => {
   ]);
 
   /* Add corresponding savings/checking account ids to publicMetadata of clerk users */
-  // let childCounter = 1;
-  // for (const savingsAccountId of insertedSavingsAccountIds.insertedIds) {
-  //   let currentChildKey = `child${childCounter}`;
-  //   let userId = userIds[currentChildKey];
-  //   let thisUser = await clerkClient.users.getUser(userId);
-  //   let publicMetadata = thisUser.publicMetadata;
-  //   await clerkClient.users.updateUser(userId, {
-  //     publicMetadata: {
-  //       ...publicMetadata,
-  //       savingsAccountId: savingsAccountId.toString(),
-  //     },
-  //   });
-  //   childCounter++;
-  // }
+  console.log(
+    "Adding savings account ids to publicMetadata of child users in clerk..."
+  );
+  let childCounter = 1;
+  for (const key in insertedSavingsAccountIds.insertedIds) {
+    let currentChildKey = `child${childCounter}`;
+    let userId = userIds[currentChildKey];
+    let thisUser = await clerkClient.users.getUser(userId);
+    let publicMetadata = thisUser.publicMetadata;
+    await clerkClient.users.updateUser(userId, {
+      publicMetadata: {
+        ...publicMetadata,
+        savingsAccountId: insertedSavingsAccountIds.insertedIds[key].toString(),
+      },
+    });
+    childCounter++;
+  }
+  console.log("Added ✅");
 
-  // fix
-  // childCounter = 1;
-  // let parentCounter = 1;
-  // for (const checkingAccountId of insertedCheckingAccountIds.insertedIds) {
-  //   let currentChildKey = `child${childCounter}`;
-  //   let currentParentKey = `child${parentCounter}`;
-  //   let userId = userIds[currentChildKey];
-  //   let thisUser = await clerkClient.users.getUser(userId);
-  //   let publicMetadata = thisUser.publicMetadata;
-  //   await clerkClient.users.updateUser(userId, {
-  //     publicMetadata: {
-  //       ...publicMetadata,
-  //       savingsAccountId: savingsAccountId.toString(),
-  //     },
-  //   });
-  //   childCounter++;
-  //   parentCounter++;
-  // }
+  console.log(
+    "Adding checking account ids to publicMetadata of all users in clerk..."
+  );
+  let parentCounter = 1;
+  for (const key in Object.entries(
+    insertedCheckingAccountIds.insertedIds
+  ).slice(0, 3)) {
+    let currentParentKey = `parent${parentCounter}`;
+    let userId = userIds[currentParentKey];
+    let thisUser = await clerkClient.users.getUser(userId);
+    let publicMetadata = thisUser.publicMetadata;
+    await clerkClient.users.updateUser(userId, {
+      publicMetadata: {
+        ...publicMetadata,
+        checkingAccountId:
+          insertedCheckingAccountIds.insertedIds[key].toString(),
+      },
+    });
+    parentCounter++;
+  }
+
+  childCounter = 1;
+  for (const key in Object.entries(
+    insertedCheckingAccountIds.insertedIds
+  ).slice(3)) {
+    let currentChildKey = `child${childCounter}`;
+    let userId = userIds[currentChildKey];
+    let thisUser = await clerkClient.users.getUser(userId);
+    let publicMetadata = thisUser.publicMetadata;
+    await clerkClient.users.updateUser(userId, {
+      publicMetadata: {
+        ...publicMetadata,
+        checkingAccountId:
+          insertedCheckingAccountIds.insertedIds[key].toString(),
+      },
+    });
+    childCounter++;
+  }
+  console.log("Added ✅");
 
   console.log("Done seeding database");
   await closeConnection();

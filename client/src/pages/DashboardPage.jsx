@@ -29,29 +29,6 @@ const DashboardPage = ({ isParent }) => {
     return code.toString().padStart(4, "0");
   };
 
-  //TODO: UNCOMMENT user.id AFTER GET_ALL_TRANSACTIONS FULLY WORKS
-  // const queryMultiple = () => {
-  //   const res1 = useQuery(queries.CHECKING_ACCOUNT_INFO_BY_USER_ID, {
-  //     variables: {
-  //       userId: user.id
-  //       // accountType: "checking",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   const res2 = useQuery(queries.SAVINGS_ACCOUNT_INFO_BY_USER_ID, {
-  //     variables: {
-  //       userId: user.id
-  //       // accountType: "savings",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   return [res1, res2];
-  // };
-  // const [
-  //   { loading: loadingChecking, data: checkingData, error: checkingError },
-  //   { loading: loadingSavings, data: savingsData, error: savingsError },
-  // ] = queryMultiple();
-
   // * successful single query of checking acc info by user ID
   const {
     loading: checkingLoading,

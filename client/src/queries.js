@@ -139,6 +139,15 @@ const GENERATE_PDF_MUTATION = gql`
   }
 `;
 
+const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
+  mutation Mutation($transactionsArray: String!, $userId: String!) {
+    downloadTransactionsOfAllChildren(
+      transactionsArray: $transactionsArray
+      userId: $userId
+    )
+  }
+`;
+
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   CREATE_OR_UPDATE_USER_IN_DB,
@@ -150,6 +159,7 @@ let exported = {
   SAVINGS_ACCOUNT_INFO_BY_USER_ID,
 
   GENERATE_PDF_MUTATION,
+  GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,
 
   // GET_USER_INFO_BY_ID,
 };
