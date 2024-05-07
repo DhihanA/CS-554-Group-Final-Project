@@ -72,6 +72,7 @@ export const typeDefs = `#graphql
     createAccountsAndUpdateUserInClerk(userId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
     addRoleAndDOB(userId: String!, dob: Date!, role: Role!): String
+    updateMetadataQuestionIds(userId: String!, completedQuesIdsString: String!): User
 
     # Account Mutations
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount

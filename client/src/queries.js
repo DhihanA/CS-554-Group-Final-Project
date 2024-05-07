@@ -291,7 +291,23 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
     }
   }
 `;
+
+const UPDATE_METADATA_QUESTION_IDS = gql`
+  mutation UpdateMetadataQuestionIds(
+    $updateMetadataQuestionIdsUserId2: String!, 
+    $completedQuesIdsString: String!) {
+      updateMetadataQuestionIds(
+        userId: $updateMetadataQuestionIdsUserId2, 
+        completedQuesIdsString: $completedQuesIdsString) {
+          id
+          firstName
+          lastName
+          imageUrl
+        }
+    }
+`;
 //#endregion
+
 
 //#region REMOVE MUTATIONS
 // const REMOVE_ARTIST = gql`
@@ -322,6 +338,7 @@ const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   CREATE_OR_UPDATE_USER_IN_DB,
+  UPDATE_METADATA_QUESTION_IDS,
   // CREATE_USER_IN_DB,
   // UPDATE_USER_IN_DB,
 

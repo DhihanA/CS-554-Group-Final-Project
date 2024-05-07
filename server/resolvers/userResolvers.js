@@ -21,7 +21,7 @@ export const userResolvers = {
     getChildren: async (_, { parentUserId }) => {
       const parentId_ = parentUserId.toString().trim();
       const allUsers = await clerkClient.users.getUserList({ limit: 500 });
-      console.log(allUsers.data);
+      // console.log(allUsers.data);
       const children = allUsers.data.filter((user) => {
         if (
           user.publicMetadata &&
@@ -235,5 +235,44 @@ export const userResolvers = {
       let updatedChild = await clerkClient.users.getUser(userId);
       return updatedChild;
     },
+    updateMetadataQuestionIds: async (_, {userId, completedQuesIdsString, date}) => {
+      let completedQuestionIds;
+      try {
+        completedQuestionIds = JSON.parse(completedQuesIdsString);
+      } catch (e) {
+        throw new GraphQLError("completedQuestionIds must be a stringified array", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      if (!Array.isArray(completedQuestionIds) || completedQuestionIds.length > 2) {
+        throw new GraphQLError("completedQuestionIds should be an array of length at most 2", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      let thisUser;
+      console.log(completedQuestionIds)
+      try {
+        thisUser = await clerkClient.users.getUser(userId.toString().trim());
+      } catch (e) {
+        throw new GraphQLError("Invalid userId", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      const newMetadata = thisUser.publicMetadata;
+      newMetadata.completedQuestionIds.push(completedQuestionIds[0], completedQuestionIds[1]);
+      newMetadata.lastDateSubmitted = new Date().toDateString();
+      console.log(newMetadata)
+
+      try {
+        await clerkClient.users.updateUserMetadata(userId.toString().trim(), {
+          publicMetadata: newMetadata
+        })
+      } catch (e) {
+        throw new GraphQLError("Could not update user metadata", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+      return thisUser;
+    }
   },
 };

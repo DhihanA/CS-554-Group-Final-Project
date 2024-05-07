@@ -16,16 +16,16 @@ export const accountResolvers = {
         });
 
         if (!account) {
-          console.log("Account not found in database.");
+          // console.log("Account not found in database.");
           throw new GraphQLError("Checking Account Not Found", {
             extensions: { code: "NOT_FOUND" },
           });
         }
         return account;
       } catch (error) {
-        console.error("Error fetching checking account info:", error);
+        // console.error("Error fetching checking account info:", error);
         if (error instanceof TypeError && error.message.includes("ObjectId")) {
-          console.error("Invalid ObjectId format:", userId);
+          // console.error("Invalid ObjectId format:", userId);
           throw new GraphQLError("Invalid ObjectId Format", {
             extensions: { code: "INVALID_ID" },
           });
@@ -117,7 +117,7 @@ export const accountResolvers = {
           }
         );
       } catch (error) {
-        console.error("Error updating savings balance:", error);
+        // console.error("Error updating savings balance:", error);
         throw new GraphQLError("Internal Server Error");
       }
     },
