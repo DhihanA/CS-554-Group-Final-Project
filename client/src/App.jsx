@@ -1,4 +1,4 @@
-import react from "react";
+import react, { useEffect, useState } from "react";
 import {
   Route,
   Routes,
@@ -6,7 +6,7 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import { useUser, useClerk } from "@clerk/clerk-react";
+import { useUser, useClerk, SignedOut, SignedIn } from "@clerk/clerk-react";
 import "./App.css";
 import ClerkEventHandlers from "./components/ClerkEventHandlers";
 
@@ -32,76 +32,67 @@ function App() {
       </div>
     );
 
-  let isParent = false;
-  let hasRole = false;
-  if (isSignedIn && user && user.publicMetadata.verificationCode)
-    isParent = true;
-  if (isSignedIn && user.publicMetadata.role) {
-    console.log(`role: ${user.publicMetadata.role}`);
-    hasRole = true;
-  }
-
   return (
     <>
       {/* <ClerkEventHandlers /> */}
-      <Routes>
-        {/* Authenticated user routes go below */}
 
-        {/* This is the only path both adults+children can access: */}
-        <Route
-          path="/dashboard"
-          element={
-            isSignedIn ? (
-              <DashboardPage isParent={isParent} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        {/* howto page */}
-        <Route path="/howto" element={<HowTo />} />
-        <Route
-          path="/transactions"
-          element={
-            isSignedIn && !isParent ? <TransactionsPage /> : <Navigate to="/" />
-          }
-        />
-        {/* <Route
-        path="/settings"
-        element={isSignedIn ? <SettingsPage /> : <Navigate to="/" />}
-      /> */}
-        <Route
-          path="/learn"
-          element={
-            isSignedIn && !isParent ? <LearnPage /> : <Navigate to="/" />
-          }
-        />
+      <SignedOut>
+        <Routes>
+          <Route path="/signup" element={<SignUpClerk />} />
+          <Route path="/login" element={<LoginClerk />} />
+          <Route path="/howto" element={<HowTo />} />
+          <Route path="/" element={<HeroPage />} />
+          <Route path="*" element={<Navigate replace to={"/"} />} />
+        </Routes>
+      </SignedOut>
 
-        {/* Unauthenticated user routes go below */}
-        {!isSignedIn && <Route path="/" element={<HeroPage />} />}
-
-        <Route
-          path="/login"
-          element={!isSignedIn ? <LoginClerk /> : <Navigate to="/dashboard" />}
-        />
-        <Route
-          path="/signup"
-          element={!isSignedIn ? <SignUpClerk /> : <Navigate to="/dashboard" />}
-        />
-
-        {/* Redirect any unknown paths */}
-        <Route
-          path="*"
-          element={<Navigate replace to={isSignedIn ? "/dashboard" : "/"} />}
-        />
-
-        <Route
-          path="/fillinfo"
-          element={hasRole ? <Navigate to="/dashboard" /> : <CustomDataForm />}
-        />
-      </Routes>
+      <SignedIn>
+        <ParentRoutes user={user} isSignedIn={isSignedIn}/>
+        <ChildRoutes user={user} isSignedIn={isSignedIn}/>
+        <NoRoleRoutes user={user} isSignedIn={isSignedIn}/>
+      </SignedIn>
     </>
   );
 }
+
+const ParentRoutes = ({isSignedIn, user}) => {
+  if (isSignedIn && user && user.publicMetadata.verificationCode) {
+    return (
+      <Routes>
+        <Route path="/dashboard" element={<DashboardPage isParent={true} />} />
+        <Route path="/howto" element={<HowTo />} />
+        <Route path="*" element={<Navigate replace to="/dashboard" />} />
+      </Routes>
+    );
+  }
+  return null; 
+};
+
+const ChildRoutes = ({isSignedIn, user}) => {
+  if (isSignedIn && user && user.publicMetadata.parentId) {
+    return (
+      <Routes>
+        <Route path="/dashboard" element={<DashboardPage isParent={false} />} />
+        <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/learn" element={<LearnPage />} />
+        <Route path="/howto" element={<HowTo />} />
+        <Route path="*" element={<Navigate replace to="/dashboard" />} />
+      </Routes>
+    );
+  }
+  return null; 
+};
+
+const NoRoleRoutes = ({isSignedIn, user}) => {
+  if (isSignedIn && !user.publicMetadata.role) {
+    return (
+      <Routes>
+        <Route path="/fillinfo" element={<CustomDataForm />} />
+        <Route path="*" element={<Navigate replace to="/fillinfo" />} />
+      </Routes>
+    );
+  }
+  return null; 
+};
 
 export default App;

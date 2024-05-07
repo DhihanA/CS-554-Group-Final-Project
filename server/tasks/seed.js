@@ -19,7 +19,13 @@ const main = async () => {
   const savingsCollection = await savingsAccount();
   const checkingCollection = await checkingAccount();
 
-  const transactionIds = [new ObjectId()];
+  const transactionIds = [
+    new ObjectId(), //first transfer transaction
+    new ObjectId(), //second transfer transaction
+    new ObjectId(), //first budgeted transaction
+    new ObjectId(), //first checking to savings transaction
+    new ObjectId(), //first savings to checking transaction
+  ];
   const savingsIds = [
     new ObjectId(), //child 1's savings account
     new ObjectId(), //child 2's savings account
@@ -58,6 +64,33 @@ const main = async () => {
       description: "Payment for school supplies",
       dateOfTransaction: new Date(),
       type: "Transfer",
+    },
+    {
+      _id: transactionIds[2],
+      senderId: checkingIds[6],
+      receiverId: checkingIds[6], //id of account money has been sent to
+      amount: 100,
+      description: "Budgeted for a new GameBoy",
+      dateOfTransaction: new Date(),
+      type: "Budgeted",
+    },
+    {
+      _id: transactionIds[3],
+      senderId: checkingIds[4], //child 2's checking account
+      receiverId: savingsIds[1], //child 2's savings account
+      amount: 200,
+      description: "200 dollars to savings",
+      dateOfTransaction: new Date(),
+      type: "CheckingToSavingTransfer",
+    },
+    {
+      _id: transactionIds[4],
+      senderId: savingsIds[4], //child 5's savings account
+      receiverId: checkingIds[7], //child 5's checking account
+      amount: 50,
+      description: "50 dollars to checking",
+      dateOfTransaction: new Date(),
+      type: "SavingToCheckingTransfer",
     },
   ]);
 
@@ -102,7 +135,7 @@ const main = async () => {
     {
       _id: savingsIds[4],
       ownerId: userIds.child5,
-      currentBalance: 1000,
+      currentBalance: 950,
       previousBalance: 1000,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
@@ -147,7 +180,7 @@ const main = async () => {
     {
       _id: checkingIds[4],
       ownerId: userIds.child2,
-      balance: 1000,
+      balance: 800,
     },
     //child 3's checking account
     {
@@ -159,13 +192,13 @@ const main = async () => {
     {
       _id: checkingIds[6],
       ownerId: userIds.child4,
-      balance: 1000,
+      balance: 900,
     },
     //child 5's checking account
     {
       _id: checkingIds[7],
       ownerId: userIds.child5,
-      balance: 1000,
+      balance: 1050,
     },
     //child 6's checking account
     {
