@@ -60,6 +60,18 @@ const GET_ALL_TRANSACTIONS = gql`
     }
   }
 `;
+
+// GET ALL CHILDREN
+const GET_ALL_CHILDREN = gql`
+  query GetAllChildren {
+    getAllChildren {
+      id
+      firstName
+      lastName
+      imageUrl
+    }
+  } 
+`;
 //#endregion
 
 //#region GET BY ID QUERIES
@@ -95,6 +107,131 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
 //#endregion
 
 //#region ADD MUTATIONS
+const ADD_TRANSFER_TRANSACTION = gql`
+  mutation AddTransferTransaction(
+    $senderOwnerId: String!, 
+    $receiverOwnerId: String!, 
+    $amount: Float!, 
+    $description: String!) {
+      addTransferTransaction(
+        senderOwnerId: $senderOwnerId, 
+        receiverOwnerId: $receiverOwnerId, 
+        amount: $amount, 
+        description: $description) {
+          sender {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                lastName
+              }
+            }
+          }
+          receiver {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                lastName
+              }
+            }
+          }
+          amount
+          description
+          dateOfTransaction
+          type
+        }
+    }
+`;
+
+const ADD_CHECKING_TO_SAVINGS_TRANSACTION = gql`
+  mutation AddCheckingToSavingTransfer(
+    $ownerId: String!, 
+    $addCheckingToSavingTransferAmount2: 
+    Float!, 
+    $addCheckingToSavingTransferDescription2: String!) {
+      addCheckingToSavingTransfer(
+        ownerId: $ownerId, 
+        amount: $addCheckingToSavingTransferAmount2, 
+        description: $addCheckingToSavingTransferDescription2) {
+          amount
+          dateOfTransaction
+          description
+          type
+          receiver {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                id
+                imageUrl
+                lastName
+              }
+            }
+          }
+          sender {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                id
+                imageUrl
+                lastName
+              }
+            }
+          }
+        }
+    }
+`;
+
+const ADD_SAVINGS_TO_CHECKING_TRANSACTION = gql`
+  mutation AddSavingToCheckingTransfer(
+    $addSavingToCheckingTransferOwnerId2: String!, 
+    $addSavingToCheckingTransferAmount2: Float!, 
+    $addSavingToCheckingTransferDescription2: String!) {
+      addSavingToCheckingTransfer(
+        ownerId: $addSavingToCheckingTransferOwnerId2, 
+        amount: $addSavingToCheckingTransferAmount2, 
+        description: $addSavingToCheckingTransferDescription2) {
+          _id
+          amount
+          dateOfTransaction
+          description
+          receiver {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                id
+                imageUrl
+                lastName
+              }
+            }
+          }
+          sender {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                id
+                imageUrl
+                lastName
+              }
+            }
+          }
+          type
+        }
+    }
+`;
+
+
+
 const VERIFY_CHILD_MUTATION = gql`
   mutation verifyChild($userId: String!, $verificationCode: String!) {
     verifyChild(userId: $userId, verificationCode: $verificationCode) {
@@ -179,8 +316,14 @@ let exported = {
   // UPDATE_USER_IN_DB,
 
   GET_ALL_TRANSACTIONS,
+  GET_ALL_CHILDREN,
+
   CHECKING_ACCOUNT_INFO_BY_USER_ID,
   SAVINGS_ACCOUNT_INFO_BY_USER_ID,
+
+  ADD_TRANSFER_TRANSACTION,
+  ADD_CHECKING_TO_SAVINGS_TRANSACTION,
+  ADD_SAVINGS_TO_CHECKING_TRANSACTION,
 
   GENERATE_PDF_MUTATION,
   GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,

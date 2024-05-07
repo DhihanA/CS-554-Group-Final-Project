@@ -12,7 +12,7 @@ const DashboardPage = ({ isParent }) => {
   // const [savingsAccInfo, setSavingsAccInfo] = useState(undefined);
 
   const { user } = useUser();
-  console.log("user here: ", user.id);
+  // console.log("user here: ", user.id);
 
   // https://medium.com/@khorvath3327/implementing-a-hashing-algorithm-in-node-js-9bbe56caab28
   // func to create a 4 digut num based on ther checking/savings acc id
@@ -39,7 +39,8 @@ const DashboardPage = ({ isParent }) => {
       userId: user.id,
       // accountType: "checking",
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    pollInterval: 5000
   });
 
   // * successful single query of savings acc info by user ID
@@ -52,7 +53,8 @@ const DashboardPage = ({ isParent }) => {
       userId: user.id,
       // accountType: "savings",
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    pollInterval: 5000
   });
 
   const hour = new Date().getHours();
@@ -81,16 +83,16 @@ const DashboardPage = ({ isParent }) => {
   if (!isParent && checkingData && savingsData) {
     const { getCheckingAccountInfo } = checkingData;
     // setCheckingAccInfo(getCheckingAccountInfo);
-    console.log(getCheckingAccountInfo);
+    // console.log(getCheckingAccountInfo);
 
     const { getSavingsAccountInfo } = savingsData;
-    console.log(getSavingsAccountInfo);
+    // console.log(getSavingsAccountInfo);
 
     const checkingAccNum = createAccNum(getCheckingAccountInfo._id);
-    console.log("checking acc ID code: ", checkingAccNum);
+    // console.log("checking acc ID code: ", checkingAccNum);
 
     const savingsAccNum = createAccNum(getSavingsAccountInfo._id);
-    console.log("checking acc ID code: ", savingsAccNum);
+    // console.log("checking acc ID code: ", savingsAccNum);
 
     return (
       <BasePage>

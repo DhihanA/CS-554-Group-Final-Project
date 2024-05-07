@@ -9,10 +9,10 @@ import {
 export const userResolvers = {
   Query: {
     getAllChildren: async () => {
-      const allUsers = await clerkClient.users.getUserList();
+      const allUsers = await clerkClient.users.getUserList({ limit: 500 });
+      console.log(allUsers);
       const allChildren = allUsers.data.filter((user) => {
-        if (!(user.publicMetadata && user.publicMetadata.verificationCode))
-          return user;
+        if (user.publicMetadata.role === "child") return user;
       });
       return allChildren;
     },
