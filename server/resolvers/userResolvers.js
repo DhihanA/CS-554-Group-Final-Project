@@ -21,7 +21,7 @@ export const userResolvers = {
     getChildren: async (_, { parentUserId }) => {
       const parentId_ = parentUserId.toString().trim();
       const allUsers = await clerkClient.users.getUserList({ limit: 500 });
-      console.log(allUsers.data);
+      // console.log(allUsers.data);
       const children = allUsers.data.filter((user) => {
         if (
           user.publicMetadata &&
