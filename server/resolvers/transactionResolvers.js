@@ -29,10 +29,7 @@ const htmlToPdf = async (html) => {
 
 export const transactionResolvers = {
   Query: {
-    getAllTransactions: async (
-      _,
-      { userId, checkingAccountId, savingsAccountId }
-    ) => {
+    getAllTransactions: async (_, { userId }) => {
       let cacheKey = `allTransactions:${userId.trim()}`;
       let exists = await redisClient.exists(cacheKey);
       if (exists) {
@@ -43,6 +40,10 @@ export const transactionResolvers = {
         );
         return list.map((str) => JSON.parse(str));
       } else {
+        const thisUser = await clerkClient.users.getUser(userId);
+        const checkingAccountId = thisUser.publicMetadata.checkingAccountId;
+        const savingsAccountId = thisUser.publicMetadata.savingsAccountId;
+
         const transactions = await transactionsCollection();
         const foundTransactions = await transactions
           .find({
@@ -98,7 +99,6 @@ export const transactionResolvers = {
       const receiverAccount = await caCollection.findOne({
         // _id: new ObjectId(receiverId),
         ownerId: receiverOwnerId,
-
       });
 
       if (!senderAccount) {
@@ -146,7 +146,6 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
-
 
     addBudgetedTransaction: async (
       _,
@@ -377,7 +376,6 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
-    
 
     deleteBudgetedTransaction: async (_, { ownerId, transactionId }) => {
       const transactionIdObj = new ObjectId(transactionId);
