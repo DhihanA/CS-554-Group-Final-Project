@@ -237,6 +237,71 @@ const ADD_SAVINGS_TO_CHECKING_TRANSACTION = gql`
   }
 `;
 
+const ADD_BUDGETED_TRANSACTION = gql`
+  mutation AddBudgetedTransaction(
+    $addBudgetedTransactionOwnerId2: String!
+    $addBudgetedTransactionAmount2: Float!
+    $addBudgetedTransactionDescription2: String!
+  ) {
+    addBudgetedTransaction(
+      ownerId: $addBudgetedTransactionOwnerId2
+      amount: $addBudgetedTransactionAmount2
+      description: $addBudgetedTransactionDescription2
+    ) {
+      amount
+      description
+      _id
+      dateOfTransaction
+      receiver {
+        ... on CheckingAccount {
+          _id
+          balance
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+      }
+      sender {
+        ... on CheckingAccount {
+          _id
+          balance
+          owner {
+            firstName
+            id
+            imageUrl
+            lastName
+          }
+        }
+      }
+      type
+    }
+  }
+`;
+
+const ADD_MONEY_FROM_QUESTIONS = gql`
+  mutation AddMoneyFromQuestions(
+    $addMoneyFromQuestionsUserId2: String!
+    $correctQuestions: Float!
+  ) {
+    addMoneyFromQuestions(
+      userId: $addMoneyFromQuestionsUserId2
+      correctQuestions: $correctQuestions
+    ) {
+      _id
+      balance
+      owner {
+        id
+        firstName
+        lastName
+        imageUrl
+      }
+    }
+  }
+`;
+
 const VERIFY_CHILD_MUTATION = gql`
   mutation verifyChild($userId: String!, $verificationCode: String!) {
     verifyChild(userId: $userId, verificationCode: $verificationCode) {
@@ -309,6 +374,23 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
     }
   }
 `;
+
+const UPDATE_METADATA_QUESTION_IDS = gql`
+  mutation UpdateMetadataQuestionIds(
+    $updateMetadataQuestionIdsUserId2: String!
+    $completedQuesIdsString: String!
+  ) {
+    updateMetadataQuestionIds(
+      userId: $updateMetadataQuestionIdsUserId2
+      completedQuesIdsString: $completedQuesIdsString
+    ) {
+      id
+      firstName
+      lastName
+      imageUrl
+    }
+  }
+`;
 //#endregion
 
 //#region REMOVE MUTATIONS
@@ -355,6 +437,7 @@ const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   CREATE_OR_UPDATE_USER_IN_DB,
+  UPDATE_METADATA_QUESTION_IDS,
   // CREATE_USER_IN_DB,
   // UPDATE_USER_IN_DB,
 
@@ -368,9 +451,8 @@ let exported = {
   ADD_TRANSFER_TRANSACTION,
   ADD_CHECKING_TO_SAVINGS_TRANSACTION,
   ADD_SAVINGS_TO_CHECKING_TRANSACTION,
-
-  DELETE_BUDGETED_TRANSACTION,
-  EDIT_BUDGETED_TRANSACTION,
+  ADD_BUDGETED_TRANSACTION,
+  ADD_MONEY_FROM_QUESTIONS,
 
   GENERATE_PDF_MUTATION,
   GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,

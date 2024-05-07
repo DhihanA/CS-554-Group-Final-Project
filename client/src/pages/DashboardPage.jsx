@@ -9,7 +9,7 @@ import queries from "../queries";
 
 const DashboardPage = ({ isParent }) => {
   const { user } = useUser();
-  // console.log("user here: ", user.id);
+  console.log("user here: ", user.id);
 
   // https://medium.com/@khorvath3327/implementing-a-hashing-algorithm-in-node-js-9bbe56caab28
   // func to create a 4 digut num based on ther checking/savings acc id

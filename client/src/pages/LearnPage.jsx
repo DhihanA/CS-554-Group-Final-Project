@@ -2,25 +2,51 @@ import "../index.css";
 import NavbarComponent from "../components/NavbarComponent";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
+import { useMutation } from "@apollo/client";
+import queries from "../queries"
 
 // https://gist.githubusercontent.com/jesalgandhi/5d0dddad0b3faf048990c534e5e98186/raw/12f54b265f69522b38660c31e8c561685d6769b7/piggyBankQuestions.json
 
 const LearnPage = () => {
+  const { user } = useUser();
+  // console.log('user id: ', user.id);
+  console.log('user completed questions: ', user.publicMetadata.completedQuestionIds);
+  // console.log('user len of comp. ques.: ', user.publicMetadata.completedQuestionIds.length);
   const [questions, setQuestions] = useState([]); // all the ques
   const [answeredQuestions, setAnsweredQuestions] = useState({}); // the ans the user picks
-  const [canAccessQuiz, setCanAccessQuiz] = useState(true); // !! need it to set 12 hr timer before next quiz, WIP
   const [displayedQuestions, setDisplayedQuestions] = useState([]); // the 2 out of the 38 ques the user sees
   const [correctCount, setCorrectCount] = useState(0); // the # of questions the user got correct
   const [incorrectCount, setIncorrectCount] = useState(0); // the # of questions the user got incorrect
+  const [submittedQuiz, setSubmittedQuiz] = useState(false); // if the ques has been submitted or not
   const link =
     "https://gist.githubusercontent.com/jesalgandhi/5d0dddad0b3faf048990c534e5e98186/raw/12f54b265f69522b38660c31e8c561685d6769b7/piggyBankQuestions.json";
+
+  const [updateMetadataQuestionIds] = useMutation(queries.UPDATE_METADATA_QUESTION_IDS);
+
+  const [addMoneyFromQuestions] = useMutation(queries.ADD_MONEY_FROM_QUESTIONS);
+
 
   // here is where i get the questions from the gist link jesal made
   useEffect(() => {
     const getQuizQuestions = async () => {
       try {
         let { data } = await axios.get(link);
-        // console.log("successful RETRIEVAL of questions: ", data);
+
+        // filtering out the questions that have already been answered by the user
+        data = data.filter((ques) => !user.publicMetadata.completedQuestionIds.includes(ques.id));
+        // console.log("successful RETRIEVAL & REMOVAL of questions that have been done already: ", data);
+
+        if (data.length === 0) {
+          return (
+            <div>
+              <NavbarComponent />
+              <div className="container mx-auto p-4">
+                <h2 className="text-2xl font-bold my-4 text-center">You have answered all possible questions. Good job!</h2>
+              </div>
+            </div>
+          )
+        }
 
         // https://stackoverflow.com/questions/59810241/how-to-fisher-yates-shuffle-a-javascript-array
         // shuffling the questions using fisher-yates shuffle algorithm
@@ -38,48 +64,89 @@ const LearnPage = () => {
     };
 
     getQuizQuestions();
-  }, []);
+  }, [user.publicMetadata.completedQuestionIds]);
 
   // selecting the first 2 ques to display, since i randomly shuffled them in the beginning, picking the first 2 from the list is still random
   useEffect(() => {
     const selectRandomQuestions = () => {
       const selectedQuestions = questions.slice(0, 2);
-      console.log("selected questions: ", selectedQuestions);
+      // console.log("selected questions: ", selectedQuestions);
       setDisplayedQuestions(selectedQuestions);
+      // user.publicMetadata.completedQuestionIds.push(selectedQuestions[0].id, selectedQuestions[1].id)
     };
 
     selectRandomQuestions();
   }, [questions]);
 
+  useEffect(() => {
+    const completedQuestionIds = [];
+
+    for (const [key, value] of Object.entries(displayedQuestions)) {
+      completedQuestionIds.push(value.id);
+    }
+
+    console.log('completedQuestoinIds in useEffect: ', completedQuestionIds);
+
+    const updateUser = async () => {
+      if (submittedQuiz) {
+        if (!user.publicMetadata.lastDateSubmitted || (new Date() - new Date(user.publicMetadata.lastDateSubmitted)) >= (24 * 60 * 60 * 1000)) {
+          // updating their metadata with their question IDs
+          try {
+            await updateMetadataQuestionIds({
+              variables: {
+                updateMetadataQuestionIdsUserId2: user.id,
+                completedQuesIdsString: JSON.stringify(completedQuestionIds),
+                date: new Date()
+              },
+            });
+          } catch (e) {
+            console.log('failed to update metadata questions ids man: ', e);
+          }
+          //  adding money from questions
+          try {
+            await addMoneyFromQuestions({
+              variables: {
+                addMoneyFromQuestionsUserId2: user.id,
+                correctQuestions: correctCount
+              },
+            });
+          } catch (e) {
+            console.log('failed to add money from their correct answers man: ', e);
+          }
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 3500); // 3500 milliseconds = 3.5 sec
+        }
+        else {
+          console.log('this should never be printed basically');
+        }
+      }
+    }
+    updateUser();
+
+  }, [submittedQuiz, displayedQuestions, user, updateMetadataQuestionIds, addMoneyFromQuestions, correctCount])
+
   // for when they submit the quiz
   const handleQuizSubmission = (e) => {
     e.preventDefault();
+    setSubmittedQuiz(true);
     let correctCount = 0;
     let incorrectCount = 0;
 
     displayedQuestions.forEach((question) => {
       const selectedOption = answeredQuestions[question.id]; // getting da ans the user selected
+      user.publicMetadata.completedQuestionIds.push(question.id); // pushing the ques into comp ques Ids since they have submitted it
       // checking how many they got right/wrong
       if (selectedOption === question.correctAnswer) correctCount++;
       else incorrectCount++;
     });
 
-    console.log("correct responses:", correctCount);
-    console.log("incorrect responses:", incorrectCount);
+    // console.log("correct responses:", correctCount);
+    // console.log("incorrect responses:", incorrectCount);
 
     setCorrectCount(correctCount);
     setIncorrectCount(incorrectCount);
-
-    // !!!! IGNORE ALL THIS RIGHT NOW. all a failed attempt at trying to implement a 12 hour timer before next quiz is available.
-    // !!!! will need to come back to this eventually
-    setCanAccessQuiz(false); // disable the shi
-    // selectRandomQuestions();
-    // setCanAccessQuiz(true);
-    // ? have no idea what i was even going for with this tbh
-    setTimeout(() => {
-      setCanAccessQuiz(true); // can access quiz after 12 hrs
-      // selectRandomQuestions(); // displaying new set of random questions after 12 hrs
-    }, 12 * 60 * 60 * 1000); // 12 hours in milliseconds
   };
 
   const handleOptionSelect = (questionId, selectedOption) => {
@@ -95,64 +162,75 @@ const LearnPage = () => {
       <NavbarComponent />
       <div className="container mx-auto p-4">
         <h2 className="text-2xl font-bold my-4 text-center">Quiz Section</h2>
-        {canAccessQuiz ? (
-          <div className="card bg-base-300 shadow-xl my-4">
-            <form className="card-body">
-              {displayedQuestions.map((question, index) => (
-                <div key={question.id}>
-                  {/* <p className="font-bold">{index + 1}. {question.id} - {question.question}</p> */}
-                  <p className="font-bold">
-                    {index + 1}. {question.question}
-                  </p>
-                  <ul>
-                    {question.options.map((option, optIndex) => (
-                      <li key={optIndex}>
-                        <label
-                          style={{
-                            marginBottom: "16px",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          <input
-                            type="radio"
-                            name={question.id}
-                            value={option}
-                            onChange={() =>
-                              handleOptionSelect(question.id, option)
-                            }
-                            required
-                          />
-                          {option}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              <button
-                className="btn btn-primary mt-4"
-                onClick={handleQuizSubmission}
-              >
-                Submit
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div>
+
+        {submittedQuiz ? 
+            <div>
             <p className="text-center">
               You got {correctCount}{" "}
               {correctCount === 1 ? "question" : "questions"} correct!
             </p>
             <p className="text-center">
-              Please wait before attempting the quiz again.
+              {correctCount > 0 ?
+                `$${correctCount * 20} added to your checking account!` :
+                undefined}
             </p>
             <p className="text-center">
-              (work in progress... atm just refresh the page to get 2 other
-              questions)
+              Please wait 24 hours before your next set of questions.
             </p>
-          </div>
-        )}
+          </div> : 
+           user.publicMetadata.lastDateSubmitted && (new Date() - new Date(user.publicMetadata.lastDateSubmitted)) < (24 * 60 * 60 * 1000) ?
+            <div>
+            <p className="text-center">
+              Please wait 24 hours before your next set of questions.
+            </p>
+            </div> :
+            
+              <div className="card bg-base-300 shadow-xl my-4">
+              <form className="card-body">
+                {displayedQuestions.map((question, index) => (
+                  <div key={question.id}>
+                    {/* <p className="font-bold">{index + 1}. {question.id} - {question.question}</p> */}
+                    <p className="font-bold">
+                      {index + 1}. {question.question}
+                    </p>
+                    <ul>
+                      {question.options.map((option, optIndex) => (
+                        <li key={optIndex}>
+                          <label
+                            style={{
+                              marginBottom: "16px",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <input
+                              type="radio"
+                              name={question.id}
+                              value={option}
+                              onChange={() =>
+                                handleOptionSelect(question.id, option)
+                              }
+                              required
+                            />
+                            {option}
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                <button
+                  className="btn btn-primary mt-4"
+                  onClick={handleQuizSubmission}
+                >
+                  Submit
+                </button>
+              </form>
+            </div>
+        }
+
+
+
       </div>
     </>
   );
