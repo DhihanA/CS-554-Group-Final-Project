@@ -240,6 +240,67 @@ const ADD_SAVINGS_TO_CHECKING_TRANSACTION = gql`
     }
 `;
 
+const ADD_BUDGETED_TRANSACTION = gql`
+  mutation AddBudgetedTransaction(
+    $addBudgetedTransactionOwnerId2: String!, 
+    $addBudgetedTransactionAmount2: Float!, 
+    $addBudgetedTransactionDescription2: String!) {
+      addBudgetedTransaction(
+        ownerId: $addBudgetedTransactionOwnerId2, 
+        amount: $addBudgetedTransactionAmount2, 
+        description: $addBudgetedTransactionDescription2) {
+          amount
+          description
+          _id
+          dateOfTransaction
+          receiver {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                id
+                imageUrl
+                lastName
+              }
+            }
+          }
+          sender {
+            ... on CheckingAccount {
+              _id
+              balance
+              owner {
+                firstName
+                id
+                imageUrl
+                lastName
+              }
+            }
+          }
+          type
+        }
+    }
+`;
+
+const ADD_MONEY_FROM_QUESTIONS = gql`
+  mutation AddMoneyFromQuestions(
+    $addMoneyFromQuestionsUserId2: String!, 
+    $correctQuestions: Float!) {
+      addMoneyFromQuestions(
+        userId: $addMoneyFromQuestionsUserId2, 
+        correctQuestions: $correctQuestions) {
+          _id
+          balance
+          owner {
+            id
+            firstName
+            lastName
+            imageUrl
+          }
+        }
+    }
+`;
+
 
 
 const VERIFY_CHILD_MUTATION = gql`
@@ -352,6 +413,8 @@ let exported = {
   ADD_TRANSFER_TRANSACTION,
   ADD_CHECKING_TO_SAVINGS_TRANSACTION,
   ADD_SAVINGS_TO_CHECKING_TRANSACTION,
+  ADD_BUDGETED_TRANSACTION,
+  ADD_MONEY_FROM_QUESTIONS,
 
   GENERATE_PDF_MUTATION,
   GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,

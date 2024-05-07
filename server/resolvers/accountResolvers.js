@@ -121,10 +121,10 @@ export const accountResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
-    addMoneyFromQuestions: async (_, {accountId, correctQuestions}) => {
+    addMoneyFromQuestions: async (_, {userId, correctQuestions}) => {
       const checkingAccounts = await checkingAccountCollection();
       let theAccount = await checkingAccounts.findOne({
-        ownerId: accountId.trim(),
+        ownerId: userId.trim(),
       });
       console.log("theAccount user:", theAccount.ownerId);
   

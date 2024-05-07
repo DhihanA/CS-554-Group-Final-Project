@@ -286,7 +286,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
               undefined)}
 
             {selectedOption === option2 && accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
-              <p className="pb-1 font-medium text-sm">* The transferred money will go into your Savings Account. *</p>
+              <p className="pb-1 font-medium text-sm">The transferred money will go into your Savings Account.</p>
             ) : selectedOption === option1 && accountType.toUpperCase() === 'CHECKING ACCOUNT' && children ? (
               // console.log('we made it: ', children)
               // <p className="pb-1 font-medium text-sm">* PUT A TEXTBOX HERE *</p>
@@ -308,7 +308,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
 
 
 
-            ) : <p className="pb-1 font-medium text-sm">* The transferred money will go into your Checking Account. *</p>}
+            ) : <p className="pb-1 font-medium text-sm">The transferred money will go into your Checking Account.</p>}
             
             <div className="mb-4">
               <input

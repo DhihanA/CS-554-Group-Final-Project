@@ -10,12 +10,11 @@ import queries from "../queries"
 
 const LearnPage = () => {
   const { user } = useUser();
-  console.log('user id: ', user.id);
+  // console.log('user id: ', user.id);
   console.log('user completed questions: ', user.publicMetadata.completedQuestionIds);
-  console.log('user len of comp. ques.: ', user.publicMetadata.completedQuestionIds.length);
+  // console.log('user len of comp. ques.: ', user.publicMetadata.completedQuestionIds.length);
   const [questions, setQuestions] = useState([]); // all the ques
   const [answeredQuestions, setAnsweredQuestions] = useState({}); // the ans the user picks
-  const [canAccessQuiz, setCanAccessQuiz] = useState(true); // !! need it to set 12 hr timer before next quiz, WIP
   const [displayedQuestions, setDisplayedQuestions] = useState([]); // the 2 out of the 38 ques the user sees
   const [correctCount, setCorrectCount] = useState(0); // the # of questions the user got correct
   const [incorrectCount, setIncorrectCount] = useState(0); // the # of questions the user got incorrect
@@ -23,31 +22,17 @@ const LearnPage = () => {
   const link =
     "https://gist.githubusercontent.com/jesalgandhi/5d0dddad0b3faf048990c534e5e98186/raw/12f54b265f69522b38660c31e8c561685d6769b7/piggyBankQuestions.json";
 
-    const [updateMetadataQuestionIds] = useMutation(queries.UPDATE_METADATA_QUESTION_IDS, {
-      // update(cache, {data: {addSavingToCheckingTransfer}}) {
-      //   const {getAllTransactions} = cache.readQuery({
-      //     query: queries.GET_ALL_TRANSACTIONS,
-      //     variables: {
-      //       userId: user.id,
-      //       checkingAccountId: user.publicMetadata.checkingAccountId,
-      //       savingsAccountId: user.publicMetadata.savingsAccountId
-      //     }
-      //   });
-      // //   console.log('like what');
-      //   cache.writeQuery({
-      //     query: queries.GET_ALL_TRANSACTIONS,
-      //     variables: {
-      //       userId: user.id,
-      //       checkingAccountId: user.publicMetadata.checkingAccountId,
-      //       savingsAccountId: user.publicMetadata.savingsAccountId
-      //     },
-      //     data: {getAllTransactions: [...getAllTransactions, addSavingToCheckingTransfer]}
-      //   });
-      // },
-      onError: (error) => {
-          console.log(JSON.stringify(error, null, 2));
-      }
-    });
+  const [updateMetadataQuestionIds] = useMutation(queries.UPDATE_METADATA_QUESTION_IDS, {
+    onError: (error) => {
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
+
+  const [addMoneyFromQuestions] = useMutation(queries.ADD_MONEY_FROM_QUESTIONS, {
+    onError: (error) => {
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
 
 
   // here is where i get the questions from the gist link jesal made
@@ -59,6 +44,17 @@ const LearnPage = () => {
         // filtering out the questions that have already been answered by the user
         data = data.filter((ques) => !user.publicMetadata.completedQuestionIds.includes(ques.id));
         // console.log("successful RETRIEVAL & REMOVAL of questions that have been done already: ", data);
+
+        if (data.length === 0) {
+          return (
+            <div>
+              <NavbarComponent />
+              <div className="container mx-auto p-4">
+                <h2 className="text-2xl font-bold my-4 text-center">You have answered all possible questions. Good job!</h2>
+              </div>
+            </div>
+          )
+        }
 
         // https://stackoverflow.com/questions/59810241/how-to-fisher-yates-shuffle-a-javascript-array
         // shuffling the questions using fisher-yates shuffle algorithm
@@ -82,7 +78,7 @@ const LearnPage = () => {
   useEffect(() => {
     const selectRandomQuestions = () => {
       const selectedQuestions = questions.slice(0, 2);
-      console.log("selected questions: ", selectedQuestions);
+      // console.log("selected questions: ", selectedQuestions);
       setDisplayedQuestions(selectedQuestions);
       // user.publicMetadata.completedQuestionIds.push(selectedQuestions[0].id, selectedQuestions[1].id)
     };
@@ -102,6 +98,7 @@ const LearnPage = () => {
     const updateUser = async () => {
       if (submittedQuiz) {
         if (!user.publicMetadata.lastDateSubmitted || (new Date() - new Date(user.publicMetadata.lastDateSubmitted)) >= (24 * 60 * 60 * 1000)) {
+          // updating their metadata with their question IDs
           try {
             await updateMetadataQuestionIds({
               variables: {
@@ -113,15 +110,30 @@ const LearnPage = () => {
           } catch (e) {
             console.log('failed to update metadata questions ids man: ', e);
           }
+          //  adding money from questions
+          try {
+            await addMoneyFromQuestions({
+              variables: {
+                addMoneyFromQuestionsUserId2: user.id,
+                correctQuestions: correctCount
+              },
+            });
+          } catch (e) {
+            console.log('failed to add money from their correct answers man: ', e);
+          }
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 3500); // 3500 milliseconds = 3.5 sec
         }
         else {
-          console.log('mmmmm2wqqwr');
+          console.log('this should never be printed basically');
         }
       }
     }
     updateUser();
 
-  }, [submittedQuiz, displayedQuestions, user, updateMetadataQuestionIds])
+  }, [submittedQuiz, displayedQuestions, user, updateMetadataQuestionIds, addMoneyFromQuestions, correctCount])
 
   // for when they submit the quiz
   const handleQuizSubmission = (e) => {
@@ -138,8 +150,8 @@ const LearnPage = () => {
       else incorrectCount++;
     });
 
-    console.log("correct responses:", correctCount);
-    console.log("incorrect responses:", incorrectCount);
+    // console.log("correct responses:", correctCount);
+    // console.log("incorrect responses:", incorrectCount);
 
     setCorrectCount(correctCount);
     setIncorrectCount(incorrectCount);
@@ -152,18 +164,6 @@ const LearnPage = () => {
     }));
   };
 
-  // reloading page after 3.5 seconds when quiz results are displayed
-  useEffect(() => {
-    if (submittedQuiz) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 3500); // 3500 milliseconds = 3.5 sec
-    }
-  }, [submittedQuiz]);
-
-
-
-  
   return (
     <>
       {/* {console.log(displayedQuestions)} */}
@@ -178,13 +178,18 @@ const LearnPage = () => {
               {correctCount === 1 ? "question" : "questions"} correct!
             </p>
             <p className="text-center">
-              Please wait 24 hours before attempting the quiz again.
+              {correctCount > 0 ?
+                `$${correctCount * 20} added to your checking account!` :
+                undefined}
+            </p>
+            <p className="text-center">
+              Please wait 24 hours before your next set of questions.
             </p>
           </div> : 
            user.publicMetadata.lastDateSubmitted && (new Date() - new Date(user.publicMetadata.lastDateSubmitted)) < (24 * 60 * 60 * 1000) ?
             <div>
             <p className="text-center">
-              Thank you for answering! Please 24 hours before your next set of questions.
+              Please wait 24 hours before your next set of questions.
             </p>
             </div> :
             

@@ -1,32 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
-// import queries from "../../queries";
+import queries from "../queries.js";
+import { useUser } from "@clerk/clerk-react";
 
 const AddBudgetedTransactionModal = ({ toggleModal }) => {
+  const { user } = useUser();
+
   /* useState hooks */
   const [transactionName, setTransactionName] = useState("");
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
 
-  /* useMutation hooks */
-  //! configure this after mutation is complete
-  // const [addBudgetedTransaction] = useMutation(queries.ADD_COMPANY, {
-  //   update(cache, { data: { addCompany } }) {
-  //     const newCompany = {
-  //       ...addCompany,
-  //       numOfAlbums: 0,
-  //     };
-
-  //     const { recordCompanies } = cache.readQuery({
-  //       query: queries.GET_COMPANIES,
-  //     });
-  //     cache.writeQuery({
-  //       query: queries.GET_COMPANIES,
-  //       data: { recordCompanies: [...recordCompanies, newCompany] },
-  //     });
-  //   },
-  // });
+  const [addBudgetedTransaction] = useMutation(queries.ADD_BUDGETED_TRANSACTION, {
+    onError: (error) => {
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
 
   useEffect(() => {
     document.getElementById("my_modal_1").showModal();
@@ -47,17 +37,16 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
   };
 
   /* Form submission */
-  //!uncomment below after mutation above is complete
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    let trimmedTransactionName = transactionName.trim();
+    // let trimmedTransactionName = transactionName.trim();
     let trimmedAmount = amount.toString().trim();
     let trimmedDescription = description.trim();
-    if (trimmedTransactionName.length === 0) {
-      setError("Transaction Name should not be empty");
-      return;
-    }
+    // if (trimmedTransactionName.length === 0) {
+    //   setError("Transaction Name should not be empty");
+    //   return;
+    // }
     if (trimmedAmount.length === 0) {
       setError("Amount should not be empty");
       return;
@@ -71,12 +60,13 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
       try {
         await addBudgetedTransaction({
           variables: {
-            transactionName: trimmedTransactionName,
-            description: trimmedDescription,
-            amount: parseInt(trimmedAmount),
+            addBudgetedTransactionOwnerId2: user.id,
+            addBudgetedTransactionAmount2: parseFloat(trimmedAmount),
+            addBudgetedTransactionDescription2: trimmedDescription
           },
         });
         document.getElementById("my_modal_1").close();
+        alert('Successful budgeted transaction');
         toggleModal();
         resetForm();
       } catch (e) {
@@ -93,12 +83,15 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
         <div className="modal-box">
           <h3 className="font-bold text-lg">Add Budgeted Transaction</h3>
           <form onSubmit={handleFormSubmit} method="dialog" className="py-4">
+            <p className="pb-1 font-medium text-sm">This transaction is for setting aside money for a short-term purchase.</p>
+            <p className="pb-1 font-medium text-sm">You can edit/delete them in My Transactions, if you change your mind.</p>
             <div className="mb-4">
               <input
-                type="text"
-                placeholder="Transaction Name"
-                value={transactionName}
-                onChange={(e) => setTransactionName(e.target.value)}
+                type="number"
+                step="0.01"
+                placeholder="Amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
                 className="input input-bordered w-full max-w-xs"
                 required
               />
@@ -109,17 +102,6 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
                 placeholder="Description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="input input-bordered w-full max-w-xs"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="number"
-                step="0.01"
-                placeholder="Amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
                 className="input input-bordered w-full max-w-xs"
                 required
               />
