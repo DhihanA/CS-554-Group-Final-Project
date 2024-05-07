@@ -6,7 +6,10 @@ import {v4 as uuid} from 'uuid'
 
 const TransferMoneyModal = ({ toggleModal, accountType }) => {
   const { user } = useUser();
-  console.log("user here: ", user);
+  // console.log("user here: ", user);
+  console.log("user here: ", user.id);
+  console.log("user here: ", user.publicMetadata.checkingAccountId);
+  console.log("user here: ", user.publicMetadata.savingsAccountId);
 
   /* useState hooks */
   // const [transactionName, setTransactionName] = useState("");
@@ -30,30 +33,81 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
   // console.log('here are all the children: ', childrenData);
 
   const [transferMoney] = useMutation(queries.ADD_TRANSFER_TRANSACTION, {
-    update(cache, {data: {addTransferTransaction}}) {
-      // !! CHANGE THIS SHIT FROM ARTISTS TO WHAT APOLLO RETURNS WHEN GETALLTRANSACTIONS WORKS
-      const {getAllTransactions} = cache.readQuery({
-        query: queries.GET_ALL_TRANSACTIONS,
-        variables: {
-          userId: user.id,
-          checkingAccountId: user.publicMetadata.checkingAccountId,
-          savingsAccountId: user.publicMetadata.savingsAccountId
-        }
-      });
-    //   console.log('like what');
-      cache.writeQuery({
-        query: queries.GET_ALL_TRANSACTIONS,
-        variables: {
-          userId: user.id,
-          checkingAccountId: user.publicMetadata.checkingAccountId,
-          savingsAccountId: user.publicMetadata.savingsAccountId
-        },
-        data: {getAllTransactions: [...getAllTransactions, addTransferTransaction]}
-      });
-    },
+    // update(cache, {data: {addTransferTransaction}}) {
+    //   const {getAllTransactions} = cache.readQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     }
+    //   });
+    // //   console.log('like what');
+    //   cache.writeQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     },
+    //     data: {getAllTransactions: [...getAllTransactions, addTransferTransaction]}
+    //   });
+    // },
     onError: (error) => {
         // https://stackoverflow.com/questions/48863441/apollo-client-how-to-simply-debug-a-400-code-error
         // helped me figure out the error so much better by printing everything about the error
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
+
+  const [transferCheckingToSavings] = useMutation(queries.ADD_CHECKING_TO_SAVINGS_TRANSACTION, {
+    // update(cache, {data: {addCheckingToSavingTransfer}}) {
+    //   const {getAllTransactions} = cache.readQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     }
+    //   });
+    // //   console.log('like what');
+    //   cache.writeQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     },
+    //     data: {getAllTransactions: [...getAllTransactions, addCheckingToSavingTransfer]}
+    //   });
+    // },
+    onError: (error) => {
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
+
+  const [transferSavingsToChecking] = useMutation(queries.ADD_SAVINGS_TO_CHECKING_TRANSACTION, {
+    // update(cache, {data: {addSavingToCheckingTransfer}}) {
+    //   const {getAllTransactions} = cache.readQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     }
+    //   });
+    // //   console.log('like what');
+    //   cache.writeQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     },
+    //     data: {getAllTransactions: [...getAllTransactions, addSavingToCheckingTransfer]}
+    //   });
+    // },
+    onError: (error) => {
         console.log(JSON.stringify(error, null, 2));
     }
   });
@@ -77,25 +131,6 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
   
     }
   }, [childrenData, user.id]);
-
-  /* useMutation hooks */
-  //! configure this after mutation is complete
-  // const [transferMoney] = useMutation(queries.ADD_COMPANY, {
-  //   update(cache, { data: { addCompany } }) {
-  //     const newCompany = {
-  //       ...addCompany,
-  //       numOfAlbums: 0,
-  //     };
-
-  //     const { recordCompanies } = cache.readQuery({
-  //       query: queries.GET_COMPANIES,
-  //     });
-  //     cache.writeQuery({
-  //       query: queries.GET_COMPANIES,
-  //       data: { recordCompanies: [...recordCompanies, newCompany] },
-  //     });
-  //   },
-  // });
 
   useEffect(() => {
     document.getElementById("my_modal_2").showModal();
@@ -155,25 +190,68 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
       return;
     }    
   
-    const handleTransferMoney = () => {
-      try {
-        transferMoney({
-          variables: {
-            // transactionName: trimmedTransactionName,
-            // _id: new uuid(),
-            senderOwnerId: user.id,
-            receiverOwnerId: trimmedSelectedChildId,
-            amount: parseFloat(trimmedAmount),
-            description: trimmedDescription,
-          },
-        });
-        document.getElementById("my_modal_2").close();
-        alert('Transfer Successful');
-        toggleModal();
-        resetForm();
-      } catch (e) {
-        setError(e.message);
+    const handleTransferMoney = async () => {
+      // inter-user checking to checking
+      if (accountType.toUpperCase() === 'CHECKING ACCOUNT' && selectedOption === option1) {
+        try {
+          await transferMoney({
+            variables: {
+              // transactionName: trimmedTransactionName,
+              // _id: new uuid(),
+              senderOwnerId: user.id,
+              receiverOwnerId: trimmedSelectedChildId,
+              amount: parseFloat(trimmedAmount),
+              description: trimmedDescription,
+            },
+          });
+          document.getElementById("my_modal_2").close();
+          alert('Transfer Successful');
+          toggleModal();
+          resetForm();
+        } catch (e) {
+          setError(e.message);
+        }
       }
+      // checking to savings
+      else if (accountType.toUpperCase() === 'CHECKING ACCOUNT' && selectedOption === option2) {
+        try {
+          await transferCheckingToSavings({
+            variables: {
+              ownerId: user.id,
+              addCheckingToSavingTransferAmount2: parseFloat(trimmedAmount),
+              addCheckingToSavingTransferDescription2: trimmedDescription,
+            },
+          });
+          document.getElementById("my_modal_2").close();
+          alert('Transfer Successful');
+          toggleModal();
+          resetForm();
+        } catch (e) {
+          setError(e.message);
+        }
+
+      }
+      // savings to checking
+      else {
+        try {
+          await transferSavingsToChecking({
+            variables: {
+              addSavingToCheckingTransferOwnerId2: user.id,
+              addSavingToCheckingTransferAmount2: parseFloat(trimmedAmount),
+              addSavingToCheckingTransferDescription2: trimmedDescription,
+            },
+          });
+          document.getElementById("my_modal_2").close();
+          alert('Transfer Successful');
+          toggleModal();
+          resetForm();
+        } catch (e) {
+          setError(e.message);
+        }
+      }
+
+
+
     };
 
     handleTransferMoney();

@@ -39,7 +39,8 @@ const DashboardPage = ({ isParent }) => {
       userId: user.id,
       // accountType: "checking",
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    pollInterval: 5000
   });
 
   // * successful single query of savings acc info by user ID
@@ -52,7 +53,8 @@ const DashboardPage = ({ isParent }) => {
       userId: user.id,
       // accountType: "savings",
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    pollInterval: 5000
   });
 
   const hour = new Date().getHours();
