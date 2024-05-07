@@ -32,8 +32,6 @@ const Transactions = () => {
             query: queries.GET_ALL_TRANSACTIONS,
             variables: {
               userId: user.id,
-              checkingAccountId: user.publicMetadata.checkingAccountId,
-              savingsAccountId: user.publicMetadata.savingsAccountId,
             },
           });
 
