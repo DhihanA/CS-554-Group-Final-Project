@@ -72,10 +72,11 @@ export const typeDefs = `#graphql
     createAccountsAndUpdateUserInClerk(userId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
     addRoleAndDOB(userId: String!, dob: Date!, role: Role!): String
+    updateMetadataQuestionIds(userId: String!, completedQuesIdsString: String!): User
 
     # Account Mutations
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
-    addMoneyFromQuestions(accountId: String!, correctQuestions: Float!): CheckingAccount
+    addMoneyFromQuestions(userId: String!, correctQuestions: Float!): CheckingAccount
 
     # Transaction Mutations
     addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!): Transactions
