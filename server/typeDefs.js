@@ -40,6 +40,11 @@ export const typeDefs = `#graphql
     SavingToCheckingTransfer
   }
 
+  enum Role {
+    child
+    parent
+  }
+
   type DeleteTransactionResponse {
     success: Boolean!
     message: String!
@@ -66,6 +71,7 @@ export const typeDefs = `#graphql
     # User Mutations
     createAccountsAndUpdateUserInClerk(userId: String!): User
     verifyChild(userId: String!, verificationCode: String!): User
+    addRoleAndDOB(userId: String!, dob: Date!, role: Role!): String
 
     # Account Mutations
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount

@@ -31,7 +31,7 @@ export const accountResolvers = {
             extensions: { code: "INVALID_ID" },
           });
         }
-        throw new GraphQLError("Internal Server Error", {
+        throw new GraphQLError(error.message, {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
@@ -40,7 +40,7 @@ export const accountResolvers = {
       try {
         const accountCollection = await savingsAccountCollection();
         const account = await accountCollection.findOne({
-          ownerId: userId,
+          ownerId: userId
         });
 
         if (!account) {
