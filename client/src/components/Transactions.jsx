@@ -17,7 +17,8 @@ const Transactions = () => {
   } = useQuery(queries.GET_ALL_TRANSACTIONS, {
     variables: {
       userId: user.id,
-      accountType: "checking",
+      checkingAccountId: user.publicMetadata.checkingAccountId,
+      savingsAccountId: user.publicMetadata.savingsAccountId,
     },
     fetchPolicy: "cache-and-network",
   });
