@@ -121,5 +121,41 @@ export const accountResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
+    addMoneyFromQuestions: async (_, {accountId, correctQuestions}) => {
+      const checkingAccounts = await checkingAccountCollection();
+      let theAccount = await checkingAccounts.findOne({
+        ownerId: accountId.trim(),
+      });
+      console.log("theAccount user:", theAccount.ownerId);
+  
+      if (!theAccount) {
+          throw new GraphQLError("Account Not Found!");
+      }
+      if (correctQuestions < 0) {
+        throw new GraphQLError("Invalid number of correct questions");
+      }
+      try {
+          if (correctQuestions === 0) {
+              return theAccount;
+          }
+  
+          const rewardPerCorrectQuestion = 20; 
+          const rewardAmount = correctQuestions * rewardPerCorrectQuestion;
+          const newBalance = theAccount.balance + rewardAmount;
+  
+          return await checkingAccounts.findOneAndUpdate(
+              { _id: new ObjectId(theAccount._id)},
+              {
+                  $set: {
+                      balance: newBalance,
+                  },
+              },
+              { returnDocument: "after" } 
+          );
+      } catch (error) {
+          console.error("Error updating checking balance:", error);
+          throw new GraphQLError("Internal Server Error");
+      }
+  },
   },
 };

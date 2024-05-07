@@ -377,6 +377,7 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
+    
 
     deleteBudgetedTransaction: async (_, { ownerId, transactionId }) => {
       const transactionIdObj = new ObjectId(transactionId);
