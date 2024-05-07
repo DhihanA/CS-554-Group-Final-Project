@@ -250,9 +250,9 @@ const main = async () => {
   }
 
   childCounter = 1;
-  for (const key in Object.entries(
-    insertedCheckingAccountIds.insertedIds
-  ).slice(3)) {
+  for (let key in Object.entries(insertedCheckingAccountIds.insertedIds).slice(
+    3
+  )) {
     let currentChildKey = `child${childCounter}`;
     let userId = userIds[currentChildKey];
     let thisUser = await clerkClient.users.getUser(userId);
@@ -261,7 +261,9 @@ const main = async () => {
       publicMetadata: {
         ...publicMetadata,
         checkingAccountId:
-          insertedCheckingAccountIds.insertedIds[key].toString(),
+          insertedCheckingAccountIds.insertedIds[
+            (parseInt(key) + 3).toString()
+          ].toString(),
       },
     });
     childCounter++;
