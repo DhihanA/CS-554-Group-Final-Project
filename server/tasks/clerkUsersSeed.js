@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SEED_USERNAMES_UNVERIFIED = [
+const SEED_USERNAMES = [
   // child1, child2 associated with parent1
   "parent1",
   "child1",
@@ -16,11 +16,9 @@ const SEED_USERNAMES_UNVERIFIED = [
   // child3 associated with parent2
   "parent2",
   "child3",
-];
 
-const SEED_USERNAMES_VERIFIED = [
   // child4, child5, child6 associated with parent3
-  // "parent3",
+  "parent3",
   "child4",
   "child5",
   "child6",
@@ -33,8 +31,7 @@ const createUser = async (
   username,
   emailAddresses,
   parent,
-  verified,
-  parentId // optional, only needed if verified true
+  parentId
 ) => {
   let privateMetadata = {};
   let publicMetadata = {};
@@ -45,6 +42,7 @@ const createUser = async (
     publicMetadata = {
       verificationCode: Math.floor(100000 + Math.random() * 900000).toString(),
       role: "parent",
+      verified: true,
     };
   } else {
     privateMetadata = {
@@ -52,17 +50,12 @@ const createUser = async (
     };
     publicMetadata = {
       role: "child",
-      verified: verified,
+      verified: true,
+      parentId: parentId,
+      completedQuestionIds: [],
       // completedQuestionIds will be populated to [] upon verifyChild for verified==false
       // parentId will be populated upon verifyChild for verified==false
     };
-    if (parentId && verified) {
-      publicMetadata = {
-        ...publicMetadata,
-        parentId: parentId,
-        completedQuestionIds: [],
-      };
-    }
   }
 
   const createdUser = await clerkClient.users.createUser({
@@ -78,16 +71,12 @@ const createUser = async (
 };
 
 const deleteAllUsers = async () => {
-  let allUsers = await clerkClient.users.getUserList();
+  let allUsers = await clerkClient.users.getUserList({ limit: 500 });
   allUsers = allUsers.data;
   console.log("Deleting all previous seed users...");
   for (const user of allUsers) {
     // only delete users from the seed file, not externally created users
-    if (
-      SEED_USERNAMES_UNVERIFIED.includes(user.username) ||
-      SEED_USERNAMES_VERIFIED.includes(user.username) ||
-      user.username === "parent3"
-    ) {
+    if (SEED_USERNAMES.includes(user.username)) {
       await clerkClient.users.deleteUser(user.id);
     }
   }
@@ -96,38 +85,20 @@ const deleteAllUsers = async () => {
 
 const createUsers = async () => {
   let createdUsers = [];
-  await deleteAllUsers();
   console.log("Creating seed users...");
-  for (const username of SEED_USERNAMES_UNVERIFIED) {
+  let currParentUsername;
+  for (const username of SEED_USERNAMES) {
     const parent = username.includes("parent");
-    const email = username + "@gmail.com";
-    const createdUser = await createUser(
-      username,
-      username.split("").reverse().join(""),
-      username,
-      [email],
-      parent,
-      false,
-      null
-    );
-    createdUsers.push(createdUser);
-  }
+    if (parent) currParentUsername = username;
 
-  /* Creating verified children (4,5,6) whose parent is parent3 */
-  await createUser(
-    "parent3",
-    "parent3".split("").reverse().join(""),
-    "parent3",
-    ["parent3@gmail.com"],
-    true,
-    true,
-    null
-  );
-  const users = await clerkClient.users.getUserList();
-  const parent3 = users.data.filter((user) => user.username === "parent3");
-  console.log();
-  for (const username of SEED_USERNAMES_VERIFIED) {
-    const parent = username.includes("parent");
+    let parentIdOfCurrentChild = undefined;
+    if (!parent) {
+      let allUsers = await clerkClient.users.getUserList({ limit: 500 });
+      const thisParent = allUsers.data.filter(
+        (user) => user.username === currParentUsername
+      );
+      parentIdOfCurrentChild = thisParent[0].id;
+    }
     const email = username + "@gmail.com";
     const createdUser = await createUser(
       username,
@@ -135,8 +106,7 @@ const createUsers = async () => {
       username,
       [email],
       parent,
-      true,
-      parent3[0].id
+      parentIdOfCurrentChild
     );
     createdUsers.push(createdUser);
   }
@@ -146,14 +116,12 @@ const createUsers = async () => {
 };
 
 const writeToJson = async () => {
+  await deleteAllUsers();
   const createdUsers = await createUsers();
   const userIds = createdUsers.reduce((acc, user) => {
     acc[user.username] = user.id;
     return acc;
   }, {});
-  const users = await clerkClient.users.getUserList();
-  const parent3 = users.data.filter((user) => user.username === "parent3");
-  userIds["parent3"] = parent3[0].id;
 
   fs.writeFile(
     __dirname + "/staticClerkIds.json",
