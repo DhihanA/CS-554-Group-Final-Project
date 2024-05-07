@@ -76,6 +76,7 @@ export const typeDefs = `#graphql
 
     # Account Mutations
     updateSavingsBalanceForLogin(accountId: String!): SavingsAccount
+    addMoneyFromQuestions(accountId: String!, correctQuestions: Float!): CheckingAccount
 
     # Transaction Mutations
     addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!): Transactions
