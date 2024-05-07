@@ -90,17 +90,21 @@ export const accountResolvers = {
   },
   Mutation: {
     updateSavingsBalanceForLogin: async (_, { accountId }) => {
+      const savingsAccounts = await savingsAccountCollection();
+      let theAccount = await savingsAccounts.findOne({
+        _id: new ObjectId(accountId.trim()),
+      });
+      if (!theAccount) {
+        throw new GraphQLError("Account Not Found!");
+      }
       try {
-        const savingsAccounts = await savingsAccountCollection();
-        let theAccount = await savingsAccounts.findOne({
-          _id: new ObjectId(accountId.trim()),
-        });
-        const interestRate = theAccount.interestRate;
+        const interestRate = theAccount.interestRate / 100;
         const days =
           (new Date() - new Date(theAccount.lastDateUpdated)) /
           (1000 * 60 * 60 * 24);
         const interest =
-          (theAccount.currentBalance * interestRate * days) / 365;
+          theAccount.currentBalance * (1 + interestRate) ** (days / 365) -
+          theAccount.currentBalance;
         const newBalance = theAccount.currentBalance + interest;
 
         return await savingsAccounts.findOneAndUpdate(
