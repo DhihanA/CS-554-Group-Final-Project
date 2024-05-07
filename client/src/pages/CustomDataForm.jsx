@@ -59,6 +59,7 @@ const CustomDataForm = () => {
         response = await updateParentUser({variables: { userId: user.id, dob: formattedDateOfBirth, role: role }});
       }
       console.log(response);
+      navigate('/dashboard');
     } catch(e) {
       console.log(e);
       setError(e.message);
