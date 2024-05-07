@@ -31,7 +31,7 @@ export const accountResolvers = {
             extensions: { code: "INVALID_ID" },
           });
         }
-        throw new GraphQLError("Internal Server Error", {
+        throw new GraphQLError(error.message, {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         });
       }
@@ -40,7 +40,7 @@ export const accountResolvers = {
       try {
         const accountCollection = await savingsAccountCollection();
         const account = await accountCollection.findOne({
-          ownerId: userId,
+          ownerId: userId
         });
 
         if (!account) {
@@ -90,17 +90,21 @@ export const accountResolvers = {
   },
   Mutation: {
     updateSavingsBalanceForLogin: async (_, { accountId }) => {
+      const savingsAccounts = await savingsAccountCollection();
+      let theAccount = await savingsAccounts.findOne({
+        _id: new ObjectId(accountId.trim()),
+      });
+      if (!theAccount) {
+        throw new GraphQLError("Account Not Found!");
+      }
       try {
-        const savingsAccounts = await savingsAccountCollection();
-        let theAccount = await savingsAccounts.findOne({
-          _id: new ObjectId(accountId.trim()),
-        });
-        const interestRate = theAccount.interestRate;
+        const interestRate = theAccount.interestRate / 100;
         const days =
           (new Date() - new Date(theAccount.lastDateUpdated)) /
           (1000 * 60 * 60 * 24);
         const interest =
-          (theAccount.currentBalance * interestRate * days) / 365;
+          theAccount.currentBalance * (1 + interestRate) ** (days / 365) -
+          theAccount.currentBalance;
         const newBalance = theAccount.currentBalance + interest;
 
         return await savingsAccounts.findOneAndUpdate(

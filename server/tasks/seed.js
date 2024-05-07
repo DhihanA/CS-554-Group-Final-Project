@@ -66,8 +66,8 @@ const main = async () => {
     {
       _id: savingsIds[0],
       ownerId: userIds.child1,
-      currentBalance: 200,
-      previousBalance: 0,
+      currentBalance: 1000,
+      previousBalance: 1000,
       interestRate: 4.3,
       lastDateUpdated: new Date(),
     },
@@ -75,8 +75,8 @@ const main = async () => {
     {
       _id: savingsIds[1],
       ownerId: userIds.child2,
-      currentBalance: 0,
-      previousBalance: 0,
+      currentBalance: 1000,
+      previousBalance: 1000,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
     },
@@ -84,8 +84,8 @@ const main = async () => {
     {
       _id: savingsIds[2],
       ownerId: userIds.child3,
-      currentBalance: 0,
-      previousBalance: 0,
+      currentBalance: 1000,
+      previousBalance: 1000,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
     },
@@ -93,8 +93,8 @@ const main = async () => {
     {
       _id: savingsIds[3],
       ownerId: userIds.child4,
-      currentBalance: 0,
-      previousBalance: 0,
+      currentBalance: 1000,
+      previousBalance: 1000,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
     },
@@ -102,8 +102,8 @@ const main = async () => {
     {
       _id: savingsIds[4],
       ownerId: userIds.child5,
-      currentBalance: 0,
-      previousBalance: 0,
+      currentBalance: 1000,
+      previousBalance: 1000,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
     },
@@ -111,8 +111,8 @@ const main = async () => {
     {
       _id: savingsIds[5],
       ownerId: userIds.child6,
-      currentBalance: 0,
-      previousBalance: 0,
+      currentBalance: 1000,
+      previousBalance: 1000,
       interestRate: 5.3,
       lastDateUpdated: new Date(),
     },
@@ -123,7 +123,7 @@ const main = async () => {
     {
       _id: checkingIds[0],
       ownerId: userIds.parent1,
-      balance: 500,
+      balance: 1000,
     },
     //parent 2's checking account
     {
