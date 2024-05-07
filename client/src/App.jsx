@@ -19,7 +19,7 @@ import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
 import HowTo from "./pages/HowTo";
-// import CustomDataForm from './pages/CustomDataForm';
+import CustomDataForm from './pages/CustomDataForm';
 
 function App() {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -37,12 +37,15 @@ function App() {
 
   // uncomment after metadata stuff done:
   let isParent = false;
-  let hasRole = true;
+  let hasRole = false;
   if (isSignedIn && user && user.publicMetadata.verificationCode)
     isParent = true;
   if (isSignedIn && user.publicMetadata.role) {
+    console.log(`role: ${user.publicMetadata.role}`)
     hasRole = true;
   }
+
+  
 
   return (
     <>
@@ -99,10 +102,11 @@ function App() {
         />
 
 
-        {/* <Route 
+        <Route 
           path="/fillinfo"
-          element = {<CustomDataForm />}
-        /> */}
+          element = {hasRole? <Navigate to="/dashboard" /> : <CustomDataForm /> }
+        />
+      
       </Routes>
     </>
   );

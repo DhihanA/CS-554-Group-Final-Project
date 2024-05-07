@@ -15,6 +15,7 @@
     "@clerk/clerk-js": "^5.2.1",
     "@clerk/clerk-react": "^5.0.1",
     "axios": "^1.6.8",
+    "date-fns": "^3.6.0",
     "graphql": "^16.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
