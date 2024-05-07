@@ -50,8 +50,6 @@ const Transactions = () => {
               },
               variables: {
                 userId: user.id,
-                checkingAccountId: user.publicMetadata.checkingAccountId,
-                savingsAccountId: user.publicMetadata.savingsAccountId,
               },
             });
           }
