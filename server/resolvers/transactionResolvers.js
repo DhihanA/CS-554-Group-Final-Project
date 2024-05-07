@@ -80,9 +80,9 @@ export const transactionResolvers = {
   Mutation: {
     addTransferTransaction: async (
       _,
-      { senderId, receiverId, amount, description }
+      { senderOwnerId, receiverOwnerId, amount, description }
     ) => {
-      if (senderId === receiverId) {
+      if (senderOwnerId === receiverOwnerId) {
         throw new GraphQLError(
           "Sender and Receiver cannot be the same for transfer transactions"
         );
@@ -92,10 +92,12 @@ export const transactionResolvers = {
       }
       const caCollection = await checkingAccountCollection();
       const senderAccount = await caCollection.findOne({
-        _id: new ObjectId(senderId),
+        // _id: new ObjectId(senderId),
+        ownerId: senderOwnerId,
       });
       const receiverAccount = await caCollection.findOne({
-        _id: new ObjectId(receiverId),
+        // _id: new ObjectId(receiverId),
+        ownerId: receiverOwnerId,
       });
 
       if (!senderAccount) {
@@ -110,8 +112,8 @@ export const transactionResolvers = {
       try {
         const transaction = {
           _id: new ObjectId(),
-          senderId: new ObjectId(senderId),
-          receiverId: new ObjectId(receiverId),
+          senderId: new ObjectId(senderAccount._id),
+          receiverId: new ObjectId(receiverAccount._id),
           amount: amount,
           description: description.trim(),
           dateOfTransaction: new Date(),
@@ -121,18 +123,18 @@ export const transactionResolvers = {
         const transactionsCol = await transactionsCollection();
         await transactionsCol.insertOne(transaction);
         const senderUser = await caCollection.findOne({
-          _id: new ObjectId(senderId),
+          _id: new ObjectId(senderAccount._id),
         });
         const receiverUser = await caCollection.findOne({
-          _id: new ObjectId(receiverId),
+          _id: new ObjectId(receiverAccount._id),
         });
 
         await caCollection.updateOne(
-          { _id: new ObjectId(senderId) },
+          { _id: new ObjectId(senderAccount._id) },
           { $inc: { balance: -amount } }
         );
         await caCollection.updateOne(
-          { _id: new ObjectId(receiverId) },
+          { _id: new ObjectId(receiverAccount._id) },
           { $inc: { balance: amount } }
         );
         await redisClient.del(`allTransactions:${senderUser.ownerId.trim()}`);

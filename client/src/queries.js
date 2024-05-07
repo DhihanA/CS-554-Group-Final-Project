@@ -89,6 +89,16 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
     }
   }
 `;
+const GET_CHILDREN_BY_PARENT_ID = gql`
+  query Query($parentUserId: String!) {
+    getChildren(parentUserId: $parentUserId) {
+      firstName
+      id
+      imageUrl
+      lastName
+    }
+  }
+`;
 // const GET_USER_INFO_BY_ID = gql`
 // `;
 
@@ -181,6 +191,7 @@ let exported = {
   GET_ALL_TRANSACTIONS,
   CHECKING_ACCOUNT_INFO_BY_USER_ID,
   SAVINGS_ACCOUNT_INFO_BY_USER_ID,
+  GET_CHILDREN_BY_PARENT_ID,
 
   GENERATE_PDF_MUTATION,
   GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,
