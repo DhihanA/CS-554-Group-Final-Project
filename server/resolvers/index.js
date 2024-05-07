@@ -17,13 +17,7 @@ export const resolvers = {
       return null;
     },
   },
-  SavingsAccount: {
-    owner: async (ParentValue) => {
-      const ownerId = ParentValue.ownerId.trim();
-      const user = await clerkClient.users.getUser(ownerId);
-      return user;
-    },
-  },
+
   CheckingAccount: {
     owner: async (ParentValue) => {
       const ownerId = ParentValue.ownerId.trim();
@@ -31,6 +25,14 @@ export const resolvers = {
       return user;
     },
   },
+  SavingsAccount: {
+    owner: async (ParentValue) => {
+      const ownerId = ParentValue.ownerId.trim();
+      const user = await clerkClient.users.getUser(ownerId);
+      return user;
+    },
+  },
+  
   Transactions: {
     sender: async (ParentValue) => {
       const accountId = ParentValue.senderId;
