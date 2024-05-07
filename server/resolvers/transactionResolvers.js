@@ -93,11 +93,12 @@ export const transactionResolvers = {
       const caCollection = await checkingAccountCollection();
       const senderAccount = await caCollection.findOne({
         // _id: new ObjectId(senderId),
-        ownerId: senderOwnerId
+        ownerId: senderOwnerId,
       });
       const receiverAccount = await caCollection.findOne({
         // _id: new ObjectId(receiverId),
-        ownerId: receiverOwnerId
+        ownerId: receiverOwnerId,
+
       });
 
       if (!senderAccount) {

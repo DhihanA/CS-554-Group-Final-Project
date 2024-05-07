@@ -64,7 +64,7 @@ export const typeDefs = `#graphql
     getAccountByAccountId(accountId: String!): AccountType
 
     # Transaction Queries
-    getAllTransactions(userId: String! , checkingAccountId: String!, savingsAccountId: String!): [Transactions]
+    getAllTransactions(userId: String!, checkingAccountId: String!, savingsAccountId: String!): [Transactions]
   }
 
   type Mutation {

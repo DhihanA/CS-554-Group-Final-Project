@@ -10,7 +10,6 @@ export const userResolvers = {
   Query: {
     getAllChildren: async () => {
       const allUsers = await clerkClient.users.getUserList({ limit: 500 });
-      console.log(allUsers);
       const allChildren = allUsers.data.filter((user) => {
         if (user.publicMetadata.role === "child") return user;
       });
@@ -19,10 +18,17 @@ export const userResolvers = {
 
     // test after parentId
     // parent will call this query on dashboard with THEIR own id
-    getChildren: async (_, { parentId }) => {
-      const allUsers = await clerkClient.users.getUserList();
+    getChildren: async (_, { parentUserId }) => {
+      const parentId_ = parentUserId.toString().trim();
+      const allUsers = await clerkClient.users.getUserList({ limit: 500 });
+      console.log(allUsers.data);
       const children = allUsers.data.filter((user) => {
-        if (user.publicMetadata.parentId === parentId) return user;
+        if (
+          user.publicMetadata &&
+          user.publicMetadata.role === "child" &&
+          user.publicMetadata.parentId === parentId_
+        )
+          return user;
       });
       return children;
     },
@@ -100,8 +106,6 @@ export const userResolvers = {
             ownerId: thisUser.id.toString(),
             balance: thisUser.publicMetadata.role === "child" ? 500 : 999999999,
           });
-
-          console.log(createdCheckingAccount);
 
           await clerkClient.users.updateUser(userId_, {
             publicMetadata: {
@@ -186,7 +190,7 @@ export const userResolvers = {
 
       let allClerkUsers;
       try {
-        allClerkUsers = await clerkClient.users.getUserList();
+        allClerkUsers = await clerkClient.users.getUserList({ limit: 500 });
       } catch (e) {
         throw new GraphQLError("Could not get all users", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
@@ -205,8 +209,6 @@ export const userResolvers = {
           break;
         }
       }
-
-      console.log("parent", parent);
 
       if (parent === undefined) {
         throw new GraphQLError("Incorrect Verification Code", {
@@ -231,7 +233,6 @@ export const userResolvers = {
       }
 
       let updatedChild = await clerkClient.users.getUser(userId);
-      console.log("updatedChild", updatedChild);
       return updatedChild;
     },
   },

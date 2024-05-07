@@ -8,9 +8,6 @@ import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import queries from "../queries";
 
 const DashboardPage = ({ isParent }) => {
-  // const [checkingAccInfo, setCheckingAccInfo] = useState(undefined);
-  // const [savingsAccInfo, setSavingsAccInfo] = useState(undefined);
-
   const { user } = useUser();
   // console.log("user here: ", user.id);
 
@@ -37,10 +34,9 @@ const DashboardPage = ({ isParent }) => {
   } = useQuery(queries.CHECKING_ACCOUNT_INFO_BY_USER_ID, {
     variables: {
       userId: user.id,
-      // accountType: "checking",
     },
     fetchPolicy: "network-only",
-    pollInterval: 5000
+    pollInterval: 5000,
   });
 
   // * successful single query of savings acc info by user ID
@@ -51,11 +47,24 @@ const DashboardPage = ({ isParent }) => {
   } = useQuery(queries.SAVINGS_ACCOUNT_INFO_BY_USER_ID, {
     variables: {
       userId: user.id,
-      // accountType: "savings",
+    },
+    fetchPolicy: "network-only",
+    pollInterval: 5000,
+  });
+
+  const {
+    loading: getChildrenLoading,
+    error: getChildrenError,
+    data: getChildrenData,
+  } = useQuery(queries.GET_CHILDREN_BY_PARENT_ID, {
+    variables: {
+      parentUserId: user.id,
     },
     fetchPolicy: "network-only",
     pollInterval: 5000
   });
+
+  console.log(getChildrenData);
 
   const hour = new Date().getHours();
   let greeting;
@@ -145,6 +154,10 @@ const DashboardPage = ({ isParent }) => {
             {" "}
             {greeting}
             <h1 className="text-2xl font-bold m-4">PARENT DASHBOARD WIP!!!</h1>
+            <h2>
+              Your Verification code is {user.publicMetadata.verificationCode}.
+              Give this to your children when they sign up.
+            </h2>
           </div>
         </div>
       </BasePage>
