@@ -7,6 +7,8 @@ import {
 } from "../config/mongoCollections.js";
 import redisClient from "../clients/redisClient.js";
 import wkhtmltopdf from "wkhtmltopdf";
+import clerkClient from "../clients/clerkClient.js";
+import { generateTransactionsHtml } from "./pdfHelpers/generateTransactionsHtml.js";
 
 const htmlToPdf = async (html) => {
   return new Promise((resolve, reject) => {
@@ -23,49 +25,6 @@ const htmlToPdf = async (html) => {
       });
     });
   });
-};
-
-const generateTransactionsHtml = (transactions) => {
-  const rows = transactions
-    .map(
-      (t) => `
-    <tr>
-      <td>${t.dateOfTransaction}</td>
-      <td>${t.description}</td>
-      <td>${t.amount}</td>
-      <td>${t.type}</td>
-    </tr>
-  `
-    )
-    .join("");
-
-  return `
-    <html>
-    <head>
-      <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-      </style>
-    </head>
-    <body>
-      <h1>Transaction Report</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Amount</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-    </body>
-    </html>
-  `;
 };
 
 export const transactionResolvers = {
@@ -454,12 +413,49 @@ export const transactionResolvers = {
         throw new GraphQLError("Internal Server Error");
       }
     },
-    downloadTransactions: async (_, { transactions }) => {
+    downloadTransactions: async (_, { transactions, userId }) => {
+      const userId_ = userId.toString().trim();
+      let thisUser;
       try {
-        let transactionsJson = JSON.parse(transactions);
+        thisUser = await clerkClient.users.getUser(userId_);
+        const userName = `${thisUser.firstName} ${thisUser.lastName}`;
+        const avatarUrl = thisUser.imageUrl;
 
-        const htmlContent = generateTransactionsHtml(transactionsJson);
+        // receive the transactions as a JSON string from the user and parse it
+        let transactionsJson = JSON.parse(transactions);
+        const htmlContent = generateTransactionsHtml(
+          transactionsJson,
+          userName
+        );
         const pdfBase64 = await htmlToPdf(htmlContent);
+        return pdfBase64;
+      } catch (e) {
+        console.log("Error downloading transactions PDF:", e);
+        throw new GraphQLError("Failed to generate PDF", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+    },
+
+    //! jesal: test
+    downloadTransactionsOfAllChildren: async (
+      _,
+      { transactionsArray, userId }
+    ) => {
+      const userId_ = userId.toString().trim();
+      let thisUser;
+      try {
+        thisUser = await clerkClient.users.getUser(userId_);
+        const userName = `${thisUser.firstName} ${thisUser.lastName}`;
+
+        let transactionsJson = JSON.parse(transactionsArray);
+        let allHtml = ``;
+        for (const transaction of transactionsJson) {
+          const htmlContent = generateTransactionsHtml(transaction, userName);
+          allHtml.concat(htmlContent);
+        }
+
+        const pdfBase64 = await htmlToPdf(allHtml);
         return pdfBase64;
       } catch (e) {
         console.log("Error downloading transactions PDF:", e);

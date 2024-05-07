@@ -2,8 +2,16 @@ import { gql } from "@apollo/client";
 
 //#region GET ALL QUERIES
 const GET_ALL_TRANSACTIONS = gql`
-  query GetAllTransactions($userId: String!, $accountType: String!) {
-    getAllTransactions(userId: $userId, accountType: $accountType) {
+  query GetAllTransactions(
+    $userId: String!
+    $checkingAccountId: String!
+    $savingsAccountId: String!
+  ) {
+    getAllTransactions(
+      userId: $userId
+      checkingAccountId: $checkingAccountId
+      savingsAccountId: $savingsAccountId
+    ) {
       _id
       amount
       dateOfTransaction
@@ -106,45 +114,6 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
 //     }
 //   }
 // `;
-
-const ADD_TRANSFER_TRANSACTION = gql`
-  mutation AddTransferTransaction(
-    $senderOwnerId: String!, 
-    $receiverOwnerId: String!, 
-    $amount: Float!, 
-    $description: String!) {
-      addTransferTransaction(
-        senderOwnerId: $senderOwnerId, 
-        receiverOwnerId: $receiverOwnerId, 
-        amount: $amount, 
-        description: $description) {
-          sender {
-            ... on CheckingAccount {
-              _id
-              balance
-              owner {
-                firstName
-                lastName
-              }
-            }
-          }
-          receiver {
-            ... on CheckingAccount {
-              _id
-              balance
-              owner {
-                firstName
-                lastName
-              }
-            }
-          }
-          amount
-          description
-          dateOfTransaction
-          type
-        }
-    }
-`;
 //#endregion
 
 //#region EDIT MUTATIONS
@@ -185,8 +154,17 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
 //#endregion
 
 const GENERATE_PDF_MUTATION = gql`
-  mutation Mutation($transactions: String!) {
-    downloadTransactions(transactions: $transactions)
+  mutation Mutation($transactions: String!, $userId: String!) {
+    downloadTransactions(transactions: $transactions, userId: $userId)
+  }
+`;
+
+const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
+  mutation Mutation($transactionsArray: String!, $userId: String!) {
+    downloadTransactionsOfAllChildren(
+      transactionsArray: $transactionsArray
+      userId: $userId
+    )
   }
 `;
 
@@ -204,8 +182,11 @@ let exported = {
 
   ADD_TRANSFER_TRANSACTION,
   GENERATE_PDF_MUTATION,
+  GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,
 
-  // GET_USER_INFO_BY_ID,
+  VERIFY_CHILD_MUTATION,
+  ADD_ROLE_AND_DOB_MUTATION,
+  CREATE_ACCOUNTS_MUTATION,
 };
 
 export default exported;
