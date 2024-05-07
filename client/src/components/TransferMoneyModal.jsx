@@ -32,85 +32,11 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
   });
   // console.log('here are all the children: ', childrenData);
 
-  const [transferMoney] = useMutation(queries.ADD_TRANSFER_TRANSACTION, {
-    // update(cache, {data: {addTransferTransaction}}) {
-    //   const {getAllTransactions} = cache.readQuery({
-    //     query: queries.GET_ALL_TRANSACTIONS,
-    //     variables: {
-    //       userId: user.id,
-    //       checkingAccountId: user.publicMetadata.checkingAccountId,
-    //       savingsAccountId: user.publicMetadata.savingsAccountId
-    //     }
-    //   });
-    // //   console.log('like what');
-    //   cache.writeQuery({
-    //     query: queries.GET_ALL_TRANSACTIONS,
-    //     variables: {
-    //       userId: user.id,
-    //       checkingAccountId: user.publicMetadata.checkingAccountId,
-    //       savingsAccountId: user.publicMetadata.savingsAccountId
-    //     },
-    //     data: {getAllTransactions: [...getAllTransactions, addTransferTransaction]}
-    //   });
-    // },
-    onError: (error) => {
-        // https://stackoverflow.com/questions/48863441/apollo-client-how-to-simply-debug-a-400-code-error
-        // helped me figure out the error so much better by printing everything about the error
-        console.log(JSON.stringify(error, null, 2));
-    }
-  });
+  const [transferMoney] = useMutation(queries.ADD_TRANSFER_TRANSACTION);
 
-  const [transferCheckingToSavings] = useMutation(queries.ADD_CHECKING_TO_SAVINGS_TRANSACTION, {
-    // update(cache, {data: {addCheckingToSavingTransfer}}) {
-    //   const {getAllTransactions} = cache.readQuery({
-    //     query: queries.GET_ALL_TRANSACTIONS,
-    //     variables: {
-    //       userId: user.id,
-    //       checkingAccountId: user.publicMetadata.checkingAccountId,
-    //       savingsAccountId: user.publicMetadata.savingsAccountId
-    //     }
-    //   });
-    // //   console.log('like what');
-    //   cache.writeQuery({
-    //     query: queries.GET_ALL_TRANSACTIONS,
-    //     variables: {
-    //       userId: user.id,
-    //       checkingAccountId: user.publicMetadata.checkingAccountId,
-    //       savingsAccountId: user.publicMetadata.savingsAccountId
-    //     },
-    //     data: {getAllTransactions: [...getAllTransactions, addCheckingToSavingTransfer]}
-    //   });
-    // },
-    onError: (error) => {
-        console.log(JSON.stringify(error, null, 2));
-    }
-  });
+  const [transferCheckingToSavings] = useMutation(queries.ADD_CHECKING_TO_SAVINGS_TRANSACTION);
 
-  const [transferSavingsToChecking] = useMutation(queries.ADD_SAVINGS_TO_CHECKING_TRANSACTION, {
-    // update(cache, {data: {addSavingToCheckingTransfer}}) {
-    //   const {getAllTransactions} = cache.readQuery({
-    //     query: queries.GET_ALL_TRANSACTIONS,
-    //     variables: {
-    //       userId: user.id,
-    //       checkingAccountId: user.publicMetadata.checkingAccountId,
-    //       savingsAccountId: user.publicMetadata.savingsAccountId
-    //     }
-    //   });
-    // //   console.log('like what');
-    //   cache.writeQuery({
-    //     query: queries.GET_ALL_TRANSACTIONS,
-    //     variables: {
-    //       userId: user.id,
-    //       checkingAccountId: user.publicMetadata.checkingAccountId,
-    //       savingsAccountId: user.publicMetadata.savingsAccountId
-    //     },
-    //     data: {getAllTransactions: [...getAllTransactions, addSavingToCheckingTransfer]}
-    //   });
-    // },
-    onError: (error) => {
-        console.log(JSON.stringify(error, null, 2));
-    }
-  });
+  const [transferSavingsToChecking] = useMutation(queries.ADD_SAVINGS_TO_CHECKING_TRANSACTION);
 
 
   useEffect(() => {
@@ -205,10 +131,11 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
             },
           });
           document.getElementById("my_modal_2").close();
-          alert('Transfer Successful');
+          // alert('Transfer Successful');
           toggleModal();
           resetForm();
         } catch (e) {
+          console.log('ISSUE HERE!!!')
           setError(e.message);
         }
       }
@@ -223,11 +150,12 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
             },
           });
           document.getElementById("my_modal_2").close();
-          alert('Transfer Successful');
+          // alert('Transfer Successful');
           toggleModal();
           resetForm();
         } catch (e) {
           setError(e.message);
+          return;
         }
 
       }
@@ -242,7 +170,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
             },
           });
           document.getElementById("my_modal_2").close();
-          alert('Transfer Successful');
+          // alert('Transfer Successful');
           toggleModal();
           resetForm();
         } catch (e) {
@@ -300,7 +228,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
                 <option value="">Select a user...</option>
                 {children.map((child) => (
                   <option key={child.id} value={child.id}>
-                    `${child.firstName} ${child.lastName}`
+                    {`${child.firstName} ${child.lastName}`}
                   </option>
                 ))}
               </select>

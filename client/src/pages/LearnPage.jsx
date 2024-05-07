@@ -22,17 +22,9 @@ const LearnPage = () => {
   const link =
     "https://gist.githubusercontent.com/jesalgandhi/5d0dddad0b3faf048990c534e5e98186/raw/12f54b265f69522b38660c31e8c561685d6769b7/piggyBankQuestions.json";
 
-  const [updateMetadataQuestionIds] = useMutation(queries.UPDATE_METADATA_QUESTION_IDS, {
-    onError: (error) => {
-        console.log(JSON.stringify(error, null, 2));
-    }
-  });
+  const [updateMetadataQuestionIds] = useMutation(queries.UPDATE_METADATA_QUESTION_IDS);
 
-  const [addMoneyFromQuestions] = useMutation(queries.ADD_MONEY_FROM_QUESTIONS, {
-    onError: (error) => {
-        console.log(JSON.stringify(error, null, 2));
-    }
-  });
+  const [addMoneyFromQuestions] = useMutation(queries.ADD_MONEY_FROM_QUESTIONS);
 
 
   // here is where i get the questions from the gist link jesal made

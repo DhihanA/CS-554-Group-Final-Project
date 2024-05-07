@@ -12,11 +12,7 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
 
-  const [addBudgetedTransaction] = useMutation(queries.ADD_BUDGETED_TRANSACTION, {
-    onError: (error) => {
-        console.log(JSON.stringify(error, null, 2));
-    }
-  });
+  const [addBudgetedTransaction] = useMutation(queries.ADD_BUDGETED_TRANSACTION);
 
   useEffect(() => {
     document.getElementById("my_modal_1").showModal();
@@ -66,7 +62,7 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
           },
         });
         document.getElementById("my_modal_1").close();
-        alert('Successful budgeted transaction');
+        // alert('Successful budgeted transaction');
         toggleModal();
         resetForm();
       } catch (e) {

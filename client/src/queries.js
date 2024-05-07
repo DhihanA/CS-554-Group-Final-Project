@@ -4,13 +4,9 @@ import { gql } from "@apollo/client";
 const GET_ALL_TRANSACTIONS = gql`
   query GetAllTransactions(
     $userId: String!
-    $checkingAccountId: String!
-    $savingsAccountId: String!
   ) {
     getAllTransactions(
       userId: $userId
-      checkingAccountId: $checkingAccountId
-      savingsAccountId: $savingsAccountId
     ) {
       _id
       amount
