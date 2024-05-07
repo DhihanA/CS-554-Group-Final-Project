@@ -2,8 +2,16 @@ import { gql } from "@apollo/client";
 
 //#region GET ALL QUERIES
 const GET_ALL_TRANSACTIONS = gql`
-  query GetAllTransactions($userId: String!, $accountType: String!) {
-    getAllTransactions(userId: $userId, accountType: $accountType) {
+  query GetAllTransactions(
+    $userId: String!
+    $checkingAccountId: String!
+    $savingsAccountId: String!
+  ) {
+    getAllTransactions(
+      userId: $userId
+      checkingAccountId: $checkingAccountId
+      savingsAccountId: $savingsAccountId
+    ) {
       _id
       amount
       dateOfTransaction
@@ -87,13 +95,29 @@ const SAVINGS_ACCOUNT_INFO_BY_USER_ID = gql`
 //#endregion
 
 //#region ADD MUTATIONS
-// const CREATE_USER_IN_DB = gql`
-//   mutation createUserInLocalDB($clerkUserId: String!) {
-//     createUser(clerkUserId: $clerkUserId) {
-//       _id
-//     }
-//   }
-// `;
+const VERIFY_CHILD_MUTATION = gql`
+  mutation verifyChild($userId: String!, $verificationCode: String!) {
+    verifyChild(userId: $userId, verificationCode: $verificationCode) {
+      id
+    }
+  }
+`;
+
+const ADD_ROLE_AND_DOB_MUTATION = gql`
+  mutation addRoleAndDOB($userId: String!, $dob: Date!, $role: Role!) {
+    addRoleAndDOB(userId: $userId, dob: $dob, role: $role)
+  }
+`;
+
+const CREATE_ACCOUNTS_MUTATION = gql`
+  mutation createAccountsAndUpdateUserInClerk($userId: String!) {
+    createAccountsAndUpdateUserInClerk(userId: $userId) {
+      firstName
+      lastName
+    }
+  }
+`;
+
 //#endregion
 
 //#region EDIT MUTATIONS
@@ -134,8 +158,17 @@ const CREATE_OR_UPDATE_USER_IN_DB = gql`
 //#endregion
 
 const GENERATE_PDF_MUTATION = gql`
-  mutation Mutation($transactions: String!) {
-    downloadTransactions(transactions: $transactions)
+  mutation Mutation($transactions: String!, $userId: String!) {
+    downloadTransactions(transactions: $transactions, userId: $userId)
+  }
+`;
+
+const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
+  mutation Mutation($transactionsArray: String!, $userId: String!) {
+    downloadTransactionsOfAllChildren(
+      transactionsArray: $transactionsArray
+      userId: $userId
+    )
   }
 `;
 
@@ -150,8 +183,11 @@ let exported = {
   SAVINGS_ACCOUNT_INFO_BY_USER_ID,
 
   GENERATE_PDF_MUTATION,
+  GENERATE_PDF_OF_ALL_CHILDREN_MUTATION,
 
-  // GET_USER_INFO_BY_ID,
+  VERIFY_CHILD_MUTATION,
+  ADD_ROLE_AND_DOB_MUTATION,
+  CREATE_ACCOUNTS_MUTATION,
 };
 
 export default exported;
