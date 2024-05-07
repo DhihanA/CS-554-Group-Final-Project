@@ -6,7 +6,7 @@ import {v4 as uuid} from 'uuid'
 
 const TransferMoneyModal = ({ toggleModal, accountType }) => {
   const { user } = useUser();
-  console.log("user here: ", user.id);
+  console.log("user here: ", user);
 
   /* useState hooks */
   // const [transactionName, setTransactionName] = useState("");
@@ -30,15 +30,25 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
   // console.log('here are all the children: ', childrenData);
 
   const [transferMoney] = useMutation(queries.ADD_TRANSFER_TRANSACTION, {
-    update(cache, {data: {transferMoney}}) {
+    update(cache, {data: {addTransferTransaction}}) {
       // !! CHANGE THIS SHIT FROM ARTISTS TO WHAT APOLLO RETURNS WHEN GETALLTRANSACTIONS WORKS
-      const {artists} = cache.readQuery({
-        query: queries.GET_ALL_TRANSACTIONS
+      const {getAllTransactions} = cache.readQuery({
+        query: queries.GET_ALL_TRANSACTIONS,
+        variables: {
+          userId: user.id,
+          checkingAccountId: user.publicMetadata.checkingAccountId,
+          savingsAccountId: user.publicMetadata.savingsAccountId
+        }
       });
     //   console.log('like what');
       cache.writeQuery({
         query: queries.GET_ALL_TRANSACTIONS,
-        data: {artists: [...artists, transferMoney]}
+        variables: {
+          userId: user.id,
+          checkingAccountId: user.publicMetadata.checkingAccountId,
+          savingsAccountId: user.publicMetadata.savingsAccountId
+        },
+        data: {getAllTransactions: [...getAllTransactions, addTransferTransaction]}
       });
     },
     onError: (error) => {
@@ -150,13 +160,11 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
         transferMoney({
           variables: {
             // transactionName: trimmedTransactionName,
-            _id: new uuid(),
-            senderId: user.id,
-            receiverId: trimmedSelectedChildId,
-            amount: parseInt(trimmedAmount),
+            // _id: new uuid(),
+            senderOwnerId: user.id,
+            receiverOwnerId: trimmedSelectedChildId,
+            amount: parseFloat(trimmedAmount),
             description: trimmedDescription,
-            date: new Date(),
-            type: "Transfer"
           },
         });
         document.getElementById("my_modal_2").close();
