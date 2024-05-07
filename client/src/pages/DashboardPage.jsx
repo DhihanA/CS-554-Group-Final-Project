@@ -8,11 +8,8 @@ import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import queries from "../queries";
 
 const DashboardPage = ({ isParent }) => {
-  // const [checkingAccInfo, setCheckingAccInfo] = useState(undefined);
-  // const [savingsAccInfo, setSavingsAccInfo] = useState(undefined);
-
   const { user } = useUser();
-  console.log("user here: ", user.id);
+  // console.log("user here: ", user.id);
 
   // https://medium.com/@khorvath3327/implementing-a-hashing-algorithm-in-node-js-9bbe56caab28
   // func to create a 4 digut num based on ther checking/savings acc id
@@ -29,29 +26,6 @@ const DashboardPage = ({ isParent }) => {
     return code.toString().padStart(4, "0");
   };
 
-  //TODO: UNCOMMENT user.id AFTER GET_ALL_TRANSACTIONS FULLY WORKS
-  // const queryMultiple = () => {
-  //   const res1 = useQuery(queries.CHECKING_ACCOUNT_INFO_BY_USER_ID, {
-  //     variables: {
-  //       userId: user.id
-  //       // accountType: "checking",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   const res2 = useQuery(queries.SAVINGS_ACCOUNT_INFO_BY_USER_ID, {
-  //     variables: {
-  //       userId: user.id
-  //       // accountType: "savings",
-  //     },
-  //     fetchPolicy: "cache-and-network",
-  //   });
-  //   return [res1, res2];
-  // };
-  // const [
-  //   { loading: loadingChecking, data: checkingData, error: checkingError },
-  //   { loading: loadingSavings, data: savingsData, error: savingsError },
-  // ] = queryMultiple();
-
   // * successful single query of checking acc info by user ID
   const {
     loading: checkingLoading,
@@ -60,9 +34,9 @@ const DashboardPage = ({ isParent }) => {
   } = useQuery(queries.CHECKING_ACCOUNT_INFO_BY_USER_ID, {
     variables: {
       userId: user.id,
-      // accountType: "checking",
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    pollInterval: 5000,
   });
 
   // * successful single query of savings acc info by user ID
@@ -73,10 +47,24 @@ const DashboardPage = ({ isParent }) => {
   } = useQuery(queries.SAVINGS_ACCOUNT_INFO_BY_USER_ID, {
     variables: {
       userId: user.id,
-      // accountType: "savings",
     },
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    pollInterval: 5000,
   });
+
+  const {
+    loading: getChildrenLoading,
+    error: getChildrenError,
+    data: getChildrenData,
+  } = useQuery(queries.GET_CHILDREN_BY_PARENT_ID, {
+    variables: {
+      parentUserId: user.id,
+    },
+    fetchPolicy: "network-only",
+    pollInterval: 5000
+  });
+
+  console.log(getChildrenData);
 
   const hour = new Date().getHours();
   let greeting;
@@ -104,16 +92,16 @@ const DashboardPage = ({ isParent }) => {
   if (!isParent && checkingData && savingsData) {
     const { getCheckingAccountInfo } = checkingData;
     // setCheckingAccInfo(getCheckingAccountInfo);
-    console.log(getCheckingAccountInfo);
+    // console.log(getCheckingAccountInfo);
 
     const { getSavingsAccountInfo } = savingsData;
-    console.log(getSavingsAccountInfo);
+    // console.log(getSavingsAccountInfo);
 
     const checkingAccNum = createAccNum(getCheckingAccountInfo._id);
-    console.log("checking acc ID code: ", checkingAccNum);
+    // console.log("checking acc ID code: ", checkingAccNum);
 
     const savingsAccNum = createAccNum(getSavingsAccountInfo._id);
-    console.log("checking acc ID code: ", savingsAccNum);
+    // console.log("checking acc ID code: ", savingsAccNum);
 
     return (
       <BasePage>
@@ -166,6 +154,10 @@ const DashboardPage = ({ isParent }) => {
             {" "}
             {greeting}
             <h1 className="text-2xl font-bold m-4">PARENT DASHBOARD WIP!!!</h1>
+            <h2>
+              Your Verification code is {user.publicMetadata.verificationCode}.
+              Give this to your children when they sign up.
+            </h2>
           </div>
         </div>
       </BasePage>

@@ -21,7 +21,6 @@ export const accountResolvers = {
             extensions: { code: "NOT_FOUND" },
           });
         }
-        console.log("Account found, caching and returning.");
         return account;
       } catch (error) {
         console.error("Error fetching checking account info:", error);
@@ -40,7 +39,7 @@ export const accountResolvers = {
       try {
         const accountCollection = await savingsAccountCollection();
         const account = await accountCollection.findOne({
-          ownerId: userId
+          ownerId: userId,
         });
 
         if (!account) {

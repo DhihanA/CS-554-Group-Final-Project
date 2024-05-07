@@ -1,42 +1,136 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-// import queries from "../../queries";
+import queries from "../queries";
+import { useUser } from "@clerk/clerk-react";
+import {v4 as uuid} from 'uuid'
 
 const TransferMoneyModal = ({ toggleModal, accountType }) => {
+  const { user } = useUser();
+  // console.log("user here: ", user);
+  console.log("user here: ", user.id);
+  console.log("user here: ", user.publicMetadata.checkingAccountId);
+  console.log("user here: ", user.publicMetadata.savingsAccountId);
+
   /* useState hooks */
   // const [transactionName, setTransactionName] = useState("");
   const [amount, setAmount] = useState(1);
   const [description, setDescription] = useState("");
+  const [selectedChildId, setSelectedChildId] = useState(""); // selected child from the dropdown
   const [error, setError] = useState("");
+
+  const [children, setChildren] = useState(undefined); // all the users that are children
+
 
   const [dropdownOpen, setDropdownOpen] = useState(false); // track if dropdown is open or closed
   let option1 = 'Other User';
   let option2 = 'Savings';
   const [selectedOption, setSelectedOption] = useState(option2); // track the user's selected option, defaulted to option2 (savings)
 
-  // !! query to display all the users in the dropdown
-  // const {loading, error, data} = useQuery(queries.GET_ALL_USERS, {
-  //   fetchPolicy: 'cache-and-network'
-  // });
+  // !! query to get all the children in the dropdown
+  let {loading: childrenLoading, error: childrenError, data: childrenData} = useQuery(queries.GET_ALL_CHILDREN, {
+    fetchPolicy: 'cache-and-network'
+  });
+  // console.log('here are all the children: ', childrenData);
 
-  /* useMutation hooks */
-  //! configure this after mutation is complete
-  // const [transferMoney] = useMutation(queries.ADD_COMPANY, {
-  //   update(cache, { data: { addCompany } }) {
-  //     const newCompany = {
-  //       ...addCompany,
-  //       numOfAlbums: 0,
-  //     };
+  const [transferMoney] = useMutation(queries.ADD_TRANSFER_TRANSACTION, {
+    // update(cache, {data: {addTransferTransaction}}) {
+    //   const {getAllTransactions} = cache.readQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     }
+    //   });
+    // //   console.log('like what');
+    //   cache.writeQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     },
+    //     data: {getAllTransactions: [...getAllTransactions, addTransferTransaction]}
+    //   });
+    // },
+    onError: (error) => {
+        // https://stackoverflow.com/questions/48863441/apollo-client-how-to-simply-debug-a-400-code-error
+        // helped me figure out the error so much better by printing everything about the error
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
 
-  //     const { recordCompanies } = cache.readQuery({
-  //       query: queries.GET_COMPANIES,
-  //     });
-  //     cache.writeQuery({
-  //       query: queries.GET_COMPANIES,
-  //       data: { recordCompanies: [...recordCompanies, newCompany] },
-  //     });
-  //   },
-  // });
+  const [transferCheckingToSavings] = useMutation(queries.ADD_CHECKING_TO_SAVINGS_TRANSACTION, {
+    // update(cache, {data: {addCheckingToSavingTransfer}}) {
+    //   const {getAllTransactions} = cache.readQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     }
+    //   });
+    // //   console.log('like what');
+    //   cache.writeQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     },
+    //     data: {getAllTransactions: [...getAllTransactions, addCheckingToSavingTransfer]}
+    //   });
+    // },
+    onError: (error) => {
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
+
+  const [transferSavingsToChecking] = useMutation(queries.ADD_SAVINGS_TO_CHECKING_TRANSACTION, {
+    // update(cache, {data: {addSavingToCheckingTransfer}}) {
+    //   const {getAllTransactions} = cache.readQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     }
+    //   });
+    // //   console.log('like what');
+    //   cache.writeQuery({
+    //     query: queries.GET_ALL_TRANSACTIONS,
+    //     variables: {
+    //       userId: user.id,
+    //       checkingAccountId: user.publicMetadata.checkingAccountId,
+    //       savingsAccountId: user.publicMetadata.savingsAccountId
+    //     },
+    //     data: {getAllTransactions: [...getAllTransactions, addSavingToCheckingTransfer]}
+    //   });
+    // },
+    onError: (error) => {
+        console.log(JSON.stringify(error, null, 2));
+    }
+  });
+
+
+  useEffect(() => {
+    if (childrenData) {
+      let {getAllChildren} = childrenData;
+      getAllChildren = getAllChildren.filter((child) => child.id !== user.id);
+
+      getAllChildren = getAllChildren.sort((a, b) => {
+        const first = a.lastName.toLowerCase();
+        const second = b.lastName.toLowerCase();
+
+        if (first < second) return -1;
+        if (first > second) return 1;
+        return 0;
+      });
+      setChildren(getAllChildren);
+      // console.log('here are all the APPROVED children: ', getAllChildren);
+  
+    }
+  }, [childrenData, user.id]);
 
   useEffect(() => {
     document.getElementById("my_modal_2").showModal();
@@ -71,10 +165,22 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
     // let trimmedTransactionName = transactionName.trim();
     let trimmedAmount = amount.toString().trim();
     let trimmedDescription = description.trim();
+    let trimmedSelectedChildId = selectedChildId.trim();
+    console.log('AMOUNTTTT: ', trimmedAmount);
+    console.log('DESCRIPTION: ', trimmedDescription);
+    console.log('SELECTED USER: ', trimmedSelectedChildId);
     // if (trimmedTransactionName.length === 0) {
     //   setError("Transaction Name should not be empty");
     //   return;
     // }
+    if (selectedOption === option1 && !trimmedSelectedChildId) {
+      setError("You must select a user");
+      return;
+    }
+    if (selectedOption === option1 && trimmedSelectedChildId.length === 0) {
+      setError("User should not be empty");
+      return;
+    }
     if (trimmedAmount.length === 0) {
       setError("Amount should not be empty");
       return;
@@ -85,20 +191,67 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
     }    
   
     const handleTransferMoney = async () => {
-      try {
-        await transferMoney({
-          variables: {
-            // transactionName: trimmedTransactionName,
-            description: trimmedDescription,
-            amount: parseInt(trimmedAmount)
-          },
-        });
-        document.getElementById("my_modal_2").close();
-        toggleModal();
-        resetForm();
-      } catch (e) {
-        setError(e.message);
+      // inter-user checking to checking
+      if (accountType.toUpperCase() === 'CHECKING ACCOUNT' && selectedOption === option1) {
+        try {
+          await transferMoney({
+            variables: {
+              // transactionName: trimmedTransactionName,
+              // _id: new uuid(),
+              senderOwnerId: user.id,
+              receiverOwnerId: trimmedSelectedChildId,
+              amount: parseFloat(trimmedAmount),
+              description: trimmedDescription,
+            },
+          });
+          document.getElementById("my_modal_2").close();
+          alert('Transfer Successful');
+          toggleModal();
+          resetForm();
+        } catch (e) {
+          setError(e.message);
+        }
       }
+      // checking to savings
+      else if (accountType.toUpperCase() === 'CHECKING ACCOUNT' && selectedOption === option2) {
+        try {
+          await transferCheckingToSavings({
+            variables: {
+              ownerId: user.id,
+              addCheckingToSavingTransferAmount2: parseFloat(trimmedAmount),
+              addCheckingToSavingTransferDescription2: trimmedDescription,
+            },
+          });
+          document.getElementById("my_modal_2").close();
+          alert('Transfer Successful');
+          toggleModal();
+          resetForm();
+        } catch (e) {
+          setError(e.message);
+        }
+
+      }
+      // savings to checking
+      else {
+        try {
+          await transferSavingsToChecking({
+            variables: {
+              addSavingToCheckingTransferOwnerId2: user.id,
+              addSavingToCheckingTransferAmount2: parseFloat(trimmedAmount),
+              addSavingToCheckingTransferDescription2: trimmedDescription,
+            },
+          });
+          document.getElementById("my_modal_2").close();
+          alert('Transfer Successful');
+          toggleModal();
+          resetForm();
+        } catch (e) {
+          setError(e.message);
+        }
+      }
+
+
+
     };
 
     handleTransferMoney();
@@ -134,8 +287,27 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
 
             {selectedOption === option2 && accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
               <p className="pb-1 font-medium text-sm">* The transferred money will go into your Savings Account. *</p>
-            ) : selectedOption === option1 && accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
-              <p className="pb-1 font-medium text-sm">* PUT A TEXTBOX HERE *</p>
+            ) : selectedOption === option1 && accountType.toUpperCase() === 'CHECKING ACCOUNT' && children ? (
+              // console.log('we made it: ', children)
+              // <p className="pb-1 font-medium text-sm">* PUT A TEXTBOX HERE *</p>
+              <div className="mb-4">
+                {console.log('we made it: ', children)}
+                <select
+                  value={selectedChildId}
+                  onChange={(e) => setSelectedChildId(e.target.value)}
+                  className="input input-bordered w-full max-w-xs"
+                >
+                <option value="">Select a user...</option>
+                {children.map((child) => (
+                  <option key={child.id} value={child.id}>
+                    `${child.firstName} ${child.lastName}`
+                  </option>
+                ))}
+              </select>
+            </div>
+
+
+
             ) : <p className="pb-1 font-medium text-sm">* The transferred money will go into your Checking Account. *</p>}
             
             <div className="mb-4">

@@ -9,19 +9,26 @@ import {
 export const userResolvers = {
   Query: {
     getAllChildren: async () => {
-      const allUsers = await clerkClient.users.getUserList();
+      const allUsers = await clerkClient.users.getUserList({ limit: 500 });
       const allChildren = allUsers.data.filter((user) => {
-        if (!(user.publicMetadata && user.publicMetadata.verificationCode))
-          return user;
+        if (user.publicMetadata.role === "child") return user;
       });
       return allChildren;
     },
 
     // test after parentId
-    getChildren: async (_, { parentId }) => {
-      const allUsers = await clerkClient.users.getUserList();
+    // parent will call this query on dashboard with THEIR own id
+    getChildren: async (_, { parentUserId }) => {
+      const parentId_ = parentUserId.toString().trim();
+      const allUsers = await clerkClient.users.getUserList({ limit: 500 });
+      console.log(allUsers.data);
       const children = allUsers.data.filter((user) => {
-        if (user.publicMetadata.parentId === parentId) return user;
+        if (
+          user.publicMetadata &&
+          user.publicMetadata.role === "child" &&
+          user.publicMetadata.parentId === parentId_
+        )
+          return user;
       });
       return children;
     },
@@ -35,32 +42,37 @@ export const userResolvers = {
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      if (role === 'child' && age < 13) {
+      if (role === "child" && age < 13) {
         throw new GraphQLError("child must be at least 13 years old", {
           extensions: { code: "BAD_USER_INPUT" },
         });
-      } else if (role === 'parent' && age < 18) {
+      } else if (role === "parent" && age < 18) {
         throw new GraphQLError("parent must be at least 18 years old", {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
 
-      const publicMetadata = {
-        role: role
-      }
+      const thisUser = await clerkClient.users.getUser(userId);
 
-      if (role === 'parent') {
-        publicMetadata["verificationCode"] = Math.floor(100000 + Math.random() * 900000).toString()
+      const publicMetadata = {
+        ...thisUser.publicMetadata,
+        role: role,
+      };
+
+      if (role === "parent") {
+        publicMetadata["verificationCode"] = Math.floor(
+          100000 + Math.random() * 900000
+        ).toString();
       }
 
       const privateMetadata = {
-        dob: dob
-      }
+        dob: dob,
+      };
 
       try {
         await clerkClient.users.updateUserMetadata(userId, {
           publicMetadata: publicMetadata,
-          privateMetadata: privateMetadata
+          privateMetadata: privateMetadata,
         });
 
         return "role and dob successfully added";
@@ -94,8 +106,6 @@ export const userResolvers = {
             ownerId: thisUser.id.toString(),
             balance: thisUser.publicMetadata.role === "child" ? 500 : 999999999,
           });
-
-          console.log(createdCheckingAccount);
 
           await clerkClient.users.updateUser(userId_, {
             publicMetadata: {
@@ -140,6 +150,8 @@ export const userResolvers = {
               savingsAccountId: createdSavingsAccount.insertedId.toString(),
             },
           });
+          publicMetadataPrev.savingsAccountId =
+            createdSavingsAccount.insertedId.toString();
         } catch (e) {
           throw new GraphQLError(
             "Could not create savings account for this user",
@@ -167,8 +179,9 @@ export const userResolvers = {
         );
       }
 
+      let thisUser;
       try {
-        await clerkClient.users.getUser(userId);
+        thisUser = await clerkClient.users.getUser(userId);
       } catch (e) {
         throw new GraphQLError("Account Not Found", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
@@ -177,7 +190,7 @@ export const userResolvers = {
 
       let allClerkUsers;
       try {
-        allClerkUsers = await clerkClient.users.getUserList();
+        allClerkUsers = await clerkClient.users.getUserList({ limit: 500 });
       } catch (e) {
         throw new GraphQLError("Could not get all users", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
@@ -197,9 +210,7 @@ export const userResolvers = {
         }
       }
 
-      console.log("parent", parent);
-
-      if (!parent) {
+      if (parent === undefined) {
         throw new GraphQLError("Incorrect Verification Code", {
           extensions: { code: "BAD_USER_INPUT" },
         });
@@ -207,11 +218,14 @@ export const userResolvers = {
 
       try {
         const publicMetadata = {
+          ...thisUser.publicMetadata,
           verified: true,
           parentId: parent.id,
           completedQuestionIds: [],
         };
-        await updateUser(userId, {}, publicMetadata);
+        await clerkClient.users.updateUserMetadata(userId, {
+          publicMetadata: publicMetadata,
+        });
       } catch (e) {
         throw new GraphQLError("Could not verify user", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
@@ -219,7 +233,6 @@ export const userResolvers = {
       }
 
       let updatedChild = await clerkClient.users.getUser(userId);
-      console.log("updatedChild", updatedChild);
       return updatedChild;
     },
   },

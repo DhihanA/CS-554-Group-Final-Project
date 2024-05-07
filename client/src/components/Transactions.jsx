@@ -5,11 +5,8 @@ import queries from "../queries";
 
 const Transactions = () => {
   const { user } = useUser();
-  const [usersByAccountId, setUsersByAccountId] = useState({});
 
-  const avatarUrl = user.imageUrl;
-
-  //TODO: UNCOMMENT user.id AFTER GET_ALL_TRANSACTIONS FULLY WORKS
+  // get all transactions data for this user
   const {
     loading: loading,
     data: data,
@@ -17,18 +14,19 @@ const Transactions = () => {
   } = useQuery(queries.GET_ALL_TRANSACTIONS, {
     variables: {
       userId: user.id,
-      accountType: "checking",
+      checkingAccountId: user.publicMetadata.checkingAccountId,
+      savingsAccountId: user.publicMetadata.savingsAccountId,
     },
     fetchPolicy: "cache-and-network",
   });
-  const [generatePDF, { data: pdfData, loading: pdfLoading, error: pdfError }] =
-    useMutation(queries.GENERATE_PDF_MUTATION);
+  const [generatePDF] = useMutation(queries.GENERATE_PDF_MUTATION);
 
   const handleDownload = async () => {
     try {
       const pdfData = await generatePDF({
         variables: {
           transactions: JSON.stringify(data.getAllTransactions),
+          userId: user.id,
         },
       });
 
@@ -46,22 +44,14 @@ const Transactions = () => {
   };
 
   if (!user || loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-infinity loading-lg"></span>
+      </div>
+    );
   }
 
   if (error) return <div>{error.message}</div>;
-  // if (checkingError) return <div>{checkingError.message}</div>;
-  // if (savingsError) return <div>{savingsError.message}</div>;
-
-  // console.log(checkingData);
-  // console.log(savingsData);
-  console.log(data);
-
-  let checkingTransactions = [];
-  let savingsTransactions = [];
-  if (data.getAllTransactions.length !== 0) {
-    // populate above two variables
-  }
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -89,7 +79,7 @@ const Transactions = () => {
                 >
                   <div className="avatar">
                     <div className="w-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                      <img src={avatarUrl} />
+                      <img src={user.imageUrl} />
                     </div>
                   </div>
                   <p className="flex-grow font-semibold">{`${transaction.sender.owner.firstName} ${transaction.sender.owner.lastName}`}</p>

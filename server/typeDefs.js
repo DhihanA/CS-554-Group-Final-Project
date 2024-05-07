@@ -64,7 +64,7 @@ export const typeDefs = `#graphql
     getAccountByAccountId(accountId: String!): AccountType
 
     # Transaction Queries
-    getAllTransactions(userId: String! , checkingAccountId: String!, savingsAccountId: String!): [Transactions]
+    getAllTransactions(userId: String!, checkingAccountId: String!, savingsAccountId: String!): [Transactions]
   }
 
   type Mutation {
@@ -78,11 +78,12 @@ export const typeDefs = `#graphql
 
     # Transaction Mutations
     addBudgetedTransaction(ownerId: String!, amount: Float!, description: String!): Transactions
-    addTransferTransaction(senderId: String!, receiverId: String!, amount: Float!, description: String!): Transactions
+    addTransferTransaction(senderOwnerId: String!, receiverOwnerId: String!, amount: Float!, description: String!): Transactions
     addCheckingToSavingTransfer(ownerId: String!, amount: Float!, description: String!): Transactions
     addSavingToCheckingTransfer(ownerId: String!, amount: Float!, description: String!): Transactions
     editBudgetedTransaction(userId: String!, transactionId: String!, newAmount: Float, newDescription: String): Transactions
     deleteBudgetedTransaction(ownerId: String!, transactionId: String!): DeleteTransactionResponse
-    downloadTransactions(transactions: String!): String
+    downloadTransactions(transactions: String!, userId: String!): String
+    downloadTransactionsOfAllChildren(transactionsArray: String!, userId: String!): String
   }
 `;
