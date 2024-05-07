@@ -47,28 +47,32 @@ function App() {
       </SignedOut>
 
       <SignedIn>
-        <ParentRoutes user={user} isSignedIn={isSignedIn}/>
-        <ChildRoutes user={user} isSignedIn={isSignedIn}/>
-        <NoRoleRoutes user={user} isSignedIn={isSignedIn}/>
+        <ParentRoutes user={user} isSignedIn={isSignedIn} />
+        <ChildRoutes user={user} isSignedIn={isSignedIn} />
+        <NoRoleRoutes user={user} isSignedIn={isSignedIn} />
       </SignedIn>
     </>
   );
 }
 
-const ParentRoutes = ({isSignedIn, user}) => {
+const ParentRoutes = ({ isSignedIn, user }) => {
   if (isSignedIn && user && user.publicMetadata.verificationCode) {
     return (
       <Routes>
         <Route path="/dashboard" element={<DashboardPage isParent={true} />} />
         <Route path="/howto" element={<HowTo />} />
         <Route path="*" element={<Navigate replace to="/dashboard" />} />
+        <Route
+          path="/transactions/:id"
+          element={<DashboardPage isParent={true} />} // change this to child transactions of current parent
+        />
       </Routes>
     );
   }
-  return null; 
+  return null;
 };
 
-const ChildRoutes = ({isSignedIn, user}) => {
+const ChildRoutes = ({ isSignedIn, user }) => {
   if (isSignedIn && user && user.publicMetadata.parentId) {
     return (
       <Routes>
@@ -80,10 +84,10 @@ const ChildRoutes = ({isSignedIn, user}) => {
       </Routes>
     );
   }
-  return null; 
+  return null;
 };
 
-const NoRoleRoutes = ({isSignedIn, user}) => {
+const NoRoleRoutes = ({ isSignedIn, user }) => {
   if (isSignedIn && !user.publicMetadata.role) {
     return (
       <Routes>
@@ -92,7 +96,7 @@ const NoRoleRoutes = ({isSignedIn, user}) => {
       </Routes>
     );
   }
-  return null; 
+  return null;
 };
 
 export default App;
