@@ -27,6 +27,49 @@ export const userResolvers = {
     },
   },
   Mutation: {
+    addRoleAndDOB: async (_, { userId, dob, role }) => {
+      const today = new Date();
+      const birthDate = new Date(dob);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      if (role === 'child' && age < 13) {
+        throw new GraphQLError("child must be at least 13 years old", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      } else if (role === 'parent' && age < 18) {
+        throw new GraphQLError("parent must be at least 18 years old", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+
+      const publicMetadata = {
+        role: role
+      }
+
+      if (role === 'parent') {
+        publicMetadata["verificationCode"] = Math.floor(100000 + Math.random() * 900000).toString()
+      }
+
+      const privateMetadata = {
+        dob: dob
+      }
+
+      try {
+        await clerkClient.users.updateUserMetadata(userId, {
+          publicMetadata: publicMetadata,
+          privateMetadata: privateMetadata
+        });
+
+        return "role and dob successfully added";
+      } catch (e) {
+        throw new GraphQLError(e.message, {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+    },
     createAccountsAndUpdateUserInClerk: async (_, { userId }) => {
       const userId_ = userId.toString().trim();
 
@@ -143,7 +186,7 @@ export const userResolvers = {
 
       let parent;
       for (const user of allClerkUsers.data) {
-        const metadata = user.privateMetadata;
+        const metadata = user.publicMetadata;
         if (
           metadata &&
           metadata.verificationCode &&

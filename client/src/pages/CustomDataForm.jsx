@@ -1,7 +1,9 @@
 import piggybank from '../assets/piggyBankIconColored.png';
 import {useUser} from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createRoutesFromChildren, useNavigate } from 'react-router-dom';
+import {gql, useMutation} from '@apollo/client';
+import { format } from 'date-fns';
 
 const CustomDataForm = () => {
 
@@ -14,6 +16,55 @@ const CustomDataForm = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const navigate = useNavigate();
 
+  // define mutation here
+  const parentMutation = gql`
+    mutation Mutation($userId: String!, $dob: Date!, $role: Role!) {
+      addRoleAndDOB(userId: $userId, dob: $dob, role: $role)
+      createAccountsAndUpdateUserInClerk(userId: $userId) {
+        firstName
+        lastName
+      }
+    }
+  `;
+
+  const childMutation = gql`
+    mutation Mutation($userId: String!, $dob: Date!, $role: Role!, $verificationCode: String!) {
+      verifyChild(userId: $userId, verificationCode: $verificationCode) {
+        id
+      }
+      addRoleAndDOB(userId: $userId, dob: $dob, role: $role)
+      createAccountsAndUpdateUserInClerk(userId: $userId) {
+        firstName
+        lastName
+      }
+    }
+  `;
+
+  // retrieve mutation function
+  const [updateChildUser] = useMutation(childMutation);
+  const [updateParentUser] = useMutation(parentMutation);
+
+
+  const submitCustomData = async () => {
+    // changing the date format to MM/DD/YYYY
+    const date = new Date(dateOfBirth);
+    const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+    const formattedDateOfBirth = format(new Date(adjustedDate), 'MM/dd/yyyy');
+    
+    try {
+      let response;
+      if (role === 'child') {
+        response = await updateChildUser({variables: { userId: user.id, verificationCode: verificationCode, dob: formattedDateOfBirth, role: role }});
+      } else {
+        response = await updateParentUser({variables: { userId: user.id, dob: formattedDateOfBirth, role: role }});
+      }
+      console.log(response);
+    } catch(e) {
+      console.log(e);
+      setError(e.message);
+    }
+  }
+
   const handleRoleChange = (event) => {
     setRole(event.target.value);
     validateForm(event.target.value, dateOfBirth, verificationCode);
@@ -24,25 +75,6 @@ const CustomDataForm = () => {
     validateForm(role, event.target.value, verificationCode);
   };
 
-  const submitCustomData = (role, dateOfBirth, verificationCode) => {
-    // try {
-    //   await user.update({
-    //     publicMetadata: {
-    //       role: customData.role,
-    //     },
-    //     privateMetadata: {
-    //       dob: customData.dob,
-    //     },
-    //   });
-    //   navigate('/dashboard');
-    // } catch (error) {
-    //   console.error("Failed to update metadata:", error);
-    //   setError(error.message);
-    // }
-
-    // call mutation here
-
-  }
 
   const handleCodeChange = (event) => {
     setVerificationCode(event.target.value);
