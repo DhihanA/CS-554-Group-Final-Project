@@ -5,6 +5,7 @@ import { createRoutesFromChildren, useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import { format } from "date-fns";
 import queries from "../queries.js";
+import { UserButton } from '@clerk/clerk-react';
 
 const CustomDataForm = () => {
   const { isSignedIn, isLoaded, user } = useUser();
@@ -132,7 +133,9 @@ const CustomDataForm = () => {
       age--;
     }
 
-    if (selectedRole === "child" && age < 13) {
+    if (age > 100) {
+      setError("You must be less than a 100 years old.")
+    } if (selectedRole === "child" && age < 13) {
       setError("A child must be at least 13 years old.");
       setIsButtonActive(false);
     } else if (selectedRole === "parent" && age < 18) {
@@ -147,56 +150,62 @@ const CustomDataForm = () => {
   };
 
   return (
-    <form className="flex flex-col items-center justify-center min-h-screen p-4" onSubmit={submitCustomData}>
-      <img src={piggybank} className="object-cover h-48 w-50" />
-      <h2 className="my-8">Please fill in the following information:</h2>
-      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-        Are you a Parent or Child?
-      </label>
-      <select
-        className="select select-bordered w-full max-w-xs"
-        value={role}
-        onChange={handleRoleChange}
-      >
-        <option value="">select</option>
-        <option value="child">Child</option>
-        <option value="parent">Parent</option>
-      </select>
+    <div className="relative p-4">
+      <div className="absolute top-10 right-10">
+        <UserButton />
+      </div>
+      <form className="flex flex-col items-center justify-center min-h-screen p-4" onSubmit={submitCustomData}>
+        <img src={piggybank} className="object-cover h-48 w-50" />
+        <h2 className="my-8">Please fill in the following information:</h2>
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+          Are you a Parent or Child?
+        </label>
+        <select
+          className="select select-bordered w-full max-w-xs"
+          value={role}
+          onChange={handleRoleChange}
+        >
+          <option value="">select</option>
+          <option value="child">Child</option>
+          <option value="parent">Parent</option>
+        </select>
 
-      <label className="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-        Date of Birth:
-      </label>
-      <input
-        type="date"
-        className="input input-bordered w-full max-w-xs"
-        value={dateOfBirth}
-        onChange={handleDateChange}
-      />
+        <label className="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+          Date of Birth:
+        </label>
+        <input
+          type="date"
+          className="input input-bordered w-full max-w-xs"
+          value={dateOfBirth}
+          onChange={handleDateChange}
+        />
 
-      {role === "child" && (
-        <>
-          <label className="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-            Verification Code:
-          </label>
-          <input
-            type="text"
-            className="input input-bordered w-full max-w-xs"
-            value={verificationCode}
-            onChange={handleCodeChange}
-          />
-        </>
-      )}
+        {role === "child" && (
+          <>
+            <label className="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              Verification Code:
+            </label>
+            <input
+              type="text"
+              className="input input-bordered w-full max-w-xs"
+              value={verificationCode}
+              onChange={handleCodeChange}
+            />
+          </>
+        )}
 
-      {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
+        {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
 
-      <button
-        type='submit'
-        className={`btn mt-4 ${isButtonActive ? "" : "btn-disabled"}`}
-        disabled={!isButtonActive}
-      >
-        Continue
-      </button>
-    </form>
+        <button
+          type='submit'
+          className={`btn mt-4 ${isButtonActive ? "" : "btn-disabled"}`}
+          disabled={!isButtonActive}
+        >
+          Continue
+        </button>
+      </form>
+    </div>
+    
   );
 };
 
