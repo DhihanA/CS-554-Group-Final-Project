@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddBudgetedTransactionModal from "./AddBudgetedTransactionModal";
 import TransferMoneyModal from "./TransferMoneyModal";
+import { useMutation } from '@apollo/client';
+import queries from '../queries.js';
 
 const AccountCard = ({
   accountType,
@@ -8,6 +10,7 @@ const AccountCard = ({
   balance,
   deposits,
   withdrawals,
+  accountId
 }) => {
   const formattedBalance = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -38,12 +41,33 @@ const AccountCard = ({
     setIsTMModalOpen(!isTMModalOpen);
   };
 
+  const [updateSavings] = useMutation(queries.UPDATE_SAVINGS_BALANCE);
+  const [difference, setDifference] = useState(0);
+
+  useEffect(() => {
+    const updateSavingsAccount = async () => {
+      try {
+        const response = await updateSavings({variables: {accountId: accountId}});
+        const {currentBalance, previousBalance} = response.data.updateSavingsBalanceForLogin;
+        // console.log("currentBalance: ", currentBalance);
+        // console.log("previousBalance: ", previousBalance);
+        setDifference((currentBalance-previousBalance).toFixed(2));
+      } catch(e) {
+        console.log(e);
+      }
+    }
+    if (accountType==="savings account") {
+      updateSavingsAccount();
+    }
+  }, []);
+
   return (
     <div className="card card-side bg-base-300 shadow-xl m-4">
       <div className="card-body flex-col justify-center">
         <h2 className="card-title justify-center text-center">
           {accountType.toUpperCase()} ({accountNumber})
         </h2>
+        {accountType === "savings account" && difference > 0 && <p className="justify-center text-center">Your balance went up ${difference} from interest!</p>}
         <p className="text-3xl font-bold text-center">{formattedBalance}</p>
         {/* <p className="text-base-content text-opacity-40 text-center"> */}
         {/* {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (

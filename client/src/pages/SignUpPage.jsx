@@ -10,7 +10,6 @@ import {
 } from "@clerk/clerk-react";
 
 
-import CustomDataForm from './CustomDataForm.jsx';
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -32,7 +31,7 @@ const SignUpClerk = () => {
             <Navigate to={'/'} />
             </SignedIn>
             <SignedOut>
-                <SignUp signInUrl='/login' afterSignUpUrl="/fillinfo"/>
+                <SignUp signInUrl='/login' fallbackRedirectUrl="/fillinfo"/>
             </SignedOut>
         </div>
     );

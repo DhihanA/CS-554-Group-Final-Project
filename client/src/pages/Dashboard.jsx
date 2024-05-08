@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BasePage from "./BasePage";
 import Card from "../components/CardComponent";
 import Transactions from "../components/Transactions";
