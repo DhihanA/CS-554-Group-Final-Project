@@ -122,6 +122,7 @@ const DashboardPage = ({ isParent }) => {
               accountType="savings account"
               accountNumber={`...${savingsAccNum}`}
               balance={getSavingsAccountInfo.currentBalance}
+              accountId={getSavingsAccountInfo._id}
             />
           </div>
         </div>
