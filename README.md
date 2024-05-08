@@ -118,7 +118,7 @@ You will need 2 separate windows open for this.
         5. Earn money for answering financial literacy correctly in Learn n' Earn.
     #### Note: If you're ever lost, navigate to How To Start!
 
-    ## Notes
+## Notes
 - We made the password for all seeded accounts **Test123$567***
 
 
