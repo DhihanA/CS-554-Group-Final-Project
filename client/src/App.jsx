@@ -14,7 +14,6 @@ import ClerkEventHandlers from "./components/ClerkEventHandlers";
 import HeroPage from "./pages/HeroPage";
 import DashboardPage from "./pages/DashboardPage";
 import TransactionsPage from "./pages/TransactionsPage";
-// import SettingsPage from "./pages/SettingsPage";
 import LearnPage from "./pages/LearnPage";
 import SignUpClerk from "./pages/SignUpPage";
 import LoginClerk from "./pages/LoginPage";
@@ -64,7 +63,7 @@ const ParentRoutes = ({ isSignedIn, user }) => {
         <Route path="*" element={<Navigate replace to="/dashboard" />} />
         <Route
           path="/transactions/:id"
-          element={<DashboardPage isParent={true} />} // change this to child transactions of current parent
+          element={<TransactionsPage isParent={true} />} // change this to child transactions of current parent
         />
       </Routes>
     );
@@ -77,7 +76,10 @@ const ChildRoutes = ({ isSignedIn, user }) => {
     return (
       <Routes>
         <Route path="/dashboard" element={<DashboardPage isParent={false} />} />
-        <Route path="/transactions" element={<TransactionsPage />} />
+        <Route
+          path="/transactions"
+          element={<TransactionsPage isParent={false} />}
+        />
         <Route path="/learn" element={<LearnPage />} />
         <Route path="/howto" element={<HowTo />} />
         <Route path="*" element={<Navigate replace to="/dashboard" />} />

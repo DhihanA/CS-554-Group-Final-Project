@@ -434,16 +434,16 @@ const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
   }
 `;
 
-const UPDATE_SAVINGS_BALANCE =  gql`
-mutation Mutation($accountId: String!) {
-  updateSavingsBalanceForLogin(accountId: $accountId) {
-    _id
-    currentBalance
-    lastDateUpdated
-    previousBalance
-    interestRate
+const UPDATE_SAVINGS_BALANCE = gql`
+  mutation Mutation($accountId: String!) {
+    updateSavingsBalanceForLogin(accountId: $accountId) {
+      _id
+      currentBalance
+      lastDateUpdated
+      previousBalance
+      interestRate
+    }
   }
-}
 `;
 
 let exported = {
