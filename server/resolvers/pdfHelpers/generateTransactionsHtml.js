@@ -1,12 +1,9 @@
 export const generateTransactionsHtml = (transactions, userName) => {
-  const rows = transactions
+  let rows = transactions
     .map(
       (t) => `
     <tr>
       <td>${t.sender.owner.firstName} ${t.sender.owner.lastName}</td>
-      <td><img src=${
-        t.sender.owner.imageUrl
-      } alt="Avatar" class="circle-img"></td>
       <td>${new Date(t.dateOfTransaction).toLocaleDateString("en-US")}</td>
       <td>${new Date(t.dateOfTransaction).toLocaleTimeString("en-US", {
         hour: "2-digit",
@@ -21,6 +18,8 @@ export const generateTransactionsHtml = (transactions, userName) => {
     )
     .join("");
 
+  // console.log(rows);
+
   return `
     <html>
     <head>
@@ -31,8 +30,6 @@ export const generateTransactionsHtml = (transactions, userName) => {
         table { width: 100%; border-collapse: collapse; background: #0f3460; border-radius: 8px; }
         th, td { padding: 12px 15px; text-align: left; color: #e0e1dd; border-bottom: 1px solid #4ecca3; }
         th { background-color: #1a1a2e; }
-        .circle-img { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; }
-        .circle-img img { width: 100%; height: 100%; object-fit: cover; }
         tr:last-child td { border-bottom: none; }
 
       </style>
@@ -43,7 +40,6 @@ export const generateTransactionsHtml = (transactions, userName) => {
         <thead>
           <tr>
             <th>Sender</th>
-            <th></th>
             <th>Date</th>
             <th>Time</th>
             <th>Description</th>

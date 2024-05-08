@@ -37,7 +37,7 @@ const DashboardPage = ({ isParent }) => {
       userId: user.id,
     },
     fetchPolicy: "network-only",
-    pollInterval: 5000,
+    pollInterval: 1500,
   });
 
   // * successful single query of savings acc info by user ID
@@ -50,7 +50,7 @@ const DashboardPage = ({ isParent }) => {
       userId: user.id,
     },
     fetchPolicy: "network-only",
-    pollInterval: 5000,
+    pollInterval: 1500,
   });
 
   const {
@@ -62,7 +62,7 @@ const DashboardPage = ({ isParent }) => {
       parentUserId: user.id,
     },
     fetchPolicy: "network-only",
-    pollInterval: 5000,
+    pollInterval: 1500,
   });
 
   console.log(getChildrenData);

@@ -64,7 +64,7 @@ const TransferMoneyToChildModal = ({ toggleModal, childUserId, firstName }) => {
             senderOwnerId: user.id,
             receiverOwnerId: childUserId,
             amount: parseFloat(trimmedAmount),
-            description: "Transfer From Parent",
+            description: "Parent Transfer",
           },
         });
         document.getElementById("my_modal_2").close();

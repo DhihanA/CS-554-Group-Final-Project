@@ -16,7 +16,6 @@ export const userResolvers = {
       return allChildren;
     },
 
-    // test after parentId
     // parent will call this query on dashboard with THEIR own id
     getChildren: async (_, { parentUserId }) => {
       const parentId_ = parentUserId.toString().trim();

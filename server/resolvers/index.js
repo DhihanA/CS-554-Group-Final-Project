@@ -32,7 +32,7 @@ export const resolvers = {
       return user;
     },
   },
-  
+
   Transactions: {
     sender: async (ParentValue) => {
       const accountId = ParentValue.senderId;
@@ -57,7 +57,7 @@ export const resolvers = {
       if (!account)
         throw new GraphQLError("Account with that _id does not exist", {
           extensions: { code: "NOT_FOUND" },
-      });
+        });
 
       return account;
     },
