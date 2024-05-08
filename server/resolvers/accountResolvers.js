@@ -124,7 +124,6 @@ export const accountResolvers = {
       let theAccount = await checkingAccounts.findOne({
         ownerId: userId.trim(),
       });
-      console.log("theAccount user:", theAccount.ownerId);
 
       if (!theAccount) {
         throw new GraphQLError("Account Not Found!");
