@@ -434,6 +434,18 @@ const GENERATE_PDF_OF_ALL_CHILDREN_MUTATION = gql`
   }
 `;
 
+const UPDATE_SAVINGS_BALANCE = gql`
+  mutation Mutation($accountId: String!) {
+    updateSavingsBalanceForLogin(accountId: $accountId) {
+      _id
+      currentBalance
+      lastDateUpdated
+      previousBalance
+      interestRate
+    }
+  }
+`;
+
 let exported = {
   // ADD ALL QUERIES/MUTATIONS BELOW:
   CREATE_OR_UPDATE_USER_IN_DB,
@@ -460,9 +472,9 @@ let exported = {
   VERIFY_CHILD_MUTATION,
   ADD_ROLE_AND_DOB_MUTATION,
   CREATE_ACCOUNTS_MUTATION,
-
   EDIT_BUDGETED_TRANSACTION,
-  DELETE_BUDGETED_TRANSACTION
+  DELETE_BUDGETED_TRANSACTION,
+  UPDATE_SAVINGS_BALANCE,
 };
 
 export default exported;

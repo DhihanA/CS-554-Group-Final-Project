@@ -43,7 +43,7 @@ export const generateTransactionsHtml = (transactions, userName) => {
         <thead>
           <tr>
             <th>Sender</th>
-            <th>Avatar</th>
+            <th></th>
             <th>Date</th>
             <th>Time</th>
             <th>Description</th>

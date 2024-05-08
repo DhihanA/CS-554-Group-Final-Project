@@ -8,7 +8,7 @@ const LoginClerk = () => {
         <Navigate to={"/dashboard"} />
       </SignedIn>
       <SignedOut>
-        <SignIn afterSignInUrl="/dashboard" signUpUrl="/signup" />
+        <SignIn fallbackRedirectUrl="/dashboard" signUpUrl="/signup" />
       </SignedOut>
     </div>
   );
