@@ -111,6 +111,15 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
       setError("Amount should not be empty");
       return;
     }
+    const regex = /^(?:\d+(?:\.\d*)?|\.\d+)$/;
+    if (!regex.test(trimmedAmount)) {
+      setError("Amount is not a valid number");
+      return;
+    }
+    if (trimmedAmount.includes('.') && trimmedAmount.split('.')[1].length > 2) {
+      setError("Amount cannot exceed 2 decimal places");
+      return;
+    }
     if (trimmedDescription.length === 0) {
       setError("Description should not be empty");
       return;
@@ -126,7 +135,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
               // _id: new uuid(),
               senderOwnerId: user.id,
               receiverOwnerId: trimmedSelectedChildId,
-              amount: parseFloat(trimmedAmount),
+              amount: parseFloat(trimmedAmount).toFixed(2),
               description: trimmedDescription,
             },
           });
@@ -145,7 +154,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
           await transferCheckingToSavings({
             variables: {
               ownerId: user.id,
-              addCheckingToSavingTransferAmount2: parseFloat(trimmedAmount),
+              addCheckingToSavingTransferAmount2: parseFloat(trimmedAmount).toFixed(2),
               addCheckingToSavingTransferDescription2: trimmedDescription,
             },
           });
@@ -165,7 +174,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
           await transferSavingsToChecking({
             variables: {
               addSavingToCheckingTransferOwnerId2: user.id,
-              addSavingToCheckingTransferAmount2: parseFloat(trimmedAmount),
+              addSavingToCheckingTransferAmount2: parseFloat(trimmedAmount).toFixed(2),
               addSavingToCheckingTransferDescription2: trimmedDescription,
             },
           });
@@ -203,7 +212,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
             </div> */}
             {accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
               <div className="dropdown">
-              <div tabIndex={0} className="btn m-1">Click</div>
+              <div tabIndex={0} className="btn m-1">Send To</div>
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                   <li><a onClick={() => handleOptionSelect(option2)}>{option2}</a></li>
                   <li><a onClick={() => handleOptionSelect(option1)}>{option1}</a></li>
@@ -214,10 +223,10 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
               undefined)}
 
             {selectedOption === option2 && accountType.toUpperCase() === 'CHECKING ACCOUNT' ? (
-              <p className="pb-1 font-medium text-sm">The transferred money will go into your Savings Account.</p>
+              <p className="pb-2 pl-2 font-medium text-sm">The transferred money will go into your Savings Account.</p>
             ) : selectedOption === option1 && accountType.toUpperCase() === 'CHECKING ACCOUNT' && children ? (
               // console.log('we made it: ', children)
-              // <p className="pb-1 font-medium text-sm">* PUT A TEXTBOX HERE *</p>
+              // <p className="pb-2 pl-2 font-medium text-sm">* PUT A TEXTBOX HERE *</p>
               <div className="mb-4">
                 {console.log('we made it: ', children)}
                 <select
@@ -236,7 +245,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
 
 
 
-            ) : <p className="pb-1 font-medium text-sm">The transferred money will go into your Checking Account.</p>}
+            ) : <p className="pb-2 pl-2 font-medium text-sm">The transferred money will go into your Checking Account.</p>}
             
             <div className="mb-4">
               <input

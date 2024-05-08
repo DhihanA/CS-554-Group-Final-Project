@@ -28,7 +28,7 @@ const HeroPage = () => {
               How To Start*
             </button> */}
             <Link to={"/howto"} className="btn btn-app-secondary">
-              *How To Start*
+              How To Start
             </Link>
           </div>
           
@@ -39,7 +39,7 @@ const HeroPage = () => {
             </div>
             <div className="p-6 rounded-lg bg-app-accent">
               <h2 className="text-xl font-semibold mb-4">Secure Transactions</h2>
-              <p className="text-base">Transfer money between accounts or to your children securely.</p>
+              <p className="text-base">Transfer money between accounts or to other users securely.</p>
             </div>
             <div className="p-6 rounded-lg bg-app-primary">
               <h2 className="text-xl font-semibold mb-4">Financial Insights</h2>
