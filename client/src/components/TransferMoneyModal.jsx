@@ -108,7 +108,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
       return;
     }
     if (trimmedAmount.length === 0) {
-      setError("Amount should not be empty");
+      setError("Amount should not be empty or contain invalid characters");
       return;
     }
     const regex = /^(?:\d+(?:\.\d*)?|\.\d+)$/;
@@ -135,7 +135,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
               // _id: new uuid(),
               senderOwnerId: user.id,
               receiverOwnerId: trimmedSelectedChildId,
-              amount: parseFloat(trimmedAmount).toFixed(2),
+              amount: parseFloat(parseFloat(trimmedAmount).toFixed(2)),
               description: trimmedDescription,
             },
           });
@@ -154,7 +154,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
           await transferCheckingToSavings({
             variables: {
               ownerId: user.id,
-              addCheckingToSavingTransferAmount2: parseFloat(trimmedAmount).toFixed(2),
+              addCheckingToSavingTransferAmount2: parseFloat(parseFloat(trimmedAmount).toFixed(2)),
               addCheckingToSavingTransferDescription2: trimmedDescription,
             },
           });
@@ -174,7 +174,7 @@ const TransferMoneyModal = ({ toggleModal, accountType }) => {
           await transferSavingsToChecking({
             variables: {
               addSavingToCheckingTransferOwnerId2: user.id,
-              addSavingToCheckingTransferAmount2: parseFloat(trimmedAmount).toFixed(2),
+              addSavingToCheckingTransferAmount2: parseFloat(parseFloat(trimmedAmount).toFixed(2)),
               addSavingToCheckingTransferDescription2: trimmedDescription,
             },
           });

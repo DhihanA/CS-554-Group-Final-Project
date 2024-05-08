@@ -117,7 +117,7 @@ const Transactions = () => {
         variables: {
           userId: user.id,
           transactionId: editTransaction._id,
-          newAmount: parseFloat(editTransaction.amount).toFixed(2),
+          newAmount: parseFloat(parseFloat(editTransaction.amount).toFixed(2)),
           newDescription: editTransaction.description,
         },
       });

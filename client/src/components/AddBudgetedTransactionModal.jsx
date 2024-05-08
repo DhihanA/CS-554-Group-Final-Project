@@ -44,7 +44,7 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
     //   return;
     // }
     if (trimmedAmount.length === 0) {
-      setError("Amount should not be empty");
+      setError("Amount should not be empty or contain invalid characters");
       return;
     }
     const regex = /^(?:\d+(?:\.\d*)?|\.\d+)$/;
@@ -66,7 +66,7 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
         await addBudgetedTransaction({
           variables: {
             addBudgetedTransactionOwnerId2: user.id,
-            addBudgetedTransactionAmount2: parseFloat(trimmedAmount).toFixed(2),
+            addBudgetedTransactionAmount2: parseFloat(parseFloat(trimmedAmount).toFixed(2)),
             addBudgetedTransactionDescription2: trimmedDescription
           },
         });
