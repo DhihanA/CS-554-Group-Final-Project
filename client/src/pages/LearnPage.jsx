@@ -175,13 +175,13 @@ const LearnPage = () => {
                 undefined}
             </p>
             <p className="text-center">
-              Please wait 24 hours before your next set of questions.
+              Please wait until the next day for your next set of questions.
             </p>
           </div> : 
            user.publicMetadata.lastDateSubmitted && (new Date() - new Date(user.publicMetadata.lastDateSubmitted)) < (24 * 60 * 60 * 1000) ?
             <div>
             <p className="text-center">
-              Please wait 24 hours before your next set of questions.
+              Please wait until the next day for your next set of questions.
             </p>
             </div> :
             

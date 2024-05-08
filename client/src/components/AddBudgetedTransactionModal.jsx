@@ -44,7 +44,16 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
     //   return;
     // }
     if (trimmedAmount.length === 0) {
-      setError("Amount should not be empty");
+      setError("Amount should not be empty or contain invalid characters");
+      return;
+    }
+    const regex = /^(?:\d+(?:\.\d*)?|\.\d+)$/;
+    if (!regex.test(trimmedAmount)) {
+      setError("Amount is not a valid number");
+      return;
+    }
+    if (trimmedAmount.includes('.') && trimmedAmount.split('.')[1].length > 2) {
+      setError("Amount cannot exceed 2 decimal places");
       return;
     }
     if (trimmedDescription.length === 0) {
@@ -57,7 +66,7 @@ const AddBudgetedTransactionModal = ({ toggleModal }) => {
         await addBudgetedTransaction({
           variables: {
             addBudgetedTransactionOwnerId2: user.id,
-            addBudgetedTransactionAmount2: parseFloat(trimmedAmount),
+            addBudgetedTransactionAmount2: parseFloat(parseFloat(trimmedAmount).toFixed(2)),
             addBudgetedTransactionDescription2: trimmedDescription
           },
         });
