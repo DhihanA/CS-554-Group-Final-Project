@@ -86,6 +86,5 @@ export const typeDefs = `#graphql
     editBudgetedTransaction(userId: String!, transactionId: String!, newAmount: Float, newDescription: String): Transactions
     deleteBudgetedTransaction(ownerId: String!, transactionId: String!): DeleteTransactionResponse
     downloadTransactions(transactions: String!, userId: String!): String
-    downloadTransactionsOfAllChildren(transactionsArray: String!, userId: String!): String
   }
 `;

@@ -12,7 +12,8 @@ const ChildCard = ({ id, firstName, lastName, imageUrl }) => {
       variables: {
         userId: id,
       },
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "network-only",
+      pollInterval: 1500,
     }
   );
 

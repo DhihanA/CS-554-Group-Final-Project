@@ -442,33 +442,5 @@ export const transactionResolvers = {
         });
       }
     },
-
-    //! jesal: test
-    downloadTransactionsOfAllChildren: async (
-      _,
-      { transactionsArray, userId }
-    ) => {
-      const userId_ = userId.toString().trim();
-      let thisUser;
-      try {
-        thisUser = await clerkClient.users.getUser(userId_);
-        const userName = `${thisUser.firstName} ${thisUser.lastName}`;
-
-        let transactionsJson = JSON.parse(transactionsArray);
-        let allHtml = ``;
-        for (const transaction of transactionsJson) {
-          const htmlContent = generateTransactionsHtml(transaction, userName);
-          allHtml.concat(htmlContent);
-        }
-
-        const pdfBase64 = await htmlToPdf(allHtml);
-        return pdfBase64;
-      } catch (e) {
-        console.log("Error downloading transactions PDF:", e);
-        throw new GraphQLError("Failed to generate PDF", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
-        });
-      }
-    },
   },
 };

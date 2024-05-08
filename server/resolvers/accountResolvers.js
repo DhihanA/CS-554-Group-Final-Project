@@ -115,7 +115,6 @@ export const accountResolvers = {
           }
         );
       } catch (error) {
-        // console.error("Error updating savings balance:", error);
         throw new GraphQLError("Internal Server Error");
       }
     },
