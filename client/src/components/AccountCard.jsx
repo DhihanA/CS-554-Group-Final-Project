@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AddBudgetedTransactionModal from "./AddBudgetedTransactionModal";
 import TransferMoneyModal from "./TransferMoneyModal";
-import { useMutation } from '@apollo/client';
-import queries from '../queries.js';
+import { useMutation } from "@apollo/client";
+import queries from "../queries.js";
 
 const AccountCard = ({
   accountType,
@@ -10,7 +10,7 @@ const AccountCard = ({
   balance,
   deposits,
   withdrawals,
-  accountId
+  accountId,
 }) => {
   const formattedBalance = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -47,16 +47,19 @@ const AccountCard = ({
   useEffect(() => {
     const updateSavingsAccount = async () => {
       try {
-        const response = await updateSavings({variables: {accountId: accountId}});
-        const {currentBalance, previousBalance} = response.data.updateSavingsBalanceForLogin;
+        const response = await updateSavings({
+          variables: { accountId: accountId },
+        });
+        const { currentBalance, previousBalance } =
+          response.data.updateSavingsBalanceForLogin;
         // console.log("currentBalance: ", currentBalance);
         // console.log("previousBalance: ", previousBalance);
-        setDifference((currentBalance-previousBalance).toFixed(2));
-      } catch(e) {
+        setDifference((currentBalance - previousBalance).toFixed(2));
+      } catch (e) {
         console.log(e);
       }
-    }
-    if (accountType==="savings account") {
+    };
+    if (accountType === "savings account") {
       updateSavingsAccount();
     }
   }, []);
@@ -67,7 +70,11 @@ const AccountCard = ({
         <h2 className="card-title justify-center text-center">
           {accountType.toUpperCase()} ({accountNumber})
         </h2>
-        {accountType === "savings account" && difference > 0 && <p className="justify-center text-center">Your balance went up ${difference} from interest!</p>}
+        {accountType === "savings account" && difference > 0 && (
+          <p className="justify-center text-center">
+            Your balance went up ${difference} from transfers and interest
+          </p>
+        )}
         <p className="text-3xl font-bold text-center">{formattedBalance}</p>
         {/* <p className="text-base-content text-opacity-40 text-center"> */}
         {/* {accountType.toUpperCase() === "CHECKING ACCOUNT" ? (
@@ -87,7 +94,9 @@ const AccountCard = ({
       {/* This is to create a vertical divider */}
       <div className="flex flex-col justify-center p-4">
         <div className="card-actions flex-col items-center">
-          <button className="btn btn-primary mb-2" onClick={toggleTMModal}>Transfer money</button>
+          <button className="btn btn-primary mb-2" onClick={toggleTMModal}>
+            Transfer money
+          </button>
           {accountType.toUpperCase() === "CHECKING ACCOUNT" && (
             <button className="btn btn-secondary mb-2" onClick={toggleBTModal}>
               Create budgeted transaction
@@ -130,9 +139,11 @@ const AccountCard = ({
       {isBTModalOpen && (
         <AddBudgetedTransactionModal toggleModal={toggleBTModal} />
       )}
-
       {isTMModalOpen && (
-        <TransferMoneyModal toggleModal={toggleTMModal} accountType={accountType} />
+        <TransferMoneyModal
+          toggleModal={toggleTMModal}
+          accountType={accountType}
+        />
       )}
     </div>
   );
