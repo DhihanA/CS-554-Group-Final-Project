@@ -3,6 +3,7 @@ import BasePage from "./BasePage";
 import Card from "../components/CardComponent";
 import Transactions from "../components/Transactions";
 import AccountCard from "../components/AccountCard";
+import ChildCard from "../components/ChildCard";
 import { useUser } from "@clerk/clerk-react";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import queries from "../queries";
@@ -61,7 +62,7 @@ const DashboardPage = ({ isParent }) => {
       parentUserId: user.id,
     },
     fetchPolicy: "network-only",
-    pollInterval: 5000
+    pollInterval: 5000,
   });
 
   console.log(getChildrenData);
@@ -71,21 +72,17 @@ const DashboardPage = ({ isParent }) => {
 
   if (hour < 12) {
     greeting = (
-      <h1 className="text-2xl font-bold m-4">
-        Good morning, {user.firstName} {isParent && <> (PARENT)</>}
-      </h1>
+      <h1 className="text-2xl font-bold m-4">Good morning, {user.firstName}</h1>
     );
   } else if (hour < 18) {
     greeting = (
       <h1 className="text-2xl font-bold m-4">
-        Good afternoon, {user.firstName} {isParent && <> (PARENT)</>}
+        Good afternoon, {user.firstName}
       </h1>
     );
   } else {
     greeting = (
-      <h1 className="text-2xl font-bold m-4">
-        Good evening, {user.firstName} {isParent && <> (PARENT)</>}
-      </h1>
+      <h1 className="text-2xl font-bold m-4">Good evening, {user.firstName}</h1>
     );
   }
 
@@ -145,7 +142,7 @@ const DashboardPage = ({ isParent }) => {
         </div>
       </BasePage>
     );
-  } else if (isParent) {
+  } else if (isParent && getChildrenData) {
     return (
       <BasePage>
         <div className="flex justify-center">
@@ -153,11 +150,28 @@ const DashboardPage = ({ isParent }) => {
           <div className="p-6 min-h-screen max-w-4xl w-full">
             {" "}
             {greeting}
-            <h1 className="text-2xl font-bold m-4">PARENT DASHBOARD WIP!!!</h1>
-            <h2>
-              Your Verification code is {user.publicMetadata.verificationCode}.
+            <p className="pl-4">
+              Your verification code is:{" "}
+              <span className="font-bold">
+                {user.publicMetadata.verificationCode}
+              </span>
+            </p>
+            <p className="pl-4">
               Give this to your children when they sign up.
-            </h2>
+            </p>
+            <h1 className="text-xl font-bold m-4">Your Children:</h1>
+            {getChildrenData.getChildren.map((child) => {
+              return (
+                <div key={child.id}>
+                  <ChildCard
+                    id={child.id}
+                    firstName={child.firstName}
+                    lastName={child.lastName}
+                    imageUrl={child.imageUrl}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </BasePage>

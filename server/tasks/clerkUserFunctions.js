@@ -1,23 +1,18 @@
 import clerkClient from "../clients/clerkClient.js";
 
+//! all passwords are hardcoded to Test123$567*
 const SEED_USERNAMES = [
-  // child1, child2 associated with parent1
+  // child1, child2, child3 associated with parent1
   "parent1",
   "child1",
   "child2",
-
-  // child3 associated with parent2
-  "parent2",
   "child3",
 
-  // child4, child5, child6 associated with parent3
-  "parent3",
+  // child4 associated with parent2
+  "parent2",
   "child4",
-  "child5",
-  "child6",
 ];
 
-//! all passwords are hardcoded to Test123$567*
 const createUser = async (
   firstName,
   lastName,

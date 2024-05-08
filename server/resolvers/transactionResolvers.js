@@ -40,9 +40,14 @@ export const transactionResolvers = {
         );
         return list.map((str) => JSON.parse(str));
       } else {
-        const thisUser = await clerkClient.users.getUser(userId);
-        const checkingAccountId = thisUser.publicMetadata.checkingAccountId;
-        const savingsAccountId = thisUser.publicMetadata.savingsAccountId;
+        const checkingCollection = await checkingAccountCollection();
+        const savingsCollection = await checkingAccountCollection();
+        const checkingAccount = await checkingCollection.findOne({
+          ownerId: userId.toString().trim(),
+        });
+        const savingsAccount = await savingsCollection.findOne({
+          ownerId: userId.toString().trim(),
+        });
 
         const transactions = await transactionsCollection();
         const foundTransactions = await transactions
@@ -50,14 +55,14 @@ export const transactionResolvers = {
             $or: [
               {
                 $or: [
-                  { senderId: new ObjectId(savingsAccountId) },
-                  { senderId: new ObjectId(checkingAccountId) },
+                  { senderId: savingsAccount._id },
+                  { senderId: checkingAccount._id },
                 ],
               },
               {
                 $or: [
-                  { receiverId: new ObjectId(savingsAccountId) },
-                  { receiverId: new ObjectId(checkingAccountId) },
+                  { receiverId: savingsAccount._id },
+                  { receiverId: checkingAccount._id },
                 ],
               },
             ],
